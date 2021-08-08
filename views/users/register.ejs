@@ -1,0 +1,48 @@
+<% layout('layouts/boilerplate.ejs') %>
+
+
+
+<main>
+    <div class="form">
+        <h1>Register</h1>
+        <form action="/register" method="POST" id="registerForm">
+            <div class="form-field">
+                <label for="username">Username</label>
+                <input  type="text" id="username" name="username" required autofocus>
+            </div>
+            <div class="form-field">
+                <label  for="email">Email</label>
+                <input  type="email" id="email" name="email" required>
+            </div>
+            <div class="form-field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            <div class="toggle-password">
+                <a href="#" id="togglePassword">View/Hide Password</a>
+            </div>
+            <div>
+                <button class="btn-submit">Register</button>
+            </div>
+            <div>
+                <div id="length" class='password-requirements'>
+                    Your password must be between 8 and 32 characters.
+                </div>
+                <div id="numbers" class='password-requirements'>
+                    Your password must contain at least one number.
+                </div>
+                <div id="symbols" class='password-requirements'>
+                    Your password must contain at least one symbol (!, @, #, %, &).
+                </div>
+                <div id="uppercase" class='password-requirements'>
+                    Your password must contain at least one upper case letter.
+                </div>
+                <div id="lowercase" class='password-requirements'>
+                    Your password must contain at least one lower case letter.
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+
+<script type="module" src="/js/registerPassword.js"></script>
