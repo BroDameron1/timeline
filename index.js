@@ -28,7 +28,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 //require helmet
 const helmet = require('helmet');
 const User = require('./models/user');
-const dbUrl = 'mongodb://localhost:27017/timeline';
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/timeline';
 
 //process.env.DB_URL || 
 
@@ -74,7 +74,7 @@ const store = MongoDBStore.create({
     mongoUrl: dbUrl,
     touchAfter: 24 * 60 * 60,
     crypto: {
-        secret: process.env.SESSION_SECRET
+        secret: secret
     }
 });
 
@@ -85,7 +85,7 @@ store.on('error', function(err) {
 const sessionConfig = {
     store: store,
     name: 'HistoriaSession',
-    secret: process.env.SESSION_SECRET,
+    secret: secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
