@@ -28,7 +28,12 @@ const mongoSanitize = require('express-mongo-sanitize');
 //require helmet
 const helmet = require('helmet');
 const User = require('./models/user');
-const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/timeline';
+const dbUrl = 'mongodb://localhost:27017/timeline';
+
+//process.env.DB_URL || 
+
+//require and execute connect-mongo for session storage
+const MongoDBStore = require('connect-mongo');
 
 //connect to mongodb
 mongoose.connect(dbUrl, {
@@ -63,8 +68,22 @@ app.use(methodOverride('_method'))
 //execute mongo-sanitize
 app.use(mongoSanitize());
 
+const secret = process.env.SECRET || 'supersecretsession'
+
+const store = MongoDBStore.create({
+    mongoUrl: dbUrl,
+    touchAfter: 24 * 60 * 60,
+    crypto: {
+        secret: process.env.SESSION_SECRET
+    }
+});
+
+store.on('error', function(err) {
+    console.log('Session store error', err)
+})
 
 const sessionConfig = {
+    store: store,
     name: 'HistoriaSession',
     secret: process.env.SESSION_SECRET,
     resave: false,
