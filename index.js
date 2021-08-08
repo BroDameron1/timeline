@@ -3,7 +3,6 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-test
 //require and execute express so the app can run
 const express = require('express');
 const app = express();
