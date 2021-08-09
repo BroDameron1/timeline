@@ -127,5 +127,5 @@ module.exports.renderDashboard = (req, res) => {
 module.exports.logout = (req, res) => {
     req.logout();
     req.flash('info', 'You have been logged out.');
-    res.redirect('/register');
+    res.redirect('/login');
 }
