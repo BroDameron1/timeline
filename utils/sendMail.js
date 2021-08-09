@@ -1,11 +1,11 @@
 const nodemailer = require('nodemailer');
 //nodemailer origin
 
-let transporter = nodemailer.createTransport({
-    service: 'Gmail',
+const transporter = nodemailer.createTransport({
+    service: 'SendGrid',
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        'user': 'apikey',
+        'pass': process.env.SENDGRID_API
     }
 });
 
@@ -26,7 +26,6 @@ module.exports.sendVerifyMail = (email, verifyLink) => {
 module.exports.sendResetMail = (email, verifyLink) => {
         
     //nodemailer message
-    console.log(process.env.EMAIL_USER);
     const message = {
         from: process.env.EMAIL_USER,
         to: email,
