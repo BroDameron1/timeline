@@ -34,7 +34,7 @@ module.exports.validateUser = (req, res, next) => {
 module.exports.notLoggedIn = (req, res, next) => {
     if(req.user) {
         req.flash('info', 'You are already logged in.')
-        return res.redirect('register');
+        return res.redirect('/dashboard');
     }
     next();
 }

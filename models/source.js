@@ -15,7 +15,11 @@ const SourceSchema = new Schema({
     state: {
         type: String,
         required: true,
-        enum: ['review', 'active', 'rejected']
+        enum: ['new', 'review', 'active', 'rejected']
+    }, 
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }
 })
 

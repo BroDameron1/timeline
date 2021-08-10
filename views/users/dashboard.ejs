@@ -2,3 +2,9 @@
 
 
 <h1>This is your dashboard <%= currentUser.username %></h1>
+
+<h2>Here are your pending submissions: </h2>
+
+<% for (let userSource of userSources) { %>
+    <div><%= userSource.title %> for <%= userSource.mediaType %> ADD EDIT LINK!</div>  
+<% } %>  

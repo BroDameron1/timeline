@@ -5,6 +5,7 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const sendMail = require('../utils/sendMail');
 const tokenHandling = require('../utils/tokenHandling');
 const ExpressError = require('../utils/expressError');
+const Source = require('../models/source');
 
 module.exports.renderRegister = (req, res) => {
     res.render('users/register')
@@ -120,8 +121,10 @@ module.exports.forgotReset = async (req, res, next) => {
     })
 }
 
-module.exports.renderDashboard = (req, res) => {
-    res.render('users/dashboard')
+module.exports.renderDashboard = async (req, res) => {
+    const userSources = await Source.find({ author: req.user._id });
+    console.log(userSources);
+    res.render('users/dashboard', { userSources })
 }
 
 module.exports.logout = (req, res) => {
