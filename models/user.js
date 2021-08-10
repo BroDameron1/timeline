@@ -15,6 +15,11 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    admin: {
+        type: Boolean,
+        default: false,
+        required: true
+    },
     verificationExpires: {
         type: Date,
         default: () => new Date(+new Date() + 24 * 60 * 60 * 1000)

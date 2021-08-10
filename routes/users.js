@@ -4,7 +4,9 @@ const catchAsync = require('../utils/catchAsync');
 const users = require('../controllers/users');
 const passport = require('passport');
 const { isLoggedIn, validateUser, notLoggedIn } = require('../middleware');
-const tokenHandling = require('../utils/tokenHandling');
+
+//delete this if nothing breaks
+//const tokenHandling = require('../utils/tokenHandling');
 
 
 router.route('/register')

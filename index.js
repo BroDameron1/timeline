@@ -50,9 +50,12 @@ db.once('open', () => {
     console.log('Database connected');
 })
 
-//require the member routes
+//require the user routes
 const userRoutes = require('./routes/users');
-const user = require('./models/user');
+const sourceRoutes = require('./routes/sources');
+
+//delete this if it doesn't break
+//const user = require('./models/user');
 
 //execute EJS and EJS mate
 app.engine('ejs', ejsMate)
@@ -105,7 +108,7 @@ app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
-passport.deserializeUser(user.deserializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
     //makes user information available in every template
@@ -116,8 +119,10 @@ app.use((req, res, next) => {
     next();
 })
 
-//direct requests to the member routes
+//direct requests to the user routes
 app.use('/', userRoutes);
+//direct requests to the source routes
+app.use('/sources', sourceRoutes);
 
 //route for the home page
 app.get('/', (req, res) => {
