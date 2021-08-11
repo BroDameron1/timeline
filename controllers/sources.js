@@ -9,7 +9,7 @@ module.exports.newSource = async (req, res, next) => {
 //TO DO: Handle duplicate errors without leaving the page?
 //TO DO: Update duplicate error to pass custom message
 //TO DO: Duplicate should only trigger on same TITLE and MEDIA TYPE
-        const source = new Source(req.body);
+        const source = new Source.sourceReview(req.body);
         source.state = 'new';
         source.author = req.user._id;
         await source.save((err, doc) => {

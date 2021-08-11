@@ -24,4 +24,6 @@ const SourceSchema = new Schema({
 })
 
 
-module.exports = mongoose.model('Source', SourceSchema);
+
+module.exports.sourceReview = mongoose.model('SourceReview', SourceSchema);
+module.exports.source = mongoose.model('Source', SourceSchema);

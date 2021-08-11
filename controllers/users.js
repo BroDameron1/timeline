@@ -122,7 +122,7 @@ module.exports.forgotReset = async (req, res, next) => {
 }
 
 module.exports.renderDashboard = async (req, res) => {
-    const userSources = await Source.find({ author: req.user._id });
+    const userSources = await Source.sourceReview.find({ author: req.user._id });
     console.log(userSources);
     res.render('users/dashboard', { userSources })
 }

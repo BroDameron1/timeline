@@ -35,6 +35,12 @@ const UserSchema = new Schema({
 
 });
 
+//validates whether the email address already exists in the db
+// UserSchema.path('email').validate(async (email) => {
+//     const emailCount = await User.find({ email: email })
+//     console.log(emailCount);
+// })
+
 //passport-local-mongoose password validation function that returns an error if it doesn't meet the regex
 //works during registration and password reset
 const passwordValidator = (password, cb) => {
