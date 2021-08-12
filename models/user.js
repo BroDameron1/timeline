@@ -15,9 +15,10 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    admin: {
-        type: Boolean,
-        default: false,
+    role: {
+        type: String,
+        default: 'basic',
+        enum: ['basic', 'admin'],
         required: true
     },
     verificationExpires: {

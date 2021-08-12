@@ -9,7 +9,7 @@ const createHmac = async (unhashedToken) => {
                         .digest('hex');
 }
 
-module.exports.createToken = async (user) => {
+const createToken = async (user) => {
     let token = await Token.findOne({ userId: user._id });
     if(!token) {
         const unhashedToken = await crypto.randomBytes(32).toString('hex');
@@ -22,7 +22,7 @@ module.exports.createToken = async (user) => {
     throw new ExpressError('A request has already been made to reset your password. Please contact an admin.', 403)
 }
 
-module.exports.validateToken = async (token, userId) => {
+const validateToken = async (token, userId) => {
     try {
         const tokenData = await Token.findOne({ userId: userId });
         const hashedToken = await createHmac(token);
@@ -36,7 +36,13 @@ module.exports.validateToken = async (token, userId) => {
     }
 }
 
-module.exports.tokenError = (req, res) => {
+const tokenError = (req, res) => {
     req.flash('error', 'This verification code is invalid or expired. Please contact an admin.')
     res.redirect('/register');
+}
+
+module.exports = {
+    createToken,
+    validateToken,
+    tokenError
 }

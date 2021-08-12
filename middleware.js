@@ -2,7 +2,7 @@ const User = require('./models/user');
 const ExpressError = require('./utils/expressError')
 const { userSchema } = require('./schemas');
 
-module.exports.isLoggedIn = async (req, res, next) => {
+const isLoggedIn = async (req, res, next) => {
     //checks to see if a user is already logged in.  If so, get their info from the DB so it can be checked
     //if they are verified.  If there is no user logged in, redirect to login.
     if (!req.user) {
@@ -21,7 +21,7 @@ module.exports.isLoggedIn = async (req, res, next) => {
     next();
 }
 
-module.exports.validateUser = (req, res, next) => {
+const validateUser = (req, res, next) => {
     const { error } = userSchema.validate(req.body);
     if (error) {
         const errorMsg = error.details.map(el => el.message).join(',')
@@ -31,10 +31,16 @@ module.exports.validateUser = (req, res, next) => {
     }
 }
 
-module.exports.notLoggedIn = (req, res, next) => {
+const notLoggedIn = (req, res, next) => {
     if(req.user) {
         req.flash('info', 'You are already logged in.')
         return res.redirect('/dashboard');
     }
     next();
+}
+
+module.exports = {
+    isLoggedIn,
+    validateUser,
+    notLoggedIn
 }

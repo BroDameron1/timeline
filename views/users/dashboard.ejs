@@ -5,6 +5,6 @@
 
 <h2>Here are your pending submissions: </h2>
 
-<% for (let userSource of userSources) { %>
-    <div><%= userSource.title %> for <%= userSource.mediaType %> ADD EDIT LINK!</div>  
+<% for (let pendingRequest of viewablePendingRequests) { %>
+    <div><%= pendingRequest.title %> for <%= pendingRequest.mediaType %> by <%= pendingRequest.author.username %>  ADD EDIT LINK!</div>  
 <% } %>  

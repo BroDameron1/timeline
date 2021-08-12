@@ -6,6 +6,7 @@ const sendMail = require('../utils/sendMail');
 const tokenHandling = require('../utils/tokenHandling');
 const ExpressError = require('../utils/expressError');
 const Source = require('../models/source');
+const { availableSubmissions } = require('../utils/permissions');
 
 module.exports.renderRegister = (req, res) => {
     res.render('users/register')
@@ -122,9 +123,9 @@ module.exports.forgotReset = async (req, res, next) => {
 }
 
 module.exports.renderDashboard = async (req, res) => {
-    const userSources = await Source.sourceReview.find({ author: req.user._id });
-    console.log(userSources);
-    res.render('users/dashboard', { userSources })
+    const allPendingRequests = await Source.sourceReview.find().populate('author')
+    const viewablePendingRequests = filterPendingRequests(req.user, allPendingRequests);
+    res.render('users/dashboard', { viewablePendingRequests })
 }
 
 module.exports.logout = (req, res) => {

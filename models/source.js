@@ -25,5 +25,10 @@ const SourceSchema = new Schema({
 
 
 
-module.exports.sourceReview = mongoose.model('SourceReview', SourceSchema);
-module.exports.source = mongoose.model('Source', SourceSchema);
+const sourceReview = mongoose.model('SourceReview', SourceSchema);
+const sourceFinal = mongoose.model('Source', SourceSchema);
+
+module.exports = {
+    sourceReview,
+    sourceFinal
+}
