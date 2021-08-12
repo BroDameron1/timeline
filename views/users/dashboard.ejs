@@ -6,5 +6,8 @@
 <h2>Here are your pending submissions: </h2>
 
 <% for (let pendingRequest of viewablePendingRequests) { %>
-    <div><%= pendingRequest.title %> for <%= pendingRequest.mediaType %> by <%= pendingRequest.author.username %>  ADD EDIT LINK!</div>  
+    <div><%= pendingRequest.title %> for <%= pendingRequest.mediaType %> by <%= pendingRequest.author.username %>  ADD EDIT LINK!</div>
+    <% if(currentUser.role === 'admin') { %>
+    <div><button>Review</button></div>
+    <% } %> 
 <% } %>  

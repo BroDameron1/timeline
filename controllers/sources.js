@@ -6,9 +6,9 @@ module.exports.renderNewSource = (req, res) => {
 }
 
 module.exports.newSource = async (req, res, next) => {
-//TO DO: Handle duplicate errors without leaving the page?
-//TO DO: Update duplicate error to pass custom message
-//TO DO: Duplicate should only trigger on same TITLE and MEDIA TYPE
+//TODO: Handle duplicate errors without leaving the page?
+//TODO: Update duplicate error to pass custom message
+//TODO: Duplicate should only trigger on same TITLE and MEDIA TYPE
         const source = new Source.sourceReview(req.body);
         source.state = 'new';
         source.author = req.user._id;
@@ -17,4 +17,12 @@ module.exports.newSource = async (req, res, next) => {
             req.flash('info', 'Your new Source has been submitted for approval.')
             res.redirect('/dashboard');
         });
+}
+
+module.exports.renderReviewSource = async (req, res) => {
+//TODO: Handle if no id exists
+//TODO: Only admins should be able to access this
+    const { sourceId } = req.params;
+    const reviewSource = await Source.sourceReview.findOne({ _id: sourceId }).populate('author')
+    res.send(reviewSource)
 }

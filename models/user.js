@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const passportLocalMongoose = require('passport-local-mongoose');
+const ExpressError = require('../utils/expressError');
 
 
 const UserSchema = new Schema({
@@ -35,6 +36,13 @@ const UserSchema = new Schema({
     }
 
 });
+
+//validate email is not a duplicate and pass a custom error
+//TODO: Fix custom error.  Flash message?
+UserSchema.path('email').validate(async (value) => {
+    const emailCount = await mongoose.models.User.countDocuments({ email: value });
+    return !emailCount;
+  }, new ExpressError('emaillllll'));
 
 //passport-local-mongoose password validation function that returns an error if it doesn't meet the regex
 //works during registration and password reset
