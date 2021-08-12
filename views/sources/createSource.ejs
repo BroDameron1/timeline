@@ -11,12 +11,9 @@
         <div class="form-field">
             <label for="media-type">Media Type</label>
             <select name="mediaType" id="mediaType">
-                <option value="">Choose a Media Type</option>
-                <option value="Movie">Movie</option>
-                <option value="TV Show">TV Show</option>
-                <option value="Book">Book</option>
-                <option value="Comic">Comic</option>
-                <option value="Video Game">Video Game</option>
+                <% for(let mediaType of mediaTypes) { %>
+                    <option value="<%= mediaType %>"><%= mediaType %></option>
+                <% } %> 
             </select>
         </div>
         <div>

@@ -8,6 +8,6 @@
 <% for (let pendingRequest of viewablePendingRequests) { %>
     <div><%= pendingRequest.title %> for <%= pendingRequest.mediaType %> by <%= pendingRequest.author.username %>  ADD EDIT LINK!</div>
     <% if(currentUser.role === 'admin') { %>
-    <div><button>Review</button></div>
+    <div><a href="/sources/review/<%= pendingRequest._id %>">Review</a></div>
     <% } %> 
 <% } %>  

@@ -15,7 +15,7 @@ const SourceSchema = new Schema({
     state: {
         type: String,
         required: true,
-        enum: ['new', 'review', 'active', 'rejected']
+        enum: ['new', 'review', 'active', 'approved', 'published', 'rejected']
     }, 
     author: {
         type: Schema.Types.ObjectId,
@@ -26,9 +26,9 @@ const SourceSchema = new Schema({
 
 
 const sourceReview = mongoose.model('SourceReview', SourceSchema);
-const sourceFinal = mongoose.model('Source', SourceSchema);
+const sourcePublished = mongoose.model('SourcePublished', SourceSchema);
 
 module.exports = {
     sourceReview,
-    sourceFinal
+    sourcePublished
 }

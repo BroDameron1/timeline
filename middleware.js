@@ -39,8 +39,22 @@ const notLoggedIn = (req, res, next) => {
     next();
 }
 
+const isAdmin = async (req, res, next) => {
+    const user = await User.findById(req.user._id)
+    if (user.role !== 'admin') {
+        const redirectUrl = req.session.returnTo || '/dashboard';
+        //deletes returnTo from the session object
+        delete req.session.returnTo;
+        //send user back to the URL they came from
+        req.flash('error', 'You do not have the correct permissions')
+        return res.redirect(redirectUrl);
+    }
+    next()
+}
+
 module.exports = {
     isLoggedIn,
     validateUser,
-    notLoggedIn
+    notLoggedIn,
+    isAdmin
 }
