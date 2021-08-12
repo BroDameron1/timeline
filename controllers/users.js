@@ -6,7 +6,7 @@ const sendMail = require('../utils/sendMail');
 const tokenHandling = require('../utils/tokenHandling');
 const ExpressError = require('../utils/expressError');
 const Source = require('../models/source');
-const { availableSubmissions } = require('../utils/permissions');
+const { filterPendingRequests } = require('../utils/permissions');
 
 module.exports.renderRegister = (req, res) => {
     res.render('users/register')
