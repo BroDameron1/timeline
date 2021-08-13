@@ -39,10 +39,11 @@ const UserSchema = new Schema({
 
 //validate email is not a duplicate and pass a custom error
 //TODO: Fix custom error.  Flash message?
-UserSchema.path('email').validate(async (value) => {
-    const emailCount = await mongoose.models.User.countDocuments({ email: value });
-    return !emailCount;
-  }, new ExpressError('emaillllll'));
+//TODO: This breaks user registration, revisist
+// UserSchema.path('email').validate(async (value) => {
+//     const emailCount = await mongoose.models.User.countDocuments({ email: value });
+//     return !emailCount;
+//   }, new ExpressError('emaillllll'));
 
 //passport-local-mongoose password validation function that returns an error if it doesn't meet the regex
 //works during registration and password reset

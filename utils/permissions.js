@@ -1,6 +1,10 @@
 const filterPendingRequests = (user, allPendingRequests) => {
     if(user.role === 'admin') return allPendingRequests
-    return allPendingRequests.filter(pendingRequest => pendingRequest.author.str === user._id.str)
+    console.log(allPendingRequests);
+    console.log(user);
+    const userPendingRequests = allPendingRequests.filter(pendingRequest => pendingRequest.author._id.toString() === user._id.toString());
+    console.log(userPendingRequests);
+    return userPendingRequests;
 }
 
 module.exports = {
