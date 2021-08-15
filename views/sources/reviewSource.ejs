@@ -3,24 +3,19 @@
 <main>
     <div class="form">
         <h1>Review Source for Approval</h1>
-        <form action='/sources/review/<%= reviewSource._id %>' method="POST">
+        <form action='/sources/review/<%= reviewSourceData._id %>' method="POST">
         <div class="form-field">
             <label for="title">Title</label>
-            <input type="text" id="title" name="title" value="<%= reviewSource.title %>" required autofocus>
+            <input type="text" id="title" name="title" value="<%= reviewSourceData.title %>" required autofocus>
         </div>
         <div class="form-field">
             <label for="media-type">Media Type</label>
             <select name="mediaType" id="mediaType">
                 <% for(let mediaType of mediaTypes) { %>
-                    <option value="<%= mediaType %>" <%= reviewSource.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
+                    <option value="<%= mediaType %>" <%= reviewSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
                 <% } %> 
             </select>
         </div>
-        <!-- <div class="form-field">
-            <label for="author">Author</label>
-            <input type="text" id="author" name="author" value="<%= reviewSource.author.username %>" required readonly>
-        </div>
-        <div> -->
             <button class="btn-submit">Approve</button>
         </div>
         </form>

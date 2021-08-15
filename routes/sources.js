@@ -6,10 +6,11 @@ const { isLoggedIn, validateUser, notLoggedIn, isAdmin } = require('../middlewar
 
 
 router.route('/new')
-    .get(isLoggedIn, catchAsync(sources.renderCreateSource))
-    .post(isLoggedIn, catchAsync(sources.createSource))
+    .get(isLoggedIn, catchAsync(sources.renderNewSource))
+    .post(isLoggedIn, catchAsync(sources.newSource))
 
 router.route('/review/:sourceId')
+    //may need to revisist if there is a way to duplicate edit functionality here.
     .get(isLoggedIn, catchAsync(sources.renderReviewSource))
     .post(isLoggedIn, isAdmin, catchAsync(sources.publishSource))
 
