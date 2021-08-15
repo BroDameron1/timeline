@@ -13,5 +13,7 @@ router.route('/review/:sourceId')
     .get(isLoggedIn, catchAsync(sources.renderReviewSource))
     .post(isLoggedIn, isAdmin, catchAsync(sources.publishSource))
 
+router.get('/:sourceId', catchAsync(sources.renderSource))
+
 
 module.exports = router;

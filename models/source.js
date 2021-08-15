@@ -18,7 +18,7 @@ const SourceSchema = new Schema({
         enum: ['new', 'review', 'active', 'approved', 'published', 'rejected']
     }, 
     author: {
-        type: Schema.Types.ObjectId,
+        type: [Schema.Types.ObjectId],
         ref: 'User'
     }
 })

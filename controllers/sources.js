@@ -12,7 +12,7 @@ module.exports.createSource = async (req, res, next) => {
 //TODO: Duplicate should only trigger on same TITLE and MEDIA TYPE
         const source = new Source.sourceReview(req.body);
         source.state = 'new';
-        source.author = req.user._id;
+        source.author.unshift(req.user._id)
         await source.save((err, doc) => {
             if (err) return next(err);
             req.flash('info', 'Your new Source has been submitted for approval.')
@@ -32,14 +32,27 @@ module.exports.renderReviewSource = async (req, res) => {
 
 module.exports.publishSource = async (req, res) => {
     const { sourceId } = req.params;
+//TODO: extract this to a reusable function.
     const publishedSource = new Source.sourcePublished(req.body);
     const reviewedSource = await Source.sourceReview.findOne({ _id: sourceId })
-    publishedSource.author = reviewedSource.author;
+    console.log(reviewedSource, req.user._id)
+    if (reviewedSource.author.toString() === req.user._id.toString()) {
+        req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
+        return res.redirect('/dashboard')
+    }
+    publishedSource.author.unshift(reviewedSource.author)
     publishedSource.state = 'published';
-    await publishedSource.save()
+    await publishedSource.save();
     reviewedSource.state = 'approved';
-    await reviewedSource.save()
-    res.send(req.body)
+    await reviewedSource.save();
+    res.redirect(`/sources/${publishedSource._id}`)
+}
+
+module.exports.renderSource = async (req, res) => {
+    const { sourceId } = req.params;
+    const sourceData = await Source.sourcePublished.findOne({ _id: sourceId }).populate('author', 'username')
+    console.log(sourceData)
+    res.render('sources/source', { sourceData })
 }
 
 //TODO: Revisit later.  We need an edit source for sourceReview and sourceFinal
