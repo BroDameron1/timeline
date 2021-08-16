@@ -3,4 +3,7 @@
 <h1>Source Data</h1>
     <div>Title: <%= publicSourceData.title %></div>
     <div>Type: <%= publicSourceData.mediaType %></div>
-    <div>Most Recent Contributors: <%= publicSourceData.author[0].username %></div>    
+    <div>Most Recent Contributors: <%= publicSourceData.author[0].username %></div>
+<% if (currentUser) { %> 
+    <div><a href="/sources/edit/<%= publicSourceData._id %>">Edit</a></div>
+<% } %> 

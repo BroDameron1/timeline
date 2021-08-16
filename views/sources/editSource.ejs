@@ -1,1 +1,23 @@
 <% layout('layouts/boilerplate.ejs') %>
+
+<main>
+    <div class="form">
+        <h1>Review Source for Approval</h1>
+        <form action='/sources/edit/<%= publicSourceData._id %>' method="POST">
+        <div class="form-field">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="<%= publicSourceData.title %>" required autofocus>
+        </div>
+        <div class="form-field">
+            <label for="media-type">Media Type</label>
+            <select name="mediaType" id="mediaType">
+                <% for(let mediaType of mediaTypes) { %>
+                    <option value="<%= mediaType %>" <%= publicSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
+                <% } %> 
+            </select>
+        </div>
+            <button class="btn-submit">Submit for Approval</button>
+        </div>
+        </form>
+    </div>
+</main>

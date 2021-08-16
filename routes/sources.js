@@ -16,5 +16,9 @@ router.route('/review/:sourceId')
 
 router.get('/:sourceId', catchAsync(sources.renderSource))
 
+router.route('/edit/:sourceId')
+    .get(isLoggedIn, catchAsync(sources.renderEditSource))
+    .post(isLoggedIn, catchAsync(sources.editSource))
+
 
 module.exports = router;

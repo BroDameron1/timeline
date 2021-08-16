@@ -15,13 +15,21 @@ const SourceSchema = new Schema({
     state: {
         type: String,
         required: true,
-        enum: ['new', 'update', 'active', 'approved', 'published', 'rejected']
+        enum: ['new', 'update', 'checked out', 'approved', 'published', 'rejected']
     }, 
     author: {
-        type: [Schema.Types.ObjectId],
+        type: [ Schema.Types.ObjectId ],
         ref: 'User'
     }
-})
+});
+
+SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
+    this.author = previousAuthors;
+    this.author.unshift(newAuthor)
+    // console.log(sourceData)
+    // console.log(this.author)
+    // console.log(this)
+}
 
 
 
