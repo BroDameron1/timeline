@@ -93,6 +93,16 @@ main, .flash-container {
     width: 100%;
 }
 
+.btn-delete {
+    border-radius: 6px;
+    background-color: rgb(196, 63, 63);
+    border: none;
+    font-size: 1em;
+    padding: .5rem;
+    margin-top: 1rem;
+    width: 100%;
+}
+
 input[type=text], input[type=password], input[type=email], select {
     border-radius: 6px;
     border: 1px solid #cdcdcd;

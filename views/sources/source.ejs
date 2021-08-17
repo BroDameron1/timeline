@@ -7,3 +7,10 @@
 <% if (currentUser) { %> 
     <div><a href="/sources/edit/<%= publicSourceData._id %>">Edit</a></div>
 <% } %> 
+<% if (currentUser.role === 'admin') { %>
+    <div>
+        <form action="/sources/<%= publicSourceData._id %>?_method=DELETE" method="POST">
+            <button class="btn-delete">Delete Record</button>
+        </form>
+    </div>
+<% } %> 

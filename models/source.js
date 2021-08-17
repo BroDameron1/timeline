@@ -20,6 +20,9 @@ const SourceSchema = new Schema({
     author: {
         type: [ Schema.Types.ObjectId ],
         ref: 'User'
+    },
+    publicId: {
+        type: String
     }
 });
 

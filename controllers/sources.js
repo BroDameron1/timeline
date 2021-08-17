@@ -69,16 +69,35 @@ module.exports.editSource = async (req, res) => {
     const { sourceId } = req.params;
     const reviewSourceData = new Source.reviewSource(req.body);
     const publicSourceData = await Source.publicSource.findOne({ _id: sourceId })
+    reviewSourceData.updateAuthor(publicSourceData.author, req.user._id)
     reviewSourceData.state = 'update';
-    //TODO: Need to save previous authors.
-    reviewSourceData.updateAuthor(publicSourceData, req.user._id)
-    // reviewSourceData.author = publicSourceData.author
-    // reviewSourceData.author.unshift(req.user._id)
-    console.log(reviewSourceData)
-    // res.send('ok')
+    reviewSourceData.publicId = sourceId;
     publicSourceData.state = 'checked out';
     await reviewSourceData.save();
     await publicSourceData.save();
+    res.redirect('/dashboard')
+}
+
+module.exports.publishEditSource = async (req, res) => {
+    const { sourceId } = req.params
+    const reviewSourceData = await Source.reviewSource.findOne({ _id: sourceId })
+    const publicSourceData = await Source.publicSource.findByIdAndUpdate(reviewSourceData.publicId, { ...req.body })
+    console.log(reviewSourceData)
+    console.log(publicSourceData)
+    publicSourceData.author = reviewSourceData.author
+    reviewSourceData.state = 'approved'
+    reviewSourceData.publicId = ''
+    publicSourceData.state = 'published'
+    await reviewSourceData.save()
+    await publicSourceData.save()
+    res.redirect(`/sources/${publicSourceData._id}`)
+}
+
+module.exports.deletePublicSource = async (req, res) => {
+    //TODO: Add delete confirmation.
+    const { sourceId } = req.params;
+    await Source.publicSource.findByIdAndDelete(sourceId)
+    req.flash('info', 'The record has been successfully deleted.')
     res.redirect('/dashboard')
 }
 
