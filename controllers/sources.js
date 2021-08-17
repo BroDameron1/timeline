@@ -31,6 +31,13 @@ module.exports.renderReviewSource = async (req, res) => {
     res.render('sources/reviewSource', { reviewSourceData, mediaTypes })
 }
 
+module.exports.editReview = async (req, res) => {
+    const reviewSourceData = await Source.reviewSource.findByIdAndUpdate(req.params.sourceId, { ...req.body })
+    await reviewSourceData.save()
+    req.flash('info', 'Your changes have been submitted.')
+    res.redirect('/dashboard')
+}
+
 module.exports.publishSource = async (req, res) => {
     const { sourceId } = req.params;
 //TODO: extract this to a reusable function.
@@ -40,7 +47,7 @@ module.exports.publishSource = async (req, res) => {
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
         return res.redirect('/dashboard')
     }
-    publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])    
+    publicSourceData.author = reviewSourceData.author;
     //publicSourceData.author.unshift(reviewSourceData.author)
     publicSourceData.state = 'published';
     await publicSourceData.save();
@@ -69,7 +76,8 @@ module.exports.editSource = async (req, res) => {
     const { sourceId } = req.params;
     const reviewSourceData = new Source.reviewSource(req.body);
     const publicSourceData = await Source.publicSource.findOne({ _id: sourceId })
-    reviewSourceData.updateAuthor(publicSourceData.author, req.user._id)
+    reviewSourceData.author.unshift(req.user._id)
+    //reviewSourceData.updateAuthor(publicSourceData.author, req.user._id)
     reviewSourceData.state = 'update';
     reviewSourceData.publicId = sourceId;
     publicSourceData.state = 'checked out';
@@ -79,12 +87,12 @@ module.exports.editSource = async (req, res) => {
 }
 
 module.exports.publishEditSource = async (req, res) => {
+    //TODO: Error properly if request has already been approved.
     const { sourceId } = req.params
     const reviewSourceData = await Source.reviewSource.findOne({ _id: sourceId })
     const publicSourceData = await Source.publicSource.findByIdAndUpdate(reviewSourceData.publicId, { ...req.body })
-    console.log(reviewSourceData)
-    console.log(publicSourceData)
-    publicSourceData.author = reviewSourceData.author
+    publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])
+    //publicSourceData.author = reviewSourceData.author
     reviewSourceData.state = 'approved'
     reviewSourceData.publicId = ''
     publicSourceData.state = 'published'
@@ -101,10 +109,10 @@ module.exports.deletePublicSource = async (req, res) => {
     res.redirect('/dashboard')
 }
 
-//TODO: Revisit later.  We need an edit source for sourceReview and sourceFinal
-//Only the author and admin should be able to edit while in sourceReview.
-//may be able to r
-// module.exports.renderEditSource = async (req, res) => {
-//     const { sourceId } = req.params;
-//     const editSource = await Source.source
-// }
+module.exports.deleteReviewSource = async (req, res) => {
+    //TODO: Add Delete confirmation
+    //TODO: Add more backend functionality to confirm user before delete (mongoose middleware?)
+    await Source.reviewSource.findByIdAndDelete(req.params.sourceId);
+    req.flash('info', 'Your pending record has been successfully deleted.')
+    res.redirect('/dashboard')
+}

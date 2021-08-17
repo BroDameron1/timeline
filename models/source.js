@@ -27,11 +27,11 @@ const SourceSchema = new Schema({
 });
 
 SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
-    this.author = previousAuthors;
+    this.author = previousAuthors.filter(previousAuthor => !previousAuthor.equals(newAuthor))
     this.author.unshift(newAuthor)
-    // console.log(sourceData)
-    // console.log(this.author)
-    // console.log(this)
+    if (this.author.length > 5) {
+        this.author.splice(5)
+    }
 }
 
 

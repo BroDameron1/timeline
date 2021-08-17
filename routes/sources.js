@@ -14,6 +14,8 @@ router.route('/review/:sourceId')
     .get(isLoggedIn, catchAsync(sources.renderReviewSource))
     .post(isLoggedIn, isAdmin, catchAsync(sources.publishSource))
     .put(isLoggedIn, isAdmin, catchAsync(sources.publishEditSource))
+    //.put(isLoggedIn, catchAsync(sources.editReview))
+    .delete(isLoggedIn, catchAsync(sources.deleteReviewSource))
 
 router.route('/:sourceId')
     .get(catchAsync(sources.renderSource))
