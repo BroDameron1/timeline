@@ -11,10 +11,10 @@ router.route('/new')
 
 router.route('/review/:sourceId')
     //may need to revisist if there is a way to duplicate edit functionality here.
-    .get(isLoggedIn, catchAsync(sources.renderReviewSource))
+    .get(isLoggedIn, catchAsync(sources.renderUpdateSource))
+    // .get(isLoggedIn, isAdmin, catchAsync(sources.renderReviewSource))
     .post(isLoggedIn, isAdmin, catchAsync(sources.publishSource))
     .put(isLoggedIn, isAdmin, catchAsync(sources.publishEditSource))
-    //.put(isLoggedIn, catchAsync(sources.editReview))
     .delete(isLoggedIn, catchAsync(sources.deleteReviewSource))
 
 router.route('/:sourceId')
@@ -22,7 +22,9 @@ router.route('/:sourceId')
     .delete(isLoggedIn, isAdmin, catchAsync(sources.deletePublicSource))
 
 router.route('/edit/:sourceId')
-    .get(isLoggedIn, catchAsync(sources.renderEditSource))
+    // .get(isLoggedIn, catchAsync(sources.renderEditSource))
+    .get(isLoggedIn, catchAsync(sources.renderUpdateSource))
+    .put(isLoggedIn, catchAsync(sources.changeEditSource))
     .post(isLoggedIn, catchAsync(sources.editSource))
     
 

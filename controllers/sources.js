@@ -31,16 +31,10 @@ module.exports.renderReviewSource = async (req, res) => {
     res.render('sources/reviewSource', { reviewSourceData, mediaTypes })
 }
 
-module.exports.editReview = async (req, res) => {
-    const reviewSourceData = await Source.reviewSource.findByIdAndUpdate(req.params.sourceId, { ...req.body })
-    await reviewSourceData.save()
-    req.flash('info', 'Your changes have been submitted.')
-    res.redirect('/dashboard')
-}
-
 module.exports.publishSource = async (req, res) => {
     const { sourceId } = req.params;
 //TODO: extract this to a reusable function.
+
     const publicSourceData = new Source.publicSource(req.body);
     const reviewSourceData = await Source.reviewSource.findOne({ _id: sourceId })
     if (reviewSourceData.author[0].equals(req.user._id)) {
@@ -48,7 +42,6 @@ module.exports.publishSource = async (req, res) => {
         return res.redirect('/dashboard')
     }
     publicSourceData.author = reviewSourceData.author;
-    //publicSourceData.author.unshift(reviewSourceData.author)
     publicSourceData.state = 'published';
     await publicSourceData.save();
     reviewSourceData.state = 'approved';
@@ -91,6 +84,7 @@ module.exports.publishEditSource = async (req, res) => {
     const { sourceId } = req.params
     const reviewSourceData = await Source.reviewSource.findOne({ _id: sourceId })
     const publicSourceData = await Source.publicSource.findByIdAndUpdate(reviewSourceData.publicId, { ...req.body })
+    console.log(publicSourceData)
     publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])
     //publicSourceData.author = reviewSourceData.author
     reviewSourceData.state = 'approved'
@@ -116,3 +110,29 @@ module.exports.deleteReviewSource = async (req, res) => {
     req.flash('info', 'Your pending record has been successfully deleted.')
     res.redirect('/dashboard')
 }
+
+module.exports.renderUpdateSource = async (req, res) => {
+    //Must be able to review/approve (as admin) (/review route, post or put to public)
+    //Must be able to update existing submission (as owner of submission) (update route, put to review)
+    //Must be able to submit changes to public documents (as anyone) (put to review)
+        const { sourceId } = req.params;
+        const getSourceData = async () => {
+            let sourceData = await Source.publicSource.findOne({ _id: sourceId })
+            if (!sourceData) {
+                sourceData = await Source.reviewSource.findOne({ _id: sourceId})
+            }
+            return sourceData;
+        }
+        const mediaTypes = await Source.publicSource.schema.path('mediaType').enumValues;
+        const sourceData = await getSourceData();
+        console.log(sourceData)
+        res.render('sources/updateSource', { sourceData, mediaTypes })
+    }
+
+module.exports.changeEditSource = async (req, res) => {
+    const { sourceId } = req.params;
+    const reviewSourceData = await Source.reviewSource.findByIdAndUpdate(sourceId, { ...req.body });
+    await reviewSourceData.save()
+    req.flash('info', 'Your updates have been submitted.');
+    res.redirect('/dashboard')
+} 
