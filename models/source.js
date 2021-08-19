@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
+const ExpressError = require('../utils/expressError');
 const Schema = mongoose.Schema;
 
 const SourceSchema = new Schema({
     title: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     mediaType: {
         type: String,
@@ -15,7 +15,7 @@ const SourceSchema = new Schema({
     state: {
         type: String,
         required: true,
-        enum: ['new', 'update', 'checked out', 'approved', 'published', 'rejected']
+        enum: ['new', 'update', 'checked out-r', 'checked out-p', 'approved', 'published', 'rejected']
     }, 
     author: {
         type: [ Schema.Types.ObjectId ],
@@ -35,6 +35,16 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
 }
 
 
+// SourceSchema.pre('save', async function(next) {
+//     const publicSourceData = await mongoose.models.PublicSource.findOne({ title: this.title })
+//     console.log(publicSourceData)
+//     if (!publicSourceData) {
+//         return next();
+//     }
+//     if (publicSourceData.title === this.title && publicSourceData.mediaType === this.mediaType) {
+//         throw new ExpressError('A record for this source already exists', 418)
+//     }
+// })
 
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);
 const publicSource = mongoose.model('PublicSource', SourceSchema);
