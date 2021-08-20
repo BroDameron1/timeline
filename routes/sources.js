@@ -7,7 +7,7 @@ const { isLoggedIn, validateUser, notLoggedIn, isAdmin } = require('../middlewar
 
 router.route('/new')
     .get(isLoggedIn, catchAsync(sources.renderNewSource))
-    .post(isLoggedIn, catchAsync(sources.newSource))
+    .post(isLoggedIn, catchAsync(sources.submitNewSource))
 
 router.route('/review/:sourceId')
     .get(isLoggedIn, isAdmin, catchAsync(sources.renderUpdateSource))

@@ -1,17 +1,20 @@
 const Source = require('../models/source');
 const ExpressError = require('../utils/expressError');
-const { checkState, changeState } = require('../utils/checkState')
 
 module.exports.renderNewSource = async (req, res) => {
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
     res.render('sources/newSource', { mediaTypes });
 }
 
-module.exports.newSource = async (req, res, next) => {
+module.exports.submitNewSource = async (req, res, next) => {
 //TODO: Handle duplicate errors without leaving the page?
-//TODO: Update duplicate error to pass custom message
-//TODO: Duplicate should only trigger on same TITLE and MEDIA TYPE
+//TODO: Return user to this page if duplicate or other validation fails.
     const reviewSourceData = new Source.reviewSource(req.body);
+    const checkDuplicate = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
+    if (!checkDuplicate) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect('/dashboard');
+    }
     reviewSourceData.state = 'new';
     reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
     await reviewSourceData.save((err, doc) => {
@@ -23,17 +26,21 @@ module.exports.newSource = async (req, res, next) => {
 
 module.exports.publishSource = async (req, res) => {
     const { sourceId } = req.params;
-//TODO: extract this to a reusable function.
     const publicSourceData = new Source.publicSource(req.body);
     const reviewSourceData = await Source.reviewSource.findOne({ _id: sourceId })
+    const checkDuplicate = await Source.publicSource.checkDuplicates(publicSourceData.title, publicSourceData.mediaType)
+    if (!checkDuplicate) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect('/dashboard');
+    }
     if (reviewSourceData.author[0].equals(req.user._id)) {
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
         return res.redirect('/dashboard')
     }
-    publicSourceData.author = reviewSourceData.author;
-    publicSourceData.state = 'published';
+    publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author)
+    publicSourceData.state = 'published'
+    reviewSourceData.state = 'approved'
     await publicSourceData.save();
-    reviewSourceData.state = 'approved';
     await reviewSourceData.save();
     res.redirect(`/sources/${publicSourceData._id}`)
 }
@@ -49,12 +56,7 @@ module.exports.renderUpdateSource = async (req, res) => {
             return sourceData;
         }
         const sourceData = await getSourceData();
-        const sourceState = checkState(sourceData);
-        if (!sourceState) {
-            return res.send("You can't edit this.")
-        }
         const mediaTypes = await Source.publicSource.schema.path('mediaType').enumValues;
-        await changeState(sourceData, 'checked out-r')
         res.render('sources/updateSource', { sourceData, mediaTypes })
 }
 
@@ -71,7 +73,6 @@ module.exports.editSource = async (req, res) => {
     const reviewSourceData = new Source.reviewSource(req.body);
     const publicSourceData = await Source.publicSource.findOne({ _id: sourceId })
     reviewSourceData.author.unshift(req.user._id)
-    //reviewSourceData.updateAuthor(publicSourceData.author, req.user._id)
     reviewSourceData.state = 'update';
     reviewSourceData.publicId = sourceId;
     publicSourceData.state = 'checked out';
@@ -87,7 +88,6 @@ module.exports.publishEditSource = async (req, res) => {
     const publicSourceData = await Source.publicSource.findByIdAndUpdate(reviewSourceData.publicId, { ...req.body })
     console.log(publicSourceData)
     publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])
-    //publicSourceData.author = reviewSourceData.author
     reviewSourceData.state = 'approved'
     reviewSourceData.publicId = ''
     publicSourceData.state = 'published'

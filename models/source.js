@@ -15,7 +15,7 @@ const SourceSchema = new Schema({
     state: {
         type: String,
         required: true,
-        enum: ['new', 'update', 'checked out-r', 'checked out-p', 'approved', 'published', 'rejected']
+        enum: ['new', 'update', 'checked out', 'approved', 'published', 'rejected']
     }, 
     author: {
         type: [ Schema.Types.ObjectId ],
@@ -26,6 +26,8 @@ const SourceSchema = new Schema({
     }
 });
 
+//adds new author to the front of the array of authors, removes any duplicates and stores the last 
+//five total authors
 SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
     this.author = previousAuthors.filter(previousAuthor => !previousAuthor.equals(newAuthor))
     this.author.unshift(newAuthor)
@@ -34,17 +36,16 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
     }
 }
 
-
-// SourceSchema.pre('save', async function(next) {
-//     const publicSourceData = await mongoose.models.PublicSource.findOne({ title: this.title })
-//     console.log(publicSourceData)
-//     if (!publicSourceData) {
-//         return next();
-//     }
-//     if (publicSourceData.title === this.title && publicSourceData.mediaType === this.mediaType) {
-//         throw new ExpressError('A record for this source already exists', 418)
-//     }
-// })
+//Validation if a newly submitted record already exists by matching title AND mediaType in both
+//review and public collections.
+SourceSchema.statics.checkDuplicates = async function (title, mediaType) {
+    //TODO: Account for capitalization
+    if (!title || !mediaType) throw new ExpressError('Invalid Entry')
+    const publicDuplicate = await mongoose.models.PublicSource.find({ title, mediaType })
+    const reviewDuplicate = await mongoose.models.ReviewSource.find({ title, mediaType })
+    if (publicDuplicate.length || reviewDuplicate.length) return false;
+    return true;
+}
 
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);
 const publicSource = mongoose.model('PublicSource', SourceSchema);
