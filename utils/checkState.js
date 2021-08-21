@@ -1,9 +1,22 @@
 const ExpressError = require("./expressError");
 
 
+const publishNewSourceValidation = (publicSourceData, reviewSourceData, admin) => {
+    if (reviewSourceData.state === 'checked out' && !reviewSourceData.author[0].equals(admin)) {
+        return true;
+    }
+    return false
+}
+
+
+
+// const badStates = ['new', 'update', 'approved', 'published', 'rejected']
+
+// const badStates = ['checked out', 'approved', 'rejected']
+
 
 module.exports = {
-
+    publishNewSourceValidation
 }
 
 
