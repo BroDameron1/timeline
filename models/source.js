@@ -41,11 +41,16 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
 SourceSchema.statics.checkDuplicates = async function (title, mediaType) {
     //TODO: Account for capitalization
     if (!title || !mediaType) throw new ExpressError('Invalid Entry')
-    const publicDuplicate = await mongoose.models.PublicSource.find({ title, mediaType })
-    const reviewDuplicate = await mongoose.models.ReviewSource.find({ title, mediaType })
-    if (publicDuplicate.length || reviewDuplicate.length) return false;
-    return true;
+    const publicDuplicate = await mongoose.models.PublicSource.findOne({ title, mediaType })
+    if (!publicDuplicate) {
+        const reviewDuplicate = await mongoose.models.ReviewSource.findOne({ title, mediaType })
+        console.log(reviewDuplicate)
+        if (!reviewDuplicate) return false
+        return true
+    }
+    return publicDuplicate;
 }
+
 
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);
 const publicSource = mongoose.model('PublicSource', SourceSchema);

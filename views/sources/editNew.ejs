@@ -2,17 +2,17 @@
 
 <main>
     <div class="form">
-        <h1>Submit a Source</h1>
-        <form action='/sources/new' method="POST" id="newSource">
+        <h1>Edit Submission</h1>
+        <form action="/sources/review/<%= reviewSourceData._id %>/edit?_method=PUT" method="POST" id="editSource">
         <div class="form-field">
             <label for="title">Title</label>
-            <input type="text" id="title" name="title" required autofocus>
+            <input type="text" id="title" name="title" value="<%= reviewSourceData.title %> " required autofocus>
         </div>
         <div class="form-field">
             <label for="media-type">Media Type</label>
             <select name="mediaType" id="mediaType">
                 <% for(let mediaType of mediaTypes) { %>
-                    <option value="<%= mediaType %>"><%= mediaType %></option>
+                    <option value="<%= mediaType %>" <%= reviewSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
                 <% } %> 
             </select>
         </div>
@@ -24,4 +24,7 @@
     </div>
 </main>
 
-<script type="module" src="/js/newSource.js"></script>
+<script>
+    const sourceId = '<%- reviewSourceData._id %>'
+</script>
+<script type="module" src="/js/editSource.js"></script>
