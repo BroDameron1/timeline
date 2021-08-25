@@ -1,17 +1,10 @@
-
+import { checkDuplicates } from "./checkDuplicates.js"
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
 const form = document.querySelector('#newSource')
 const div = document.querySelector('#warning')
 
-const checkDuplicates = async (data) => {
-    const response = await fetch('/sources/data?' + new URLSearchParams({
-        title: data.title,
-        mediaType: data.mediaType,
-    }))
-    return response.json()
-}
 
 form.addEventListener('submit', async event => {
     event.preventDefault()

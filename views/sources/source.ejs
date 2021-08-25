@@ -5,7 +5,7 @@
     <div>Type: <%= publicSourceData.mediaType %></div>
     <div>Most Recent Contributors: <%= publicSourceData.author[0].username %></div>
 <% if (currentUser) { %> 
-    <div><a href="/sources/edit/<%= publicSourceData._id %>">Edit</a></div>
+    <div><a href="/sources/<%= publicSourceData._id %>/edit">Edit</a></div>
 <% } %> 
 <% if (currentUser.role === 'admin') { %>
     <div>

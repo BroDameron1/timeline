@@ -35,8 +35,22 @@ module.exports.renderEditNew = async (req, res) => {
     res.render('sources/editNew', { reviewSourceData, mediaTypes })
 }
 
+//controller for publishing changes to an existing "new" source
+//TODO: Try to combine this with publishing changes to existing "review" source
+module.exports.publishEditNew = async (req, res) => {
+    const { sourceId } = req.params
+    const duplicateCheck = await Source.reviewSource.checkDuplicates(req.body.title, req.body.mediaType)
+    if (duplicateCheck) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect('/sources/new')
+    }
+    const reviewSourceData = await Source.reviewSource.findByIdAndUpdate(sourceId, { ...req.body }, {new: true})
+    req.flash('info', 'Your submission has been updated.')
+    res.redirect('/dashboard')
+}
+
 //controller for the post route for submitting a New Source to be approved.
-module.exports.submitNewSource = async(req, res) => {
+module.exports.submitNewSource = async (req, res) => {
     const reviewSourceData = new Source.reviewSource(req.body)
     const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
     //backup duplicate check if the front end fails.
@@ -52,7 +66,38 @@ module.exports.submitNewSource = async(req, res) => {
     res.redirect('/dashboard');
 }
 
+//controller for publishing new "review" records to public records.
+module.exports.publishNewSource = async (req, res) => {
+    const { sourceId } = req.params
+    const publicSourceData = new Source.publicSource(req.body)
+    const reviewSourceData = await Source.reviewSource.findById(sourceId)
+    const duplicateCheck = await Source.publicSource.checkDuplicates(publicSourceData.title, publicSourceData.mediaType)
+    if (duplicateCheck) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect(`/sources/review/${sourceId}`)
+    }
+    if (reviewSourceData.author[0].equals(req.user._id)) {
+        req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
+        return res.redirect('/dashboard')
+    }
+    publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])
+    publicSourceData.state = 'published'
+    reviewSourceData.state = 'approved'
+    await publicSourceData.save()
+    await reviewSourceData.save()
+    res.redirect(`/sources/${publicSourceData._id}`)
+}
 
+module.exports.renderEditPublicSource = async (req, res) => {
+    const { sourceId } = req.params
+    const publicSourceData = await Source.publicSource.findById(sourceId)
+    if (!publicSourceData) {
+        req.flash('error', 'This record does not exist.')
+        return res.redirect('/dashboard')
+    }
+    const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
+    res.render('sources/editPublic', { publicSourceData, mediaTypes })
+}
 
 //controller for get route that let's JS files query for data.  Right now only for 
 //checking duplicates but may be needed for other things.
@@ -69,6 +114,7 @@ module.exports.putData = async (req, res) => {
     const { state, sourceId } = req.body
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     reviewSourceData.state = state
+    //console.log(reviewSourceData)
     await reviewSourceData.save()
-    res.status(200)
+    res.status(200).end()
 }

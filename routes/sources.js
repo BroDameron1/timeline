@@ -10,7 +10,8 @@ router.route('/new')
 
 router.route('/review/:sourceId/edit')
     .get(isLoggedIn, catchAsync(sources.renderEditNew))
-//    .put(isLoggedIn, catachAsync(sources.publishEditNew))
+    .put(isLoggedIn, catchAsync(sources.publishEditNew))
+    .post(isLoggedIn, isAdmin, catchAsync(sources.publishNewSource))
 
 router.route('/data')
     .get(isLoggedIn, catchAsync(sources.getData))
@@ -19,5 +20,7 @@ router.route('/data')
 router.route('/:sourceId')
     .get(catchAsync(sources.renderSource))
 
+router.route('/:sourceId/edit')
+    .get(isLoggedIn, catchAsync(sources.renderEditPublicSource))
 
 module.exports = router;

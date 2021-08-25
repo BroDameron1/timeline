@@ -13,7 +13,7 @@
 <% for (let pendingRequest of viewablePendingRequests) { %>
     <div><%= pendingRequest.title %> for <%= pendingRequest.mediaType %> by <%= pendingRequest.author[0].username %>  ADD EDIT LINK!</div>
     <% if(currentUser.role === 'admin' && !currentUser._id.equals(pendingRequest.author[0]._id)) { %>
-    <div><a href="/sources/review/<%= pendingRequest._id %>">Review</a></div>
+    <div><a href="/sources/review/<%= pendingRequest._id %>/edit">Review</a></div>
     <% } %>
     <% if (currentUser._id.equals(pendingRequest.author[0]._id) && (pendingRequest.state === 'new' ||  pendingRequest.state ==='update')) { %>
         <a href="sources/review/<%= pendingRequest._id %>/edit/">EDIT SUBMISSION</a>
