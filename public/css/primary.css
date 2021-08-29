@@ -45,10 +45,10 @@ a {
 }
 
 main, .flash-container {
-    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
 .form {
@@ -130,4 +130,39 @@ input[type=text], input[type=password], input[type=email], select {
     background-color: rgba(255, 112, 112, 0.7);
     box-shadow: inset 0px 0px 0px 4px rgba(255, 112, 112, 1.0);
     border-radius: 6px;
+}
+
+
+
+.countdown-popup {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    padding: 1rem;
+    background-color: white;
+    border: solid 3px grey;
+    border-radius: 8px;
+    width: 400px;
+    height: 150px;
+    display: none;
+}
+
+.countdown-timer {
+    text-align: center;
+    padding: 5px;
+    font-size: 2rem;   
+}
+
+.disableDiv {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128,128,128,0.5);
+    z-index: 9999;
+    display: none;
+    backdrop-filter: blur(10px);
 }

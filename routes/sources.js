@@ -22,5 +22,6 @@ router.route('/:sourceId')
 
 router.route('/:sourceId/edit')
     .get(isLoggedIn, catchAsync(sources.renderEditPublicSource))
+    .post(isLoggedIn, catchAsync(sources.submitEditPublicSource))
 
 module.exports = router;

@@ -88,6 +88,7 @@ module.exports.publishNewSource = async (req, res) => {
     res.redirect(`/sources/${publicSourceData._id}`)
 }
 
+//controller for rendering the form to update an existing record.
 module.exports.renderEditPublicSource = async (req, res) => {
     const { sourceId } = req.params
     const publicSourceData = await Source.publicSource.findById(sourceId)
@@ -99,12 +100,34 @@ module.exports.renderEditPublicSource = async (req, res) => {
     res.render('sources/editPublic', { publicSourceData, mediaTypes })
 }
 
+//controller for submitting an update to an existing record for review and approval.
+module.exports.submitEditPublicSource = async (req, res) => {
+    const { sourceId } = req.params
+    const publicSourceData = await Source.publicSource.findById(sourceId)
+    const reviewSourceData = new Source.reviewSource(req.body)
+    const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
+    if (duplicateCheck) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect(`/sources/review/${sourceId}`)
+    }
+    reviewSourceData.author.unshift(req.user._id)
+    reviewSourceData.publicId = sourceId;
+    reviewSourceData.state = 'update';
+    publicSourceData.state = 'checked out';
+    await reviewSourceData.save();
+    await publicSourceData.save();
+    req.flash('info', 'Your changes have been submitted for review.')
+    res.redirect(`/sources/${sourceId}`)
+}
+
 //controller for get route that let's JS files query for data.  Right now only for 
 //checking duplicates but may be needed for other things.
 //TODO: See if this can be put in the renderSource route
 module.exports.getData = async (req, res) => {
     const { title, mediaType } = req.query
-    const duplicateResult = await Source.reviewSource.checkDuplicates(title, mediaType)
+    const userRole = req.user.role
+    console.log(userRole)
+    const duplicateResult = await Source.reviewSource.checkDuplicates(title, mediaType, userRole)
     res.json(duplicateResult)
 }
 
@@ -114,7 +137,6 @@ module.exports.putData = async (req, res) => {
     const { state, sourceId } = req.body
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     reviewSourceData.state = state
-    //console.log(reviewSourceData)
     await reviewSourceData.save()
     res.status(200).end()
 }

@@ -38,13 +38,12 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
 
 //Validation if a newly submitted record already exists by matching title AND mediaType in both
 //review and public collections.
-SourceSchema.statics.checkDuplicates = async function (title, mediaType) {
+SourceSchema.statics.checkDuplicates = async function (title, mediaType, userRole) {
     //TODO: Account for capitalization
     if (!title || !mediaType) throw new ExpressError('Invalid Entry')
     const publicDuplicate = await mongoose.models.PublicSource.findOne({ title, mediaType })
-    if (!publicDuplicate) {
+    if (!publicDuplicate && !userRole === 'admin') {
         const reviewDuplicate = await mongoose.models.ReviewSource.findOne({ title, mediaType })
-        console.log(reviewDuplicate)
         if (!reviewDuplicate) return false
         return true
     }
