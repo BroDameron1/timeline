@@ -61,7 +61,7 @@ module.exports.submitEditNew = async (req, res) => {
         req.flash('error', 'This record already exists.')
         return res.redirect('/sources/new')
     }
-    const reviewSourceData = await Source.reviewSource.findByIdAndUpdate(sourceId, { ...req.body }, {new: true})
+    await Source.reviewSource.findByIdAndUpdate(sourceId, { ...req.body }, {new: true})
     req.flash('info', 'Your submission has been updated.')
     res.redirect('/dashboard')
 }
@@ -73,7 +73,7 @@ module.exports.publishNewSource = async (req, res) => {
     const { sourceId } = req.params
     const publicSourceData = new Source.publicSource(req.body)
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
-    const duplicateCheck = await Source.publicSource.checkDuplicates(publicSourceData.title, publicSourceData.mediaType)
+    const duplicateCheck = await Source.publicSource.checkPublicDuplicates(publicSourceData.title, publicSourceData.mediaType)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
         return res.redirect(`/sources/review/${sourceId}`)
@@ -122,17 +122,8 @@ module.exports.submitEditPublicSource = async (req, res) => {
     res.redirect(`/sources/${sourceId}`)
 }
 
-//controller for get route that let's JS files query for data.  Right now only for 
-//checking duplicates but may be needed for other things.
-//TODO: See if this can be put in the renderSource route
-// module.exports.getData = async (req, res) => {
-//     const { title, mediaType } = req.query
-//     const userRole = req.user.role
-//     console.log(userRole)
-//     const duplicateResult = await Source.reviewSource.checkDuplicates(title, mediaType, userRole)
-//     res.json(duplicateResult)
-// }
-
+//controller to check for duplicate data by passing the title, mediaType, and sometimes review Id through
+//to check against the review and public collections
 module.exports.getData = async (req, res) => {
     const { title, mediaType, collection, sourceId } = req.query
     if (collection === 'both') {

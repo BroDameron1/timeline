@@ -10,12 +10,13 @@ const countdownTimer = document.querySelector('.countdown-timer')
 const blurBackground = document.querySelector('.disableDiv')
 const timerButton = document.querySelector('#timerButton')
 
-
 const startingMinutes = 1.1 //sets timeout for page
 const warningTime = 1 * 60 //sets time when warning will pop up
 let time = startingMinutes * 60 //timer for use in idleLogout function, should not change
 
+
 const idleLogout = () => { //function for kicking user out of the page if they don't take any action
+
     const closePopup = () => { //closes the warning popup and resets everything
         countdown.style.display = 'none'
         blurBackground.style.display = 'none'
@@ -58,8 +59,6 @@ const idleLogout = () => { //function for kicking user out of the page if they d
     window.addEventListener('scroll', resetTimer, true); // improved; see comments
 }
 
-
-
 const changeState = async (newState, sourceId) => {
     try {
         const response = await fetch('/sources/data', {
@@ -78,8 +77,6 @@ const changeState = async (newState, sourceId) => {
     }
 }
 
-
-
 window.addEventListener('load', async event => {
     const state = await changeState('checked out', sourceId)
     if (state !== 200) {
@@ -91,7 +88,6 @@ window.addEventListener('load', async event => {
 
 
 window.addEventListener('beforeunload', async event => {
-        console.log('ignore this')
         const state = await changeState('new', sourceId)
         if (state !== 200) {
             console.log('Something went wrong, please contact an admin.', state)
