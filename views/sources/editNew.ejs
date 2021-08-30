@@ -1,0 +1,46 @@
+<% layout('layouts/boilerplate.ejs') %>
+
+<div class="disableDiv">
+    <div class="countdown-popup">
+        Your session will time out and you will lose all changes in:
+        <div class="countdown-timer"></div>
+        <button class="btn-delete" id="timerButton">Click to continue working.</button>
+    </div>
+</div>
+
+
+
+<main>
+    <div class="form">
+        <h1>Edit Submission</h1>
+        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id)) {%>
+            <form action="/sources/review/<%= reviewSourceData._id %>/edit" method="POST" id="editSource">
+        <% } else { %> 
+            <form action="/sources/review/<%= reviewSourceData._id %>/edit?_method=PUT" method="POST" id="editSource">
+        <% } %> 
+        <div class="form-field">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="<%= reviewSourceData.title %>" required autofocus>
+        </div>
+        <div class="form-field">
+            <label for="media-type">Media Type</label>
+            <select name="mediaType" id="mediaType">
+                <% for(let mediaType of mediaTypes) { %>
+                    <option value="<%= mediaType %>" <%= reviewSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
+                <% } %> 
+            </select>
+        </div>
+        <div>
+            <button class="btn-submit">Submit for Review</button>
+        </div>
+        <div id="warning"></div>
+        </form>
+    </div>
+</main>
+
+
+
+<script>
+    const sourceId = '<%- reviewSourceData._id %>'
+</script>
+<script type="module" src="/js/editSource.js"></script>

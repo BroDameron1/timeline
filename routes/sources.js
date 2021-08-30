@@ -4,27 +4,24 @@ const catchAsync = require('../utils/catchAsync');
 const sources = require('../controllers/sources');
 const { isLoggedIn, validateUser, notLoggedIn, isAdmin } = require('../middleware');
 
-
 router.route('/new')
     .get(isLoggedIn, catchAsync(sources.renderNewSource))
-    .post(isLoggedIn, catchAsync(sources.newSource))
+    .post(isLoggedIn, catchAsync(sources.submitNewSource))
 
-router.route('/review/:sourceId')
-    //may need to revisist if there is a way to duplicate edit functionality here.
-    .get(isLoggedIn, catchAsync(sources.renderReviewSource))
-    .post(isLoggedIn, isAdmin, catchAsync(sources.publishSource))
-    .put(isLoggedIn, isAdmin, catchAsync(sources.publishEditSource))
-    //.put(isLoggedIn, catchAsync(sources.editReview))
-    .delete(isLoggedIn, catchAsync(sources.deleteReviewSource))
+router.route('/review/:sourceId/edit')
+    .get(isLoggedIn, catchAsync(sources.renderEditNew))
+    .put(isLoggedIn, catchAsync(sources.submitEditNew))
+    .post(isLoggedIn, isAdmin, catchAsync(sources.publishNewSource))
+
+router.route('/data')
+    .get(isLoggedIn, catchAsync(sources.getData))
+    .put(isLoggedIn, catchAsync(sources.putData))
 
 router.route('/:sourceId')
     .get(catchAsync(sources.renderSource))
-    .delete(isLoggedIn, isAdmin, catchAsync(sources.deletePublicSource))
 
-router.route('/edit/:sourceId')
-    .get(isLoggedIn, catchAsync(sources.renderEditSource))
-    .post(isLoggedIn, catchAsync(sources.editSource))
-    
-
+router.route('/:sourceId/edit')
+    .get(isLoggedIn, catchAsync(sources.renderEditPublicSource))
+    .post(isLoggedIn, catchAsync(sources.submitEditPublicSource))
 
 module.exports = router;

@@ -64,6 +64,8 @@ app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 //allows express to parse form data as url encoded data
 app.use(express.urlencoded({ extended: true }))
+//allows parsing json data?
+app.use(express.json());
 //this tells express where static assets are held
 app.use(express.static(path.join(__dirname, 'public')))
 //execute methodoverride functionality
@@ -102,6 +104,25 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 app.use(flash());
 app.use(helmet());
+
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'"],
+            scriptSrc: ["'unsafe-inline'", "'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+            ],
+            fontSrc: ["'self'"],
+        },
+    })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());

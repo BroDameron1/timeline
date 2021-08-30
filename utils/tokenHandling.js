@@ -10,6 +10,7 @@ const createHmac = async (unhashedToken) => {
 }
 
 const createToken = async (user) => {
+     //TODO Change to findById
     let token = await Token.findOne({ userId: user._id });
     if(!token) {
         const unhashedToken = await crypto.randomBytes(32).toString('hex');
@@ -24,6 +25,7 @@ const createToken = async (user) => {
 
 const validateToken = async (token, userId) => {
     try {
+        //TODO Change to findById
         const tokenData = await Token.findOne({ userId: userId });
         const hashedToken = await createHmac(token);
         const user = await User.findOne({ _id: userId });

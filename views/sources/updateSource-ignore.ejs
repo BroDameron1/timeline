@@ -1,0 +1,37 @@
+<% layout('layouts/boilerplate.ejs') %>
+
+<main>
+    <div class="form">
+        <% if (currentUser._id.equals(sourceData.author[0]._id) && (sourceData.state === "new" || sourceData.state === "review")) { %>
+            <h1>Edit Your Submission</h1>
+            <form action="/sources/edit/<%= sourceData._id %>?_method=PUT" method="POST">
+        <% } else if (currentUser.role === 'admin' && !currentUser._id.equals(sourceData.author[0]._id) && sourceData.state === 'new') { %>
+            <h1>Approve New Entry</h1>
+            <form action="/sources/review/<%= sourceData._id %>" method="POST">
+        <% } else if (currentUser.role === 'admin' && !currentUser._id.equals(sourceData.author[0]._id)) { %>
+            <h1>Approve Updated Entry</h1>
+            <form action="/sources/review/<%= sourceData._id %>?_method=PUT" method="POST">
+        <% } else { %>
+            <h1>Submit Update</h1>
+            <form action="/sources/edit/<%= sourceData._id %>" method="POST">
+        <% } %> 
+        <div class="form-field">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" value="<%= sourceData.title %>" required autofocus>
+        </div>
+        <div class="form-field">
+            <label for="media-type">Media Type</label>
+            <select name="mediaType" id="mediaType">
+                <% for(let mediaType of mediaTypes) { %>
+                    <option value="<%= mediaType %>" <%= sourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
+                <% } %> 
+            </select>
+        </div>
+            <button class="btn-submit">Submit</button>
+        </div>
+        </form>
+    </div>
+</main>
+
+
+<script type="module" src="/js/idleTimer.js"></script>
