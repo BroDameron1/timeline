@@ -10,7 +10,7 @@ router.route('/new')
 
 router.route('/review/:sourceId/edit')
     .get(isLoggedIn, catchAsync(sources.renderEditNew))
-    .put(isLoggedIn, catchAsync(sources.publishEditNew))
+    .put(isLoggedIn, catchAsync(sources.submitEditNew))
     .post(isLoggedIn, isAdmin, catchAsync(sources.publishNewSource))
 
 router.route('/data')

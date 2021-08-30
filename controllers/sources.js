@@ -19,6 +19,23 @@ module.exports.renderNewSource = async (req, res) => {
     res.render('sources/newSource', { mediaTypes })
 }
 
+//controller for the post route for submitting a New Source to be approved.
+module.exports.submitNewSource = async (req, res) => {
+    const reviewSourceData = new Source.reviewSource(req.body)
+    const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
+    //backup duplicate check if the front end fails.
+    if (duplicateCheck) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect('/sources/new')
+    }
+    //updates the author array in the Review Source which will be passed along to the public source.
+    reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
+    reviewSourceData.state = 'new'
+    await reviewSourceData.save()
+    req.flash('info', 'Your new Source has been submitted for approval.')
+    res.redirect('/dashboard');
+}
+
 //controller for get route for editting a pending approval source.
 module.exports.renderEditNew = async (req, res) => {
     const { sourceId } = req.params;
@@ -37,9 +54,9 @@ module.exports.renderEditNew = async (req, res) => {
 
 //controller for publishing changes to an existing "new" source
 //TODO: Try to combine this with publishing changes to existing "review" source
-module.exports.publishEditNew = async (req, res) => {
+module.exports.submitEditNew = async (req, res) => {
     const { sourceId } = req.params
-    const duplicateCheck = await Source.reviewSource.checkDuplicates(req.body.title, req.body.mediaType)
+    const duplicateCheck = await Source.reviewSource.checkDuplicates(req.body.title, req.body.mediaType, sourceId)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
         return res.redirect('/sources/new')
@@ -49,22 +66,7 @@ module.exports.publishEditNew = async (req, res) => {
     res.redirect('/dashboard')
 }
 
-//controller for the post route for submitting a New Source to be approved.
-module.exports.submitNewSource = async (req, res) => {
-    const reviewSourceData = new Source.reviewSource(req.body)
-    const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
-    //backup duplicate check if the front end fails.
-    if (duplicateCheck) {
-        req.flash('error', 'This record already exists.')
-        return res.redirect('/sources/new')
-    }
-    //updates the author array in the Review Source which will be passed along to the public source.
-    reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
-    reviewSourceData.state = 'new'
-    await reviewSourceData.save()
-    req.flash('info', 'Your new Source has been submitted for approval.')
-    res.redirect('/dashboard');
-}
+
 
 //controller for publishing new "review" records to public records.
 module.exports.publishNewSource = async (req, res) => {
@@ -123,12 +125,24 @@ module.exports.submitEditPublicSource = async (req, res) => {
 //controller for get route that let's JS files query for data.  Right now only for 
 //checking duplicates but may be needed for other things.
 //TODO: See if this can be put in the renderSource route
+// module.exports.getData = async (req, res) => {
+//     const { title, mediaType } = req.query
+//     const userRole = req.user.role
+//     console.log(userRole)
+//     const duplicateResult = await Source.reviewSource.checkDuplicates(title, mediaType, userRole)
+//     res.json(duplicateResult)
+// }
+
 module.exports.getData = async (req, res) => {
-    const { title, mediaType } = req.query
-    const userRole = req.user.role
-    console.log(userRole)
-    const duplicateResult = await Source.reviewSource.checkDuplicates(title, mediaType, userRole)
-    res.json(duplicateResult)
+    const { title, mediaType, collection, sourceId } = req.query
+    if (collection === 'both') {
+        const duplicateResult = await Source.reviewSource.checkDuplicates(title, mediaType, sourceId)
+        return res.json(duplicateResult)
+    }
+    if (collection === 'public') {
+        const duplicateResult = await Source.publicSource.checkPublicDuplicates(title, mediaType)
+        return res.json(duplicateResult)
+    }
 }
 
 //controller for put route that let's JS files update data.  Right now only for

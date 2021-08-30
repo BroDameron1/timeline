@@ -38,16 +38,34 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
 
 //Validation if a newly submitted record already exists by matching title AND mediaType in both
 //review and public collections.
-SourceSchema.statics.checkDuplicates = async function (title, mediaType, userRole) {
+SourceSchema.statics.checkDuplicates = async function (title, mediaType, sourceId) {
     //TODO: Account for capitalization
     if (!title || !mediaType) throw new ExpressError('Invalid Entry')
     const publicDuplicate = await mongoose.models.PublicSource.findOne({ title, mediaType })
-    if (!publicDuplicate && !userRole === 'admin') {
+    if (!publicDuplicate) {
         const reviewDuplicate = await mongoose.models.ReviewSource.findOne({ title, mediaType })
         if (!reviewDuplicate) return false
-        return true
+        if (reviewDuplicate && !reviewDuplicate._id.equals(sourceId)) {
+            return true
+        } else {
+            return false
+        }
     }
     return publicDuplicate;
+}
+
+SourceSchema.statics.checkReviewDuplicates = async function (title, mediaType) {
+    if (!title || !mediaType) throw new ExpressError('Invalid Entry')
+    const reviewDuplicate = await mongoose.models.ReviewSource.findOne({ title, mediaType })
+    if (!reviewDuplicate) return false
+    return true
+}
+
+SourceSchema.statics.checkPublicDuplicates = async function (title, mediaType) {
+    if (!title || !mediaType) throw new ExpressError('Invalid Entry')
+    const publicDuplicate = await mongoose.models.PublicSource.findOne({ title, mediaType })
+    if (!publicDuplicate) return false
+    return publicDuplicate
 }
 
 
