@@ -43,7 +43,47 @@ export class Duplicate {
     }
 }
 
-//function for idling out a user while they are editting a record.
+//Class for managing record state from the front end
+export class StateManager {
+    constructor(newState, sourceId, targetCollection) {
+        this.newState = newState
+        this.sourceId = sourceId
+        this.targetCollection = targetCollection
+    }
+
+    async retrieveState () {
+        const response = await fetch('/sources/data?' + new URLSearchParams({
+            sourceId: this.sourceId,
+            collection: this.targetCollection
+        }))
+        const data = await response.json()
+        return data.state
+    }
+
+    async updateState () {
+        const previousState = await this.retrieveState()
+        sessionStorage.setItem('previousState', previousState)
+        console.log(previousState)
+        try {
+            const response = await fetch('/sources/data', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    state: this.newState,
+                    sourceId: this.sourceId,
+                    collection: this.targetCollection
+                })
+            })
+            return response.status
+        } catch (err) {
+            console.log('Something went wrong.', err)
+        }
+    }
+}
+
+//variables and function for idling out a user while they are editing a record.
 const countdown = document.querySelector('.countdown-popup')
 const countdownTimer = document.querySelector('.countdown-timer')
 const blurBackground = document.querySelector('.disableDiv')
@@ -52,7 +92,6 @@ const timerButton = document.querySelector('#timerButton')
 const startingMinutes = 1.1 //sets timeout for page
 const warningTime = 1 * 60 //sets time when warning will pop up
 let time = startingMinutes * 60 //timer for use in idleLogout function, should not change
-
 
 export const idleLogout = () => { //function for kicking user out of the page if they don't take any action
 

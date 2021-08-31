@@ -1,4 +1,5 @@
 const Source = require('../models/source');
+const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 
 //controller for get route for rendering any existing source.
@@ -61,7 +62,7 @@ module.exports.submitEditNew = async (req, res) => {
         req.flash('error', 'This record already exists.')
         return res.redirect('/sources/new')
     }
-    await Source.reviewSource.findByIdAndUpdate(sourceId, { ...req.body }, {new: true})
+    await Source.reviewSource.findByIdAndUpdate(sourceId, { ...req.body, state: 'new' }, {new: true})
     req.flash('info', 'Your submission has been updated.')
     res.redirect('/dashboard')
 }
@@ -134,14 +135,16 @@ module.exports.getData = async (req, res) => {
         const duplicateResult = await Source.publicSource.checkPublicDuplicates(title, mediaType)
         return res.json(duplicateResult)
     }
+    const queryResults = await mongoose.model(collection).findById(sourceId)
+    res.json(queryResults)
 }
 
 //controller for put route that let's JS files update data.  Right now only for
 //updating state of record
 module.exports.putData = async (req, res) => {
-    const { state, sourceId } = req.body
-    const reviewSourceData = await Source.reviewSource.findById(sourceId)
-    reviewSourceData.state = state
-    await reviewSourceData.save()
+    const { state, sourceId, collection } = req.body
+    const dataToUpdate = await mongoose.model(collection).findById(sourceId)
+    dataToUpdate.state = state
+    await dataToUpdate.save()
     res.status(200).end()
 }
