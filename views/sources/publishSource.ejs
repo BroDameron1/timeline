@@ -12,10 +12,11 @@
 
 <main>
     <div class="form">
-        <h1>Edit Submission</h1>
-        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id)) {%>
+        <h1>Review Submission</h1>
+        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id) && reviewSourceData.state === 'new') {%>
             <form action="/sources/review/<%= reviewSourceData._id %>/edit" method="POST" id="editSource">
-        <% } else { %> 
+        <% } %> 
+        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id) && reviewSourceData.state === 'update') {%>
             <form action="/sources/review/<%= reviewSourceData._id %>/edit?_method=PUT" method="POST" id="editSource">
         <% } %> 
         <div class="form-field">
@@ -31,7 +32,7 @@
             </select>
         </div>
         <div>
-            <button class="btn-submit">Submit for Review</button>
+            <button class="btn-submit">Publish</button>
         </div>
         <div id="warning"></div>
         </form>

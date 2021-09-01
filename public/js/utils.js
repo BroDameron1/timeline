@@ -45,25 +45,25 @@ export class Duplicate {
 
 //Class for managing record state from the front end
 export class StateManager {
-    constructor(newState, sourceId, targetCollection) {
-        this.newState = newState
+    constructor(checkedOut, sourceId, targetCollection) {
+        this.checkedOut = checkedOut
         this.sourceId = sourceId
         this.targetCollection = targetCollection
     }
 
-    async retrieveState () {
-        const response = await fetch('/sources/data?' + new URLSearchParams({
-            sourceId: this.sourceId,
-            collection: this.targetCollection
-        }))
-        const data = await response.json()
-        return data.state
-    }
+    // async retrieveState () {
+    //     const response = await fetch('/sources/data?' + new URLSearchParams({
+    //         sourceId: this.sourceId,
+    //         collection: this.targetCollection
+    //     }))
+    //     const data = await response.json()
+    //     return data.state
+    // }
 
     async updateState () {
-        const previousState = await this.retrieveState()
-        sessionStorage.setItem('previousState', previousState)
-        console.log(previousState)
+        // const previousState = await this.retrieveState()
+        // sessionStorage.setItem('previousState', previousState)
+        // console.log(previousState)
         try {
             const response = await fetch('/sources/data', {
                 method: 'PUT',
@@ -71,7 +71,7 @@ export class StateManager {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    state: this.newState,
+                    checkedOut: this.checkedOut,
                     sourceId: this.sourceId,
                     collection: this.targetCollection
                 })

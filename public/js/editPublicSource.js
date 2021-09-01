@@ -6,8 +6,10 @@ const form = document.querySelector('#editSource')
 const div = document.querySelector('#warning')
 const button = document.querySelector('.btn-submit')
 
+
+
 window.addEventListener('load', async event => {
-    const state = new StateManager('checked out', sourceId, 'ReviewSource')
+    const state = new StateManager(true, sourceId, 'PublicSource')
     const stateResult = await state.updateState()
     if (stateResult !== 200) {
         location.href="/dashboard"
@@ -19,14 +21,11 @@ window.addEventListener('load', async event => {
 let unloadCheck = false //flag to determine if the beforeunload event fires on submit
 
 window.addEventListener('beforeunload', async event => {
-    event.preventDefault()
-    const previousState = sessionStorage.getItem('previousState')
-    
+    event.preventDefault()  
     if (!unloadCheck) {
         event.returnValue = 'test'
-        const state = new StateManager(previousState, sourceId, 'ReviewSource')
+        const state = new StateManager(false, sourceId, 'PublicSource')
         const stateResult = await state.updateState()
-        sessionStorage.removeItem('previousState')
         if (stateResult !== 200) {
             return console.log('Something went wrong, please contact an admin.', state)
         }
