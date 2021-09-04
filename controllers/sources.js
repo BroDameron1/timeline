@@ -1,6 +1,7 @@
 const Source = require('../models/source');
 const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
+const duplicateChecker = require('../utils/duplicateChecker')
 
 //controller for get route for rendering any existing source.
 //TODO: Handle failed to cast errors
@@ -23,12 +24,13 @@ module.exports.renderNewSource = async (req, res) => {
 //controller for the post route for submitting a New Source to be approved.
 module.exports.submitNewSource = async (req, res) => {
     const reviewSourceData = new Source.reviewSource(req.body)
-    const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
-    //backup duplicate check if the front end fails.
-    if (duplicateCheck) {
-        req.flash('error', 'This record already exists.')
-        return res.redirect('/sources/new')
-    }
+    //TODO: Replace!
+    // const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
+    // //backup duplicate check if the front end fails.
+    // if (duplicateCheck) {
+    //     req.flash('error', 'This record already exists.')
+    //     return res.redirect('/sources/new')
+    // }
     //updates the author array in the Review Source which will be passed along to the public source.
     reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
     reviewSourceData.state = 'new'
@@ -157,12 +159,23 @@ module.exports.submitNewSource = async (req, res) => {
 //to check against the review and public collections
 module.exports.getData = async (req, res) => {
     const { title, mediaType, collection, sourceId } = req.query
+    if (collection === 'submitNew') {
+        const duplicateResult = await duplicateChecker.submitNew(title, mediaType)
+        return res.json(duplicateResult)
+    }
+    if (collection === 'updateReview') {
+        const duplicateResult = await duplicateChecker.updateReview(title, mediaType, sourceId)
+        console.log(duplicateResult, 'here')
+        return res.json(duplicateResult)
+    }
+    
+    
     if (collection === 'both') {
         const duplicateResult = await Source.reviewSource.checkDuplicates(title, mediaType, sourceId)
         return res.json(duplicateResult)
     }
     if (collection === 'public') {
-        const duplicateResult = await Source.publicSource.checkPublicDuplicates(title, mediaType)
+        const duplicateResult = await Source.publicSource.checkPublicDuplicates(title, mediaType, sourceId)
         return res.json(duplicateResult)
     }
     // const queryResults = await mongoose.model(collection).findById(sourceId)
@@ -206,7 +219,7 @@ module.exports.publishReviewSource = async (req, res) => {
     } else {
         publicSourceData.set({ ...req.body })
     }
-    const duplicateCheck = await Source.publicSource.checkPublicDuplicates(publicSourceData.title, publicSourceData.mediaType)
+    const duplicateCheck = await Source.publicSource.checkPublicDuplicates(publicSourceData.title, publicSourceData.mediaType, reviewSourceData.publicId)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
         return res.redirect(`/sources/review/${sourceId}`)
@@ -219,7 +232,6 @@ module.exports.publishReviewSource = async (req, res) => {
     publicSourceData.checkedOut = false
     publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])
     reviewSourceData.state = 'approved'
-    reviewSourceData.publicId = ''
     await reviewSourceData.save()
     await publicSourceData.save()
     res.redirect(`/sources/${publicSourceData._id}`)
@@ -251,12 +263,12 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
     const { sourceId } = req.params
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     reviewSourceData.set({ ...req.body })
-    console.log(reviewSourceData)
-    const duplicateCheck = await Source.publicSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
-    if (duplicateCheck) {
-        req.flash('error', 'This record already exists.')
-        return res.redirect(`/sources/review/${sourceId}`)
-    }
+    //TODO: Replace duplicate check logic
+    // const duplicateCheck = await Source.publicSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
+    // if (duplicateCheck) {
+    //     req.flash('error', 'This record already exists.')
+    //     return res.redirect(`/sources/review/${sourceId}`)
+    // }
     if (!reviewSourceData.author[0].equals(req.user._id)) {
         req.flash('error', "You do not have permission to edit this submission.")
         return res.redirect('/dashboard')
@@ -271,7 +283,7 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
     res.redirect('/dashboard')
 }
 
-//renders the page for update an update to an existing source
+//renders the page for update to an existing source
 module.exports.renderEditSource = async (req, res) => {
     const { sourceId } = req.params
     const publicSourceData = await Source.publicSource.findById(sourceId)
@@ -284,7 +296,7 @@ module.exports.renderEditSource = async (req, res) => {
         return res.redirect('/dashboard')
     }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/updatePublicSource', { reviewSourceData, mediaTypes})
+    res.render('sources/updatePublicSource', { publicSourceData, mediaTypes})
 }
 
 //allows a user to submit an update for an existing source
@@ -292,10 +304,12 @@ module.exports.submitEditSource = async (req, res) => {
     const { sourceId } = req.params
     const publicSourceData = await Source.publicSource.findById(sourceId)
     const reviewSourceData = new Source.reviewSource(req.body)
-    const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
+    console.log(reviewSourceData, 'test3')
+    const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
+    console.log(duplicateCheck, 'test4')
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
-        return res.redirect(`/sources/review/${sourceId}`)
+        return res.redirect(`/sources/${sourceId}`)
     }
     reviewSourceData.author.unshift(req.user._id)
     reviewSourceData.publicId = sourceId;

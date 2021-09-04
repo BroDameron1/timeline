@@ -32,7 +32,7 @@ router.route('/:sourceId')
 
 router.route('/:sourceId/edit')
     .get(isLoggedIn, catchAsync(sources.renderEditSource))
-    .put(isLoggedIn, catchAsync(sources.submitEditSource))
+    .post(isLoggedIn, catchAsync(sources.submitEditSource))
     //.put(isLoggedIn, isAdmin, catchAsync(sources.publishEditSource))
 
 // router.route('/:sourceId/edit')
