@@ -25,13 +25,11 @@ module.exports.renderNewSource = async (req, res) => {
 module.exports.submitNewSource = async (req, res) => {
     const reviewSourceData = new Source.reviewSource(req.body)
     //TODO: Replace!
-    // const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType)
-    // //backup duplicate check if the front end fails.
-    // if (duplicateCheck) {
-    //     req.flash('error', 'This record already exists.')
-    //     return res.redirect('/sources/new')
-    // }
-    //updates the author array in the Review Source which will be passed along to the public source.
+    const duplicateCheck = await duplicateChecker.submitNew(reviewSourceData.title, reviewSourceData.mediaType)
+    if (duplicateCheck) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect('/sources/new')
+    }
     reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
     reviewSourceData.state = 'new'
     await reviewSourceData.save()
@@ -65,12 +63,11 @@ module.exports.publishReviewSource = async (req, res) => {
     } else {
         publicSourceData.set({ ...req.body })
     }
-    //TODO: Replace this
-    // const duplicateCheck = await Source.publicSource.checkPublicDuplicates(publicSourceData.title, publicSourceData.mediaType, reviewSourceData.publicId)
-    // if (duplicateCheck) {
-    //     req.flash('error', 'This record already exists.')
-    //     return res.redirect(`/sources/review/${sourceId}`)
-    // }
+    const duplicateCheck = await duplicateChecker.publishRecord(publicSourceData.title, publicSourceData.mediaType, sourceId)
+    if (duplicateCheck) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect('/dashboard')
+    }
     if (reviewSourceData.author[0].equals(req.user._id)) {
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
         return res.redirect('/dashboard')
@@ -111,11 +108,12 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     reviewSourceData.set({ ...req.body })
     //TODO: Replace duplicate check logic
-    // const duplicateCheck = await Source.publicSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
-    // if (duplicateCheck) {
-    //     req.flash('error', 'This record already exists.')
-    //     return res.redirect(`/sources/review/${sourceId}`)
-    // }
+    const duplicateCheck = await duplicateChecker.updateReview(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
+    if (duplicateCheck) {
+        req.flash('error', 'This record already exists.')
+        //TODO: fix this so it dumps them back to the form still filled out?
+        return res.redirect(`/dashboard`)
+    }
     if (!reviewSourceData.author[0].equals(req.user._id)) {
         req.flash('error', "You do not have permission to edit this submission.")
         return res.redirect('/dashboard')
@@ -151,11 +149,11 @@ module.exports.submitEditSource = async (req, res) => {
     const { sourceId } = req.params
     const publicSourceData = await Source.publicSource.findById(sourceId)
     const reviewSourceData = new Source.reviewSource(req.body)
-    // const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
-    // if (duplicateCheck) {
-    //     req.flash('error', 'This record already exists.')
-    //     return res.redirect(`/sources/${sourceId}`)
-    // }
+    const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
+    if (duplicateCheck) {
+        req.flash('error', 'This record already exists.')
+        return res.redirect(`/sources/${sourceId}`)
+    }
     reviewSourceData.author.unshift(req.user._id)
     reviewSourceData.publicId = sourceId;
     reviewSourceData.state = 'update';

@@ -51,6 +51,7 @@ const publishRecord = async (title, mediaType, sourceId) => {
     return false
 }
 
+//sourceId here is the PUBLIC SOURCE ID for the article being edited.
 const editPublic = async (title, mediaType, sourceId) => {
     const publicDuplicate = await Source.publicSource.findOne({
         title,
