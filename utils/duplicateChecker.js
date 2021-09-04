@@ -2,6 +2,8 @@ const Source = require('../models/source');
 const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 
+//TODO: Handle capitalization
+
 const submitNew = async (title, mediaType) => {
     const publicDuplicate = await Source.publicSource.findOne({ title, mediaType })
     if (publicDuplicate) return publicDuplicate
@@ -22,13 +24,13 @@ const updateReview = async (title, mediaType, sourceId) => {
 
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     if (reviewSourceData.publicId) {
-        publicDuplicate = await mongoose.models.PublicSource.findOne({ //finds any public records EXCLUDING the related review record.
+        publicDuplicate = await Source.publicSource.findOne({ //finds any public records EXCLUDING the related review record.
                 title, 
                 mediaType, 
-                _id: { $ne: reviewDuplicate.publicId }
+                _id: { $ne: reviewSourceData.publicId }
             })
     } else {
-        publicDuplicate = await mongoose.models.PublicSource.findOne({ //finds any public records EXCLUDING the related review record.
+        publicDuplicate = await Source.publicSource.findOne({ 
             title, 
             mediaType
         })
@@ -38,17 +40,36 @@ const updateReview = async (title, mediaType, sourceId) => {
     return false
 }
 
-module.exports = {
-    submitNew,
-    updateReview
+const publishRecord = async (title, mediaType, sourceId) => {
+    const reviewSourceData = await Source.reviewSource.findById(sourceId)
+    const publicDuplicate = await Source.publicSource.findOne({ 
+        title, 
+        mediaType, 
+        _id: { $ne: reviewSourceData.publicId }
+    })
+    if (publicDuplicate) return publicDuplicate
+    return false
 }
 
+const editPublic = async (title, mediaType, sourceId) => {
+    const publicDuplicate = await Source.publicSource.findOne({
+        title,
+        mediaType,
+        _id: { $ne: sourceId}
+    })
+    const reviewDuplicate = await Source.publicSource.findOne({
+        title,
+        mediaType,
+        state: { $in: ['new', 'review'] }
+    })
+    if (publicDuplicate) return publicDuplicate
+    if (reviewDuplicate) return true
+    return false
+}
 
-//(!mongoose.Types.ObjectId.isValid(sourceId)
-
-
-// if (!mongoose.Types.ObjectId.isValid(sourceId)) { //determines if source Id exists or is null
-//     publicDuplicate = await Source.publicSource.findOne({ title, mediaType }) //finds any publics records if sourceId doesn't exist
-// } else {
-//     reviewDuplicate = await Source.reviewSource.findById(sourceId) //finds review records if source Id exists
-// }
+module.exports = {
+    submitNew,
+    updateReview,
+    publishRecord,
+    editPublic
+}

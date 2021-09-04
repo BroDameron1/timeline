@@ -1,12 +1,4 @@
-// export const checkDuplicates = async (data) => {
-//     const response = await fetch('/sources/data?' + new URLSearchParams({
-//         title: data.title,
-//         mediaType: data.mediaType,
-//     }))
-//     return response.json()
-// }
 
-//Class to help determine if a source has duplicate entries.
 //TODO: Can it be expanded to work with any record?
 export class Duplicate {
     constructor (title, mediaType, sourceId) {
@@ -35,7 +27,6 @@ export class Duplicate {
     }
     async updateReviewDuplicates () {
         const duplicateResponse = await this.checkDuplicates('updateReview')
-        console.log(duplicateResponse)
         if (!duplicateResponse) return false
         if (duplicateResponse.title) {
             return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
@@ -44,48 +35,24 @@ export class Duplicate {
         }
     }
     async publishRecordDuplicates () {
-        
+        const duplicateResponse = await this.checkDuplicates('publishRecord')
+        if (!duplicateResponse) return false
+        if (duplicateResponse.title) {
+            return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
+        } else {
+            return `A record with that title is already under review.`
+        }
+    }
+    async editPublicDuplicates () {
+        const duplicateResponse = await this.checkDuplicates('editPublic')
+        if (!duplicateResponse) return false
+        if (duplicateResponse.title) {
+            return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
+        } else {
+            return `A record with that title is already under review.`
+        }
     }
 }
-
-
-
-
-// export class Duplicate {
-//     constructor (title, mediaType, sourceId) {
-//         this.title = title
-//         this.mediaType = mediaType
-//         this.sourceId = sourceId || null
-//     }
-
-//     async checkDuplicates (collection) {
-//         const response = await fetch('/sources/data?' + new URLSearchParams({
-//             title: this.title,
-//             mediaType: this.mediaType,
-//             sourceId: this.sourceId,
-//             collection
-//         }))
-//         return response.json()
-//     }
-
-//     async checkPublicDuplicates () {
-//         const duplicateResponse = await this.checkDuplicates('public')
-//         if (!duplicateResponse) return true
-//         //TODO: Fix this so it will properly display a link.
-//         return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
-//     }
-
-//     async checkBothDuplicates () {
-//         const duplicateResponse = await this.checkDuplicates('both')
-//         //console.log(this.sourceId)
-//         if (!duplicateResponse) return true
-//         if (duplicateResponse.title) {
-//             return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
-//         } else {
-//             return `A record with that title is already under review.`
-//         }
-//     }
-// }
 
 //Class for managing record state from the front end
 export class StateManager {
