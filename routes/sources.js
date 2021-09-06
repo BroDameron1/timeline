@@ -14,9 +14,7 @@ router.route('/review/:sourceId')
     .get(isLoggedIn, catchAsync(sources.renderReviewSource))
     .put(isLoggedIn, isAdmin, catchAsync(sources.publishReviewSource))
     .post(isLoggedIn, isAdmin, catchAsync(sources.publishReviewSource))
-    //.get(isLoggedIn, catchAsync(sources.renderEditNew))
-    // .put(isLoggedIn, catchAsync(sources.submitEditNew))
-    // .post(isLoggedIn, isAdmin, catchAsync(sources.publishNewSource))
+    .delete(isLoggedIn, catchAsync(sources.deleteReviewSource))
 
 //routes for editing a pending submission
 router.route('/review/:sourceId/edit')
@@ -33,11 +31,5 @@ router.route('/:sourceId')
 router.route('/:sourceId/edit')
     .get(isLoggedIn, catchAsync(sources.renderEditSource))
     .post(isLoggedIn, catchAsync(sources.submitEditSource))
-    //.put(isLoggedIn, isAdmin, catchAsync(sources.publishEditSource))
-
-// router.route('/:sourceId/edit')
-//     .get(isLoggedIn, catchAsync(sources.renderEditPublicSource))
-//     .post(isLoggedIn, catchAsync(sources.submitEditPublicSource))
-//     .put(isLoggedIn, isAdmin, catchAsync(sources.publishEditPublicSource))
 
 module.exports = router;

@@ -5,9 +5,15 @@ const ExpressError = require('../utils/expressError');
 //TODO: Handle capitalization
 
 const submitNew = async (title, mediaType) => {
-    const publicDuplicate = await Source.publicSource.findOne({ title, mediaType })
+    const publicDuplicate = await Source.publicSource.findOne({ 
+        title, 
+        mediaType 
+    }).collation({ locale: 'en', strength: 2 })
     if (publicDuplicate) return publicDuplicate
-    const reviewDuplicate = await Source.reviewSource.findOne({ title, mediaType })
+    const reviewDuplicate = await Source.reviewSource.findOne({ 
+        title, 
+        mediaType 
+    }).collation({ locale: 'en', strength: 2 })
     if (reviewDuplicate) return true
     return false
 }
@@ -20,7 +26,7 @@ const updateReview = async (title, mediaType, sourceId) => {
         title,
         mediaType,
         _id: { $ne: sourceId }
-    })
+    }).collation({ locale: 'en', strength: 2 })
 
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     if (reviewSourceData.publicId) {
@@ -28,12 +34,12 @@ const updateReview = async (title, mediaType, sourceId) => {
                 title, 
                 mediaType, 
                 _id: { $ne: reviewSourceData.publicId }
-            })
+            }).collation({ locale: 'en', strength: 2 })
     } else {
         publicDuplicate = await Source.publicSource.findOne({ 
             title, 
             mediaType
-        })
+        }).collation({ locale: 'en', strength: 2 })
     }
     if (publicDuplicate) return publicDuplicate
     if (reviewDuplicate) return true
@@ -46,7 +52,7 @@ const publishRecord = async (title, mediaType, sourceId) => {
         title, 
         mediaType, 
         _id: { $ne: reviewSourceData.publicId }
-    })
+    }).collation({ locale: 'en', strength: 2 })
     if (publicDuplicate) return publicDuplicate
     return false
 }
@@ -57,12 +63,12 @@ const editPublic = async (title, mediaType, sourceId) => {
         title,
         mediaType,
         _id: { $ne: sourceId}
-    })
+    }).collation({ locale: 'en', strength: 2 })
     const reviewDuplicate = await Source.publicSource.findOne({
         title,
         mediaType,
         state: { $in: ['new', 'review'] }
-    })
+    }).collation({ locale: 'en', strength: 2 })
     if (publicDuplicate) return publicDuplicate
     if (reviewDuplicate) return true
     return false

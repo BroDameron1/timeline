@@ -125,7 +125,7 @@ module.exports.forgotReset = async (req, res, next) => {
 module.exports.renderDashboard = async (req, res) => {
     const allPendingRequests = await Source.reviewSource.find().populate('author', 'username')
     const viewablePendingRequests = filterPendingRequests(req.user, allPendingRequests);
-    res.render('users/dashboard', { viewablePendingRequests })
+    res.render('users/dashboard2', { viewablePendingRequests })
 }
 
 module.exports.logout = (req, res) => {

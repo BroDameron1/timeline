@@ -38,8 +38,8 @@ window.addEventListener('beforeunload', async event => {
 
 form.addEventListener('submit', async event => {
     event.preventDefault()
-    const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId)
-    const duplicateResult = await submittedRecord.updateReviewDuplicates()
+    const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, 'updateReview')
+    const duplicateResult = await submittedRecord.validateDuplicates()
     //TODO: Revisit this conditional    
     if (!duplicateResult) {
         unloadCheck = true

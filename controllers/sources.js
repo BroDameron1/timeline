@@ -45,6 +45,10 @@ module.exports.renderReviewSource = async (req, res) => {
         req.flash('error', 'This record does not exist')
         return res.redirect('/dashboard')
     }
+    if (reviewSourceData.state === 'approved' || reviewSourceData.state === 'rejected') {
+        req.flash('error', 'This article has already been reviewed.')
+        return res.redirect('/dashboard')
+    }
     if (reviewSourceData.checkedOut) {
         req.flash('error', 'This record is currently in use.')
         return res.redirect('/dashboard')
@@ -128,6 +132,24 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
     res.redirect('/dashboard')
 }
 
+//allows a user to delete a pending submitted update
+module.exports.deleteReviewSource = async (req, res) => {
+    const { sourceId } = req.params
+    const reviewSourceData = await Source.reviewSource.findById(sourceId)
+    if (!reviewSourceData.author[0].equals(req.user._id)) {
+        req.flash('error', "You don't have permission to do that.")
+        res.redirect('/dashboard')
+    }
+    await Source.reviewSource.findByIdAndDelete(sourceId)
+    if (reviewSourceData.publicId) {
+        const publicSourceData = await Source.publicSource.findById(reviewSourceData.publicId)
+        publicSourceData.checkedOut = false
+        publicSourceData.save()
+    }
+    req.flash('info', 'Your submission was successfully deleted.')
+    res.redirect('/dashboard')
+}
+
 //renders the page for update to an existing source
 module.exports.renderEditSource = async (req, res) => {
     const { sourceId } = req.params
@@ -149,7 +171,7 @@ module.exports.submitEditSource = async (req, res) => {
     const { sourceId } = req.params
     const publicSourceData = await Source.publicSource.findById(sourceId)
     const reviewSourceData = new Source.reviewSource(req.body)
-    const duplicateCheck = await Source.reviewSource.checkDuplicates(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
+    const duplicateCheck = await duplicateChecker.editPublic(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
         return res.redirect(`/sources/${sourceId}`)
@@ -167,20 +189,22 @@ module.exports.submitEditSource = async (req, res) => {
 //controller to check for duplicate data by passing the title, mediaType, and sometimes review Id through
 //to check against the review and public collections
 module.exports.getData = async (req, res) => {
-    const { title, mediaType, collection, sourceId } = req.query
-    if (collection === 'submitNew') {
+    const { title, mediaType, type, sourceId } = req.query
+    console.log('here1', type)
+    if (type === 'submitNew') {
         const duplicateResult = await duplicateChecker.submitNew(title, mediaType)
         return res.json(duplicateResult)
     }
-    if (collection === 'updateReview') {
+    if (type === 'updateReview') {
         const duplicateResult = await duplicateChecker.updateReview(title, mediaType, sourceId)
         return res.json(duplicateResult)
     }
-    if (collection === 'publishRecord') {
+    if (type === 'publishRecord') {
+        console.log('here')
         const duplicateResult = await duplicateChecker.publishRecord(title, mediaType, sourceId)
         return res.json(duplicateResult)
     }
-    if (collection === 'editPublic') {
+    if (type === 'editPublic') {
         const duplicateResult = await duplicateChecker.editPublic(title, mediaType, sourceId)
         return res.json(duplicateResult)
     }

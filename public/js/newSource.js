@@ -8,8 +8,8 @@ const div = document.querySelector('#warning')
 
 form.addEventListener('submit', async event => {
     event.preventDefault()
-    const submittedRecord = new Duplicate(title.value, mediaType.value)
-    const duplicateResult = await submittedRecord.submitNewDuplicates()
+    const submittedRecord = new Duplicate(title.value, mediaType.value, null, 'submitNew')
+    const duplicateResult = await submittedRecord.validateDuplicates()
     if(!duplicateResult) {
         return form.submit();
     }

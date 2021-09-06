@@ -1,51 +1,27 @@
 
 //TODO: Can it be expanded to work with any record?
 export class Duplicate {
-    constructor (title, mediaType, sourceId) {
+    constructor (title, mediaType, sourceId, type) {
         this.title = title
         this.mediaType = mediaType || null
         this.sourceId = sourceId || null
+        this.type = type
     }
-    async checkDuplicates (collection) {
+    async checkDuplicates () {
         const response = await fetch('/sources/data?' + new URLSearchParams({
             title: this.title,
             mediaType: this.mediaType,
             sourceId: this.sourceId,
-            collection
+            type: this.type
+            //collection
         }))
         return response.json()
     }
-    async submitNewDuplicates () {
-        const duplicateResponse = await this.checkDuplicates('submitNew')
+
+    async validateDuplicates () {
+        const duplicateResponse = await this.checkDuplicates()
         if (!duplicateResponse) return false
         //TODO: Fix this so it will properly display a link.
-        if (duplicateResponse.title) {
-            return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
-        } else {
-            return `A record with that title is already under review.`
-        }
-    }
-    async updateReviewDuplicates () {
-        const duplicateResponse = await this.checkDuplicates('updateReview')
-        if (!duplicateResponse) return false
-        if (duplicateResponse.title) {
-            return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
-        } else {
-            return `A record with that title is already under review.`
-        }
-    }
-    async publishRecordDuplicates () {
-        const duplicateResponse = await this.checkDuplicates('publishRecord')
-        if (!duplicateResponse) return false
-        if (duplicateResponse.title) {
-            return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
-        } else {
-            return `A record with that title is already under review.`
-        }
-    }
-    async editPublicDuplicates () {
-        const duplicateResponse = await this.checkDuplicates('editPublic')
-        if (!duplicateResponse) return false
         if (duplicateResponse.title) {
             return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
         } else {
@@ -62,19 +38,7 @@ export class StateManager {
         this.targetCollection = targetCollection
     }
 
-    // async retrieveState () {
-    //     const response = await fetch('/sources/data?' + new URLSearchParams({
-    //         sourceId: this.sourceId,
-    //         collection: this.targetCollection
-    //     }))
-    //     const data = await response.json()
-    //     return data.state
-    // }
-
     async updateState () {
-        // const previousState = await this.retrieveState()
-        // sessionStorage.setItem('previousState', previousState)
-        // console.log(previousState)
         try {
             const response = await fetch('/sources/data', {
                 method: 'PUT',
@@ -100,7 +64,7 @@ const countdownTimer = document.querySelector('.countdown-timer')
 const blurBackground = document.querySelector('.disableDiv')
 const timerButton = document.querySelector('#timerButton')
 
-const startingMinutes = 1.1 //sets timeout for page
+const startingMinutes = 20 //sets timeout for page
 const warningTime = 1 * 60 //sets time when warning will pop up
 let time = startingMinutes * 60 //timer for use in idleLogout function, should not change
 
