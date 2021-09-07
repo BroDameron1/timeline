@@ -166,3 +166,115 @@ input[type=text], input[type=password], input[type=email], select {
     display: none;
     backdrop-filter: blur(10px);
 }
+
+/* dashboard CSS */
+
+.pending-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: stretch;
+    align-content: flex-start;
+}
+
+.user-header {
+    border: solid 3px rgba(202, 202, 202, 0.6);
+    box-sizing: border-box;
+    flex: 1 1 0;
+    min-width: 100%;
+}
+
+.record-column {
+    /* border: solid 3px rgba(202, 202, 202, 0.6); */
+    margin: 1rem;
+    border-radius: 5px;
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.column-header {
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin: .5rem;
+    padding: .5rem;
+    background-color: grey;
+    color: white;
+}
+
+.column-entry {
+    margin: .5rem;
+    padding: .5rem;
+    border: solid 3px rgba(202, 202, 202, 0.6);
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-gap: 10px;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.record-title {
+    grid-column: span 3;
+}
+
+.record-date {
+    grid-column: span 1;
+    font-size: .8rem;
+    justify-self: end;
+}
+
+.record-state {
+    display: grid;
+    grid-column: span 2;
+    text-align: center;
+    justify-items: center;
+    font-size: .8rem;
+}
+
+.state-container {
+    background-color: rgba(194, 194, 194, 0.7);
+    width: 10rem;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.record-edit {
+    display: grid;
+    grid-column: span 1;
+    text-align: center;
+}
+
+.record-delete {
+    display: grid;
+    grid-column: span 1;
+    text-align: center;
+}
+
+a.button-edit {
+    box-sizing: border-box;
+    border-radius: 6px;
+    background-color: rgb(62, 130, 255);
+    border: none;
+    padding: .5rem;
+    width: 80%;
+    justify-self: end;
+    color: white;
+
+}
+
+.button-delete {
+    font-size: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    border-radius: 6px;
+    background-color: rgb(196, 63, 63);
+    border: none;
+    padding: .5rem;
+    width: 80%;
+    justify-self: end;
+    color: white;
+}

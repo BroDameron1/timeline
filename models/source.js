@@ -28,8 +28,13 @@ const SourceSchema = new Schema({
     },
     publicId: {
         type: String
-    }
-});
+    },
+    updateDate: {
+        type: Date,
+        get: formatDate
+    },
+},
+    { timestamps: true, get: formatDate  });
 
 //adds new author to the front of the array of authors, removes any duplicates and stores the last 
 //five total authors
@@ -39,6 +44,18 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
     if (this.author.length > 5) {
         this.author.splice(5)
     }
+}
+
+SourceSchema.pre('save', function(next) {
+    this.updateDate = Date.now()
+    next()
+})
+
+function formatDate (date) {
+    const month = date.toLocaleString('default', { month: 'short' });
+    const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    const displayDate = `${month} ${date.getDate()} ${date.getFullYear()} at ${time}`
+    return displayDate;
 }
 
 
