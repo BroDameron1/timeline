@@ -18,7 +18,7 @@
         </div>
         <div class="form-field">
             <label for="media-type">Media Type</label>
-            <select name="mediaType" id="mediaType">
+            <select name="mediaType" id="mediaType" disabled>
                 <% for(let mediaType of mediaTypes) { %>
                     <option value="<%= mediaType %>" <%= publicSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
                 <% } %> 

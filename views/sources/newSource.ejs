@@ -1,5 +1,6 @@
 <% layout('layouts/boilerplate.ejs') %>
 
+
 <main>
     <div class="form">
         <h1>Submit a Source</h1>
@@ -11,11 +12,34 @@
         <div class="form-field">
             <label for="media-type">Media Type</label>
             <select name="mediaType" id="mediaType">
+                <option value="default">----Select a Media----</option>
                 <% for(let mediaType of mediaTypes) { %>
                     <option value="<%= mediaType %>"><%= mediaType %></option>
                 <% } %> 
             </select>
-        </div>
+        <div class="hide-sources" id="book-fields">
+            <div class="form-field">
+                <label for="author">Author(s)</label>
+                <input type="text" id="author0" name="author" required>
+                <a href="#" id="add-author">Add another author</a>
+            </div>
+            <div class="form-field">
+                <label for="publisher">Publisher</label>
+                <input type="text" id="publisher" name="publisher" required>
+            </div>
+        </div> 
+        <div class="hide-sources" id="movie-fields">
+            Movie Test
+        </div> 
+        <div class="hide-sources" id="comic-fields">
+            Comic Test
+        </div> 
+        <div class="hide-sources" id="tv-fields">
+            TV Show Test
+        </div> 
+        <div class="hide-sources" id="game-fields">
+            Video Game Test
+        </div> 
         <div>
             <button class="btn-submit">Submit for Review</button>
         </div>

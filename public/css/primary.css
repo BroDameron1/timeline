@@ -278,3 +278,9 @@ a.button-edit {
     justify-self: end;
     color: white;
 }
+
+/* use to hide a fieldset */
+
+.hide-sources {
+    display: none;
+}

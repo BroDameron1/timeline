@@ -10,6 +10,7 @@ const SourceSchema = new Schema({
     mediaType: {
         type: String,
         required: true,
+        immutable: true,
         enum: ['Movie', 'TV Show', 'Book', 'Comic', 'Video Game']
     },
     state: {
