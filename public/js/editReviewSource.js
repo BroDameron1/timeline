@@ -1,36 +1,61 @@
-import { Duplicate } from "./utils.js"
+import { idleLogout, Duplicate, StateManager } from "./utils.js"
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
-const form = document.querySelector('#newSource')
+const form = document.querySelector('#editSource')
 const div = document.querySelector('#warning')
+const button = document.querySelector('.btn-submit')
 const bookFields = document.querySelector('#book-fields')
 const movieFields = document.querySelector('#movie-fields')
 const tvFields = document.querySelector('#tv-fields')
 const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
 const addAuthor = document.querySelector('#add-author')
-const sourceImage = document.querySelector('#sourceImage')
 
 
-form.addEventListener('submit', async event => {
-    event.preventDefault()
-    if (mediaType.value === 'default') {
-        return div.textContent = 'Please select a media type.'
+
+window.addEventListener('load', async event => {
+    const state = new StateManager(true, sourceId, 'ReviewSource')
+    const stateResult = await state.updateState()
+    if (stateResult !== 200) {
+        location.href="/dashboard"
+        console.log('Something went wrong, please contact an admin.', state)
     }
-    const submittedRecord = new Duplicate(title.value, mediaType.value, null, 'submitNew')
-    const duplicateResult = await submittedRecord.validateDuplicates()
-    if(!duplicateResult) {
-        return form.submit();
-    }
-    if(duplicateResult) {
-        return div.textContent = duplicateResult
+    setInterval(idleLogout, 1000)
+})
+
+let unloadCheck = false //flag to determine if the beforeunload event fires on submit
+
+window.addEventListener('beforeunload', async event => {
+    event.preventDefault()  
+    if (!unloadCheck) {
+        event.returnValue = 'test'
+        const state = new StateManager(false, sourceId, 'ReviewSource')
+        const stateResult = await state.updateState()
+        if (stateResult !== 200) {
+            return console.log('Something went wrong, please contact an admin.', state)
+        }
+    } else {
+        return
     }
 })
 
+// TODO: Do an AJAX call for ID instead of passing it through EJS?
 
-mediaType.addEventListener('input', event => {
+form.addEventListener('submit', async event => {
     event.preventDefault()
+    const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, 'updateReview')
+    const duplicateResult = await submittedRecord.validateDuplicates()
+    //TODO: Revisit this conditional    
+    if (!duplicateResult) {
+        unloadCheck = true
+        return form.submit()
+    }
+    return div.textContent = duplicateResult
+})
+
+window.addEventListener('load', event => {
+    console.log('test')
     if (mediaType.value === 'Book') {
         bookFields.classList.remove('hide-sources')
     } else {
@@ -58,17 +83,6 @@ mediaType.addEventListener('input', event => {
     }
 })
 
-let authorCount = 0
-addAuthor.addEventListener('click', event => {  
-    if (authorCount <= 3) {
-        addAuthor.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" id="author${authorCount}" name="book[author][]"></div>`)
-        authorCount++
-    }
-    if (authorCount === 3) {
-        addAuthor.classList.add('hide-sources')
-    }
-})
-
 sourceImage.addEventListener('change', event => {
     const imgPreview = document.querySelector('.image-preview')
     const file = document.querySelector('input[type=file]').files[0]
@@ -85,4 +99,3 @@ sourceImage.addEventListener('change', event => {
 
     document.querySelector('.file-name').textContent = file.name
 })
-

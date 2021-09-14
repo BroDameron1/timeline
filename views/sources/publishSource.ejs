@@ -12,11 +12,12 @@
 
 <main>
     <div class="form">
-        <h1>Edit Submission</h1>
-        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id)) {%>
-            <form action="/sources/review/<%= reviewSourceData._id %>/edit" method="POST" id="editSource">
-        <% } else { %> 
-            <form action="/sources/review/<%= reviewSourceData._id %>/edit?_method=PUT" method="POST" id="editSource">
+        <h1>Review Submission</h1>
+        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id) && reviewSourceData.state === 'new') {%>
+            <form action="/sources/review/<%= reviewSourceData._id %>" method="POST" id="editSource">
+        <% } %> 
+        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id) && reviewSourceData.state === 'update') {%>
+            <form action="/sources/review/<%= reviewSourceData._id %>?_method=PUT" method="POST" id="editSource">
         <% } %> 
         <div class="form-field">
             <label for="title">Title</label>
@@ -24,14 +25,14 @@
         </div>
         <div class="form-field">
             <label for="media-type">Media Type</label>
-            <select name="mediaType" id="mediaType">
+            <select name="mediaType" id="mediaType" disabled>
                 <% for(let mediaType of mediaTypes) { %>
                     <option value="<%= mediaType %>" <%= reviewSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
                 <% } %> 
             </select>
         </div>
         <div>
-            <button class="btn-submit">Submit for Review</button>
+            <button class="btn-submit">Publish</button>
         </div>
         <div id="warning"></div>
         </form>
@@ -43,4 +44,4 @@
 <script>
     const sourceId = '<%- reviewSourceData._id %>'
 </script>
-<script type="module" src="/js/editSource.js"></script>
+<script type="module" src="/js/publishSource.js"></script>

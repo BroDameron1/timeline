@@ -10,7 +10,7 @@
 
 <main>
     <div class="form">
-        <h1>Edit Submission</h1>
+        <h1>Submit Update</h1>
         <form action="/sources/<%= publicSourceData._id %>/edit" method="POST" id="editSource">
         <div class="form-field">
             <label for="title">Title</label>
@@ -18,7 +18,7 @@
         </div>
         <div class="form-field">
             <label for="media-type">Media Type</label>
-            <select name="mediaType" id="mediaType">
+            <select name="mediaType" id="mediaType" disabled>
                 <% for(let mediaType of mediaTypes) { %>
                     <option value="<%= mediaType %>" <%= publicSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
                 <% } %> 
@@ -35,4 +35,4 @@
 <script>
     const sourceId = '<%- publicSourceData._id %>'
 </script>
-<script type="module" src="/js/editSource.js"></script>
+<script type="module" src="/js/editPublicSource.js"></script>

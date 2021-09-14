@@ -118,6 +118,7 @@ app.use(
                 "'self'",
                 "blob:",
                 "data:",
+                "https://res.cloudinary.com/dwanm3bjb/"
             ],
             fontSrc: ["'self'"],
         },

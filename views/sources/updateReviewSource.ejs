@@ -1,19 +1,26 @@
 <% layout('layouts/boilerplate.ejs') %>
 
+<div class="disableDiv">
+    <div class="countdown-popup">
+        Your session will time out and you will lose all changes in:
+        <div class="countdown-timer"></div>
+        <button class="btn-delete" id="timerButton">Click to continue working.</button>
+    </div>
+</div>
+
 <main>
     <div class="form">
-        <h1>Submit a Source</h1>
-        <form action='/sources/new' method="POST" id="newSource" enctype="multipart/form-data">
+        <h1>Edit Submission</h1>
+            <form action="/sources/review/<%= reviewSourceData._id %>/edit?_method=PUT" method="POST" id="editSource">
         <div class="form-field">
             <label for="title">Title</label>
-            <input type="text" id="title" name="title" required autofocus>
+            <input type="text" id="title" name="title" value="<%= reviewSourceData.title %>" required autofocus>
         </div>
         <div class="form-field">
             <label for="media-type">Media Type</label>
-            <select name="mediaType" id="mediaType">
-                <option value="default">----Select a Media----</option>
+            <select name="mediaType" id="mediaType" disabled>
                 <% for(let mediaType of mediaTypes) { %>
-                    <option value="<%= mediaType %>"><%= mediaType %></option>
+                    <option value="<%= mediaType %>" <%= reviewSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
                 <% } %> 
             </select>
         </div>
@@ -24,7 +31,7 @@
             <label for="sourceImage" class="btn-browse">Browse...</label>
         </div>
         <div class="imgpreview-wrapper">
-            <img src="" class="image-preview">
+            <img src="<%= reviewSourceData.images.url %>" class="image-preview">
         </div>  
         
         <div class="hide-sources" id="book-fields">
@@ -35,7 +42,7 @@
             </div>
             <div class="form-field">
                 <label for="publisher">Publisher</label>
-                <input type="text" id="publisher" name="book[publisher]">
+                <input type="text" id="publisher" name="book[publisher]" value="<%= reviewSourceData.book.publisher %>">
             </div>
         </div> 
         <div class="hide-sources" id="movie-fields">
@@ -58,4 +65,10 @@
     </div>
 </main>
 
-<script type="module" src="/js/newSource.js"></script>
+
+
+<script>
+    const sourceId = '<%- reviewSourceData._id %>'
+</script>
+<script type="module" src="/js/editReviewSource.js"></script>
+

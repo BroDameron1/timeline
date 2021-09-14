@@ -1,40 +1,27 @@
-// export const checkDuplicates = async (data) => {
-//     const response = await fetch('/sources/data?' + new URLSearchParams({
-//         title: data.title,
-//         mediaType: data.mediaType,
-//     }))
-//     return response.json()
-// }
 
-//Class to help determine if a source has duplicate entries.
 //TODO: Can it be expanded to work with any record?
 export class Duplicate {
-    constructor (title, mediaType, sourceId) {
+    constructor (title, mediaType, sourceId, type) {
         this.title = title
-        this.mediaType = mediaType
+        this.mediaType = mediaType || null
         this.sourceId = sourceId || null
+        this.type = type
     }
-
-    async checkDuplicates (collection) {
+    async checkDuplicates () {
         const response = await fetch('/sources/data?' + new URLSearchParams({
             title: this.title,
             mediaType: this.mediaType,
             sourceId: this.sourceId,
-            collection
+            type: this.type
+            //collection
         }))
         return response.json()
     }
 
-    async checkPublicDuplicates () {
-        const duplicateResponse = await this.checkDuplicates('public')
-        if (!duplicateResponse) return true
+    async validateDuplicates () {
+        const duplicateResponse = await this.checkDuplicates()
+        if (!duplicateResponse) return false
         //TODO: Fix this so it will properly display a link.
-        return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
-    }
-
-    async checkBothDuplicates () {
-        const duplicateResponse = await this.checkDuplicates('both')
-        if (!duplicateResponse) return true
         if (duplicateResponse.title) {
             return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
         } else {
@@ -43,16 +30,43 @@ export class Duplicate {
     }
 }
 
-//function for idling out a user while they are editting a record.
+//Class for managing record state from the front end
+export class StateManager {
+    constructor(checkedOut, sourceId, targetCollection) {
+        this.checkedOut = checkedOut
+        this.sourceId = sourceId
+        this.targetCollection = targetCollection
+    }
+
+    async updateState () {
+        try {
+            const response = await fetch('/sources/data', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    checkedOut: this.checkedOut,
+                    sourceId: this.sourceId,
+                    collection: this.targetCollection
+                })
+            })
+            return response.status
+        } catch (err) {
+            console.log('Something went wrong.', err)
+        }
+    }
+}
+
+//variables and function for idling out a user while they are editing a record.
 const countdown = document.querySelector('.countdown-popup')
 const countdownTimer = document.querySelector('.countdown-timer')
 const blurBackground = document.querySelector('.disableDiv')
 const timerButton = document.querySelector('#timerButton')
 
-const startingMinutes = 1.1 //sets timeout for page
+const startingMinutes = 20 //sets timeout for page
 const warningTime = 1 * 60 //sets time when warning will pop up
 let time = startingMinutes * 60 //timer for use in idleLogout function, should not change
-
 
 export const idleLogout = () => { //function for kicking user out of the page if they don't take any action
 

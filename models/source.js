@@ -10,21 +10,45 @@ const SourceSchema = new Schema({
     mediaType: {
         type: String,
         required: true,
+        immutable: true,
         enum: ['Movie', 'TV Show', 'Book', 'Comic', 'Video Game']
     },
+    images: {
+            url: String,
+            filename: String,
+        },
     state: {
         type: String,
         required: true,
-        enum: ['new', 'update', 'checked out', 'approved', 'published', 'rejected']
-    }, 
+        enum: ['new', 'update', 'approved', 'published', 'rejected']
+    },
+    checkedOut: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     author: {
         type: [ Schema.Types.ObjectId ],
         ref: 'User'
     },
     publicId: {
         type: String
+    },
+    updateDate: {
+        type: Date,
+        get: formatDate
+    },
+    book: {
+        author: {
+            type: [ String ],
+            required: true
+        },
+        publisher: {
+            type: String,
+        }
     }
-});
+},
+    { timestamps: true, get: formatDate  });
 
 //adds new author to the front of the array of authors, removes any duplicates and stores the last 
 //five total authors
@@ -36,34 +60,16 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
     }
 }
 
-//Validation if a newly submitted record already exists by matching title, mediaType, and Review ID 
-//in both review and public collections.  Returns true if a record exists and returns the record
-//if in the public collection.  Returns true if in the review collection.  Returns false if no record
-//exists.
-SourceSchema.statics.checkDuplicates = async function (title, mediaType, sourceId = null) {
-    //TODO: Account for capitalization
-    if (!title || !mediaType) throw new ExpressError('Invalid Entry')
-    const publicDuplicate = await mongoose.models.PublicSource.findOne({ title, mediaType })
-    if (!publicDuplicate) {
-        const reviewDuplicate = await mongoose.models.ReviewSource.findOne({ title, mediaType })
-        if (!reviewDuplicate) return false
-        //this ensures the record doesn't find itself in the review collection by checking the review ID.
-        if (reviewDuplicate && !reviewDuplicate._id.equals(sourceId)) {
-            return true
-        } else {
-            return false
-        }
-    }
-    return publicDuplicate;
-}
+SourceSchema.pre('save', function(next) {
+    this.updateDate = Date.now()
+    next()
+})
 
-//Validation if a submitted record already exists in the public collection by matching title and
-//mediaType.  Returns the record if it exists, returns false if it doesn't.
-SourceSchema.statics.checkPublicDuplicates = async function (title, mediaType) {
-    if (!title || !mediaType) throw new ExpressError('Invalid Entry')
-    const publicDuplicate = await mongoose.models.PublicSource.findOne({ title, mediaType })
-    if (!publicDuplicate) return false
-    return publicDuplicate
+function formatDate (date) {
+    const month = date.toLocaleString('default', { month: 'short' });
+    const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    const displayDate = `${month} ${date.getDate()} ${date.getFullYear()} at ${time}`
+    return displayDate;
 }
 
 
