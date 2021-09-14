@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 const catchAsync = require('../utils/catchAsync');
 const sources = require('../controllers/sources');
+const multer = require('multer') //adds multer to process file uploads
+const { storage } = require('../utils/cloudinary')
+const upload = multer({ storage }) //initialize multer and add location for file uploads
 const { isLoggedIn, validateUser, notLoggedIn, isAdmin } = require('../middleware');
 
 //routes for creating and submitting a new source
 router.route('/new')
     .get(isLoggedIn, catchAsync(sources.renderNewSource))
-    .post(isLoggedIn, catchAsync(sources.submitNewSource))
+    .post(isLoggedIn, upload.single('sourceImage'), catchAsync(sources.submitNewSource))
 
 //routes for publishing a source to public
 router.route('/review/:sourceId')

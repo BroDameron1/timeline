@@ -24,13 +24,13 @@ module.exports.renderNewSource = async (req, res) => {
 //controller for the post route for submitting a New Source to be approved.
 module.exports.submitNewSource = async (req, res) => {
     const reviewSourceData = new Source.reviewSource(req.body)
-    //TODO: Replace!
     const duplicateCheck = await duplicateChecker.submitNew(reviewSourceData.title, reviewSourceData.mediaType)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
         return res.redirect('/sources/new')
     }
     reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
+    reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
     reviewSourceData.state = 'new'
     await reviewSourceData.save()
     req.flash('info', 'Your new Source has been submitted for approval.')

@@ -103,7 +103,7 @@ main, .flash-container {
     width: 100%;
 }
 
-input[type=text], input[type=password], input[type=email], select {
+input[type=text], input[type=password], input[type=email], select, .file-name {
     border-radius: 6px;
     border: 1px solid #cdcdcd;
     width: 100%;
@@ -111,6 +111,7 @@ input[type=text], input[type=password], input[type=email], select {
     padding: .5rem;
     margin: 0;
     box-sizing: border-box;
+    height: 2.5rem;
 }
 
 .password-requirements {
@@ -284,3 +285,52 @@ a.button-edit {
 .hide-sources {
     display: none;
 }
+
+/* styling for image upload preview */
+.imgpreview-wrapper {
+    display: flex;
+    box-sizing: border-box;
+    margin: 1rem;
+    width: 100%;
+    height: 200px;
+    align-items: center;
+    justify-content: center;
+}
+    
+.image-preview
+{
+    max-width: 100%;
+    max-height: 200px;
+}
+
+
+/* for file upload button and box */
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.inputfile + label {
+    cursor: pointer;
+    display: inline-block;
+}
+
+.inputfile:focus + label {
+	outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}
+
+
+.btn-browse {
+    border-radius: 6px;
+    background-color: rgb(62, 130, 255);
+    border: none;
+    font-size: 1em;
+    padding: .5rem;
+    margin-top: 1rem;
+    width: 5rem;
+}   

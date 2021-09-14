@@ -10,7 +10,7 @@ const tvFields = document.querySelector('#tv-fields')
 const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
 const addAuthor = document.querySelector('#add-author')
-const sourceFields = document.querySelector('.source-fields')
+const sourceImage = document.querySelector('#sourceImage')
 
 
 form.addEventListener('submit', async event => {
@@ -61,10 +61,28 @@ mediaType.addEventListener('input', event => {
 let authorCount = 0
 addAuthor.addEventListener('click', event => {  
     if (authorCount <= 3) {
-        addAuthor.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" id="author${authorCount}"></div>`)
+        addAuthor.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" id="author${authorCount}" name="book[author][]"></div>`)
         authorCount++
     }
     if (authorCount === 3) {
         addAuthor.classList.add('hide-sources')
     }
 })
+
+sourceImage.addEventListener('change', event => {
+    const imgPreview = document.querySelector('.image-preview')
+    const file = document.querySelector('input[type=file]').files[0]
+    console.log(file)
+    const reader = new FileReader()
+
+    reader.addEventListener('load', function () {
+        imgPreview.src = reader.result
+    }, false)
+
+    if (file) {
+        reader.readAsDataURL(file)
+    }
+
+    document.querySelector('.file-name').textContent = file.name
+})
+

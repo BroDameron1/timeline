@@ -13,6 +13,10 @@ const SourceSchema = new Schema({
         immutable: true,
         enum: ['Movie', 'TV Show', 'Book', 'Comic', 'Video Game']
     },
+    images: {
+            url: String,
+            filename: String,
+        },
     state: {
         type: String,
         required: true,
@@ -34,6 +38,15 @@ const SourceSchema = new Schema({
         type: Date,
         get: formatDate
     },
+    book: {
+        author: {
+            type: [ String ],
+            required: true
+        },
+        publisher: {
+            type: String,
+        }
+    }
 },
     { timestamps: true, get: formatDate  });
 

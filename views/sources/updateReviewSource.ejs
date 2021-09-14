@@ -8,8 +8,6 @@
     </div>
 </div>
 
-
-
 <main>
     <div class="form">
         <h1>Edit Submission</h1>
@@ -26,6 +24,39 @@
                 <% } %> 
             </select>
         </div>
+        <div class="form-field">
+            Upload Image
+            <div class="file-name" id="file-name"></div>
+            <input type="file" name="sourceImage" id="sourceImage" class="inputfile">
+            <label for="sourceImage" class="btn-browse">Browse...</label>
+        </div>
+        <div class="imgpreview-wrapper">
+            <img src="<%= reviewSourceData.images.url %>" class="image-preview">
+        </div>  
+        
+        <div class="hide-sources" id="book-fields">
+            <div class="form-field">
+                <label for="author">Author(s)</label>
+                <input type="text" id="author0" name="book[author][]">
+                <a href="#" id="add-author">Add another author</a>
+            </div>
+            <div class="form-field">
+                <label for="publisher">Publisher</label>
+                <input type="text" id="publisher" name="book[publisher]" value="<%= reviewSourceData.book.publisher %>">
+            </div>
+        </div> 
+        <div class="hide-sources" id="movie-fields">
+            Movie Test
+        </div> 
+        <div class="hide-sources" id="comic-fields">
+            Comic Test
+        </div> 
+        <div class="hide-sources" id="tv-fields">
+            TV Show Test
+        </div> 
+        <div class="hide-sources" id="game-fields">
+            Video Game Test
+        </div> 
         <div>
             <button class="btn-submit">Submit for Review</button>
         </div>
@@ -40,3 +71,4 @@
     const sourceId = '<%- reviewSourceData._id %>'
 </script>
 <script type="module" src="/js/editReviewSource.js"></script>
+
