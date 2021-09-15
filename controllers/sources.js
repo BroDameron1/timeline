@@ -2,6 +2,7 @@ const Source = require('../models/source');
 const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
+const { cloudinary } = require('../utils/cloudinary')
 
 //controller for get route for rendering any existing source.
 //TODO: Handle failed to cast errors
@@ -18,7 +19,7 @@ module.exports.renderSource = async (req, res) => {
 //controller for get route for rendering the New Source submission form.
 module.exports.renderNewSource = async (req, res) => {
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/newSource', { mediaTypes })
+    res.render('sources/newSource', { mediaTypes, data: {} })
 }
 
 //controller for the post route for submitting a New Source to be approved.
@@ -54,7 +55,7 @@ module.exports.renderReviewSource = async (req, res) => {
         return res.redirect('/dashboard')
     }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/publishSource', { reviewSourceData, mediaTypes })
+    res.render('sources/publishSource', { mediaTypes, reviewSourceData })
 }
 
 //allows the publishing of any review record (whether a new record or an updated one)
@@ -103,7 +104,7 @@ module.exports.renderUpdateReviewSource = async (req, res) => {
         return res.redirect('/dashboard')
     }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/updateReviewSource', { reviewSourceData, mediaTypes})
+    res.render('sources/updateReviewSource', { data: reviewSourceData, mediaTypes})
 }
 
 //allows submission of an update to an already submitted review record
@@ -111,7 +112,11 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
     const { sourceId } = req.params
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     reviewSourceData.set({ ...req.body })
-    //TODO: Replace duplicate check logic
+    console.log(req.file, 'test')
+    if (req.file) {
+        await cloudinary.uploader.destroy(reviewSourceData.images.filename)
+        reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+    }
     const duplicateCheck = await duplicateChecker.updateReview(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
@@ -190,7 +195,6 @@ module.exports.submitEditSource = async (req, res) => {
 //to check against the review and public collections
 module.exports.getData = async (req, res) => {
     const { title, mediaType, type, sourceId } = req.query
-    console.log('here1', type)
     if (type === 'submitNew') {
         const duplicateResult = await duplicateChecker.submitNew(title, mediaType)
         return res.json(duplicateResult)
@@ -200,7 +204,6 @@ module.exports.getData = async (req, res) => {
         return res.json(duplicateResult)
     }
     if (type === 'publishRecord') {
-        console.log('here')
         const duplicateResult = await duplicateChecker.publishRecord(title, mediaType, sourceId)
         return res.json(duplicateResult)
     }

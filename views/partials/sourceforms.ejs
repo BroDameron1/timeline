@@ -1,0 +1,34 @@
+
+<div class="hide-sources" id="book-fields">
+    <div class="form-field">
+        <label for="author">Author(s)</label>
+        <% for(let author of data.book.author) { %>    
+            <div class="form-field"><input type="text" class="book-author" name="book[author][]" value="<%= author %>"></div>
+        <% } %> 
+        <a href="#" id="add-author">Add another author</a>
+    </div>
+    <div class="form-field">
+        <label for="publisher">Publisher</label>
+        <input type="text" id="publisher" name="book[publisher]" value="<%= data.book.publisher %>">
+    </div>
+    <div class="form-field">
+        <label for="releaseDate">Initial Release Date</label>
+        <input type="date" id="releaseDate" name="book[releaseDate]" value="<%= data.book.releaseDate %>">
+    </div>
+    <div class="form-field">
+        <label for="isbn10">ISBN-10</label>
+        <input type="text" id="isbn10" name="book[isbn10]" value="<%= data.book.isbn10 %>">
+    </div>
+</div> 
+<div class="hide-sources" id="movie-fields">
+    Movie Test
+</div> 
+<div class="hide-sources" id="comic-fields">
+    Comic Test
+</div> 
+<div class="hide-sources" id="tv-fields">
+    TV Show Test
+</div> 
+<div class="hide-sources" id="game-fields">
+    Video Game Test
+</div> 

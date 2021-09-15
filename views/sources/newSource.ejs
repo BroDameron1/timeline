@@ -26,16 +26,24 @@
         <div class="imgpreview-wrapper">
             <img src="" class="image-preview">
         </div>  
-        
+
         <div class="hide-sources" id="book-fields">
             <div class="form-field">
                 <label for="author">Author(s)</label>
-                <input type="text" id="author0" name="book[author][]">
+                    <input type="text" class="book-author" name="book[author][]">
                 <a href="#" id="add-author">Add another author</a>
             </div>
             <div class="form-field">
                 <label for="publisher">Publisher</label>
                 <input type="text" id="publisher" name="book[publisher]">
+            </div>
+            <div class="form-field">
+                <label for="releaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="bookReleaseDate" name="book[releaseDate]" min="1977-05-25">
+            </div>
+            <div class="form-field">
+                <label for="isbn10">ISBN-10</label>
+                <input type="text" id="isbn10" name="book[isbn10]">
             </div>
         </div> 
         <div class="hide-sources" id="movie-fields">
@@ -50,6 +58,7 @@
         <div class="hide-sources" id="game-fields">
             Video Game Test
         </div> 
+
         <div>
             <button class="btn-submit">Submit for Review</button>
         </div>

@@ -103,7 +103,7 @@ main, .flash-container {
     width: 100%;
 }
 
-input[type=text], input[type=password], input[type=email], select, .file-name {
+input[type=text], input[type=password], input[type=email], input[type=date], select, .file-name {
     border-radius: 6px;
     border: 1px solid #cdcdcd;
     width: 100%;

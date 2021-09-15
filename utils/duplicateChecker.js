@@ -2,7 +2,6 @@ const Source = require('../models/source');
 const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 
-//TODO: Handle capitalization
 
 const submitNew = async (title, mediaType) => {
     const publicDuplicate = await Source.publicSource.findOne({ 
@@ -19,7 +18,6 @@ const submitNew = async (title, mediaType) => {
 }
 
 const updateReview = async (title, mediaType, sourceId) => {
-    console.log('here')
     let publicDuplicate
     //i'm good, returns ANY review records that match title and mediatype but NOT the same _id
     const reviewDuplicate = await Source.reviewSource.findOne({

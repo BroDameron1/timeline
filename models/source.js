@@ -43,9 +43,32 @@ const SourceSchema = new Schema({
             type: [ String ],
             required: true
         },
-        publisher: {
-            type: String,
-        }
+        publisher: String,
+        releaseDate: Date,
+        isbn10: String
+    },
+    movie: {
+        director: [ String ],
+        writer: [ String ],
+        releaseDate: Date,
+    },
+    comic: {
+        writer: String,
+        contributors: [ String ],
+        line: String,
+        issueNum: Number,
+        releaseDate: Date
+    },
+    tv: {
+        series: String,
+        season: Number,
+        episode: Number,
+        releaseDate: Date
+    },
+    videoGame: {
+        studio: String,
+        publisher: String,
+        releaseDate: Date
     }
 },
     { timestamps: true, get: formatDate  });

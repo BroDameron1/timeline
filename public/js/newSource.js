@@ -12,6 +12,28 @@ const comicFields = document.querySelector('#comic-fields')
 const addAuthor = document.querySelector('#add-author')
 const sourceImage = document.querySelector('#sourceImage')
 
+window.addEventListener('load', event => {
+    let today = new Date();
+    let dd = today.getDate();
+    let mm = today.getMonth() + 1; //January is 0!
+    const yyyy = today.getFullYear();
+
+    if (dd < 10) {
+        dd = '0' + dd;
+    }
+
+    if (mm < 10) {
+        mm = '0' + mm;
+    } 
+        
+    today = yyyy + '-' + mm + '-' + dd;
+    // document.getElementById("datefield").setAttribute("max", today);
+    const dateFields = document.querySelectorAll('.date')
+    console.log(dateFields)
+    dateFields.forEach(date => {
+        date.setAttribute("max", today)
+    })
+})
 
 form.addEventListener('submit', async event => {
     event.preventDefault()
@@ -58,13 +80,13 @@ mediaType.addEventListener('input', event => {
     }
 })
 
-let authorCount = 0
-addAuthor.addEventListener('click', event => {  
-    if (authorCount <= 3) {
-        addAuthor.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" id="author${authorCount}" name="book[author][]"></div>`)
-        authorCount++
+addAuthor.addEventListener('click', event => {
+    const authorCount = document.querySelectorAll('.book-author')
+    console.log(authorCount.length)
+    if (authorCount.length <= 3) {
+        addAuthor.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="book-author" name="book[author][]"></div>`)
     }
-    if (authorCount === 3) {
+    if (authorCount.length === 3) {
         addAuthor.classList.add('hide-sources')
     }
 })

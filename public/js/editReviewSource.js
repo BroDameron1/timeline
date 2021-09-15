@@ -55,7 +55,6 @@ form.addEventListener('submit', async event => {
 })
 
 window.addEventListener('load', event => {
-    console.log('test')
     if (mediaType.value === 'Book') {
         bookFields.classList.remove('hide-sources')
     } else {
@@ -81,6 +80,11 @@ window.addEventListener('load', event => {
     } else {
         gameFields.classList.add('hide-sources')
     }
+
+    const authorCount = document.querySelectorAll('.book-author')
+    if (authorCount.length === 4) {
+        addAuthor.classList.add('hide-sources')
+    }
 })
 
 sourceImage.addEventListener('change', event => {
@@ -98,4 +102,15 @@ sourceImage.addEventListener('change', event => {
     }
 
     document.querySelector('.file-name').textContent = file.name
+})
+
+addAuthor.addEventListener('click', event => {
+    const authorCount = document.querySelectorAll('.book-author')
+    console.log(authorCount.length)
+    if (authorCount.length <= 3) {
+        addAuthor.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="book-author" name="book[author][]"></div>`)
+    }
+    if (authorCount.length === 3) {
+        addAuthor.classList.add('hide-sources')
+    }
 })

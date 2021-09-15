@@ -22,7 +22,7 @@ router.route('/review/:sourceId')
 //routes for editing a pending submission
 router.route('/review/:sourceId/edit')
     .get(isLoggedIn, catchAsync(sources.renderUpdateReviewSource))
-    .put(isLoggedIn, catchAsync(sources.submitUpdateReviewSource))
+    .put(isLoggedIn, upload.single('sourceImage'), catchAsync(sources.submitUpdateReviewSource))
 
 router.route('/data')
     .get(isLoggedIn, catchAsync(sources.getData))
