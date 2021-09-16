@@ -44,7 +44,10 @@ const SourceSchema = new Schema({
             required: true
         },
         publisher: String,
-        releaseDate: Date,
+        releaseDate: {
+            type: Date,
+            get: formDate
+        },
         isbn10: String
     },
     movie: {
@@ -54,8 +57,8 @@ const SourceSchema = new Schema({
     },
     comic: {
         writer: String,
-        contributors: [ String ],
-        line: String,
+        artContributors: [ String ],
+        series: String,
         issueNum: Number,
         releaseDate: Date
     },
@@ -83,16 +86,21 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
     }
 }
 
-SourceSchema.pre('save', function(next) {
+//sets the date/time for updateDate.  Not sure why we can't use the timestamps.  TODO
+SourceSchema.pre('save', function(next) { 
     this.updateDate = Date.now()
     next()
 })
 
-function formatDate (date) {
+function formatDate (date) { //formats and passes through the last updated time to be displayed.
     const month = date.toLocaleString('default', { month: 'short' });
     const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
     const displayDate = `${month} ${date.getDate()} ${date.getFullYear()} at ${time}`
     return displayDate;
+}
+
+function formDate (date) {
+    return date.toISOString().substring(0, 10)
 }
 
 

@@ -103,7 +103,7 @@ main, .flash-container {
     width: 100%;
 }
 
-input[type=text], input[type=password], input[type=email], input[type=date], select, .file-name {
+input, select, .file-name {
     border-radius: 6px;
     border: 1px solid #cdcdcd;
     width: 100%;
@@ -112,6 +112,7 @@ input[type=text], input[type=password], input[type=email], input[type=date], sel
     margin: 0;
     box-sizing: border-box;
     height: 2.5rem;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .password-requirements {

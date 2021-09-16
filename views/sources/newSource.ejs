@@ -38,7 +38,7 @@
                 <input type="text" id="publisher" name="book[publisher]">
             </div>
             <div class="form-field">
-                <label for="releaseDate">Initial Release Date</label>
+                <label for="bookReleaseDate">Initial Release Date</label>
                 <input type="date" class="date" id="bookReleaseDate" name="book[releaseDate]" min="1977-05-25">
             </div>
             <div class="form-field">
@@ -47,16 +47,75 @@
             </div>
         </div> 
         <div class="hide-sources" id="movie-fields">
-            Movie Test
+            <div class="form-field">
+                <label for="author">Director(s)</label>
+                    <input type="text" class="movie-director" name="movie[director][]">
+                <a href="#" id="add-director">Add another director</a>
+            </div>
+            <div class="form-field">
+                <label for="author">Writer(s)</label>
+                    <input type="text" class="movie-writer" name="movie[writer][]">
+                <a href="#" id="add-writer">Add another writer</a>
+            </div>
+            <div class="form-field">
+                <label for="movieReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="movieReleaseDate" name="movie[releaseDate]" min="1977-05-25">
+            </div>
         </div> 
         <div class="hide-sources" id="comic-fields">
-            Comic Test
+            <div class="form-field">
+                <label for="comic-writer">Writer</label>
+                <input type="text" id="comic-writer" name="comic[writer]">
+            </div>
+            <div class="form-field">
+                <label for="artists">Art Contributor(s)</label>
+                    <input type="text" class="art-contributor" name="comic[artContributor][]">
+                <a href="#" id="add-artist">Add another art contributor</a>
+            </div>
+            <div class="form-field">
+                <label for="comic-series">Series</label>
+                <input type="text" id="comic-series" name="comic[series]">
+            </div>
+            <div class="form-field">
+                <label for="comic-issue">Issue</label>
+                <input type="number" id="comic-issue" name="comic[issue]">
+            </div>
+            <div class="form-field">
+                <label for="comicReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="comicReleaseDate" name="comic[releaseDate]" min="1977-05-25">
+            </div>
         </div> 
         <div class="hide-sources" id="tv-fields">
-            TV Show Test
+            <div class="form-field">
+                <label for="tv-series">Series</label>
+                <input type="text" id="tv-series" name="tv[series]">
+            </div>
+            <div class="form-field">
+                <label for="tv-season">Season</label>
+                <input type="number" id="tv-season" name="tv[season]" min="1">
+            </div>
+            <div class="form-field">
+                <label for="tv-episode">Episode</label>
+                <input type="number" id="tv-episode" name="tv[episode]" min="1">
+            </div>
+            <div class="form-field">
+                <label for="tvReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="tvReleaseDate" name="tv[releaseDate]" min="1977-05-25">
+            </div>
         </div> 
         <div class="hide-sources" id="game-fields">
-            Video Game Test
+            <div class="form-field">
+                <label for="vg-studio">Production Studio</label>
+                <input type="text" id="vg-studio" name="videoGame[studio]">
+            </div>
+            <div class="form-field">
+                <label for="vg-publisher">Series</label>
+                <input type="text" id="vg-publisher" name="videoGame[publisher]">
+            </div>
+            <div class="form-field">
+                <label for="vgReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="vgReleaseDate" name="videoGame[releaseDate]" min="1977-05-25">
+            </div>
         </div> 
 
         <div>

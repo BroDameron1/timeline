@@ -1,4 +1,4 @@
-import { Duplicate } from "./utils.js"
+import { Duplicate, FieldManager } from "./utils.js"
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
@@ -10,6 +10,8 @@ const tvFields = document.querySelector('#tv-fields')
 const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
 const addAuthor = document.querySelector('#add-author')
+const addDirector = document.querySelector('#add-director')
+const addWriter = document.querySelector('#add-writer')
 const sourceImage = document.querySelector('#sourceImage')
 
 window.addEventListener('load', event => {
@@ -27,7 +29,6 @@ window.addEventListener('load', event => {
     } 
         
     today = yyyy + '-' + mm + '-' + dd;
-    // document.getElementById("datefield").setAttribute("max", today);
     const dateFields = document.querySelectorAll('.date')
     console.log(dateFields)
     dateFields.forEach(date => {
@@ -80,9 +81,9 @@ mediaType.addEventListener('input', event => {
     }
 })
 
+
 addAuthor.addEventListener('click', event => {
     const authorCount = document.querySelectorAll('.book-author')
-    console.log(authorCount.length)
     if (authorCount.length <= 3) {
         addAuthor.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="book-author" name="book[author][]"></div>`)
     }
@@ -90,6 +91,33 @@ addAuthor.addEventListener('click', event => {
         addAuthor.classList.add('hide-sources')
     }
 })
+
+addDirector.addEventListener('click', event => {
+    const addFields = new FieldManager('add-director', 'movie-director', 'movie[director][]', 1)
+    addFields.addField()
+    // const directorCount = document.querySelectorAll('.movie-director')
+    // if (directorCount.length <= 1) {
+    //     addDirector.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="movie-director" name="movie[director][]"></div>`)
+    // }
+    // if (directorCount.length === 1) {
+    //     addDirector.classList.add('hide-sources')
+    // }
+})
+
+addWriter.addEventListener('click', event => {
+    const addFields = new FieldManager('add-writer', 'movie-writer', 'movie[writer][]', 3)
+    addFields.addField()
+})
+
+// addWriter.addEventListener('click', event => {
+//     const writerCount = document.querySelectorAll('.movie-writer')
+//     if (writerCount.length <= 3) {
+//         addWriter.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="movie-writer" name="movie[writer][]"></div>`)
+//     }
+//     if (writerCount.length === 3) {
+//         addWriter.classList.add('hide-sources')
+//     }
+// })
 
 sourceImage.addEventListener('change', event => {
     const imgPreview = document.querySelector('.image-preview')

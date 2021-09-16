@@ -111,3 +111,23 @@ export const idleLogout = () => { //function for kicking user out of the page if
     window.onkeydown = resetTimer;   
     window.addEventListener('scroll', resetTimer, true); // improved; see comments
 }
+
+export class FieldManager {
+    constructor (linkClass, countClass, fieldName, additionalFields) {
+        this.linkClass = linkClass,
+        this.countClass = countClass,
+        this.fieldName = fieldName,
+        this.additionalFields = additionalFields
+    }
+
+    addField () {
+        const addLink = document.querySelector(`#${this.linkClass}`)
+        const currentCount = document.querySelectorAll(`.${this.countClass}`)
+        if (currentCount.length <= this.additionalFields) {
+            addLink.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="${this.countClass}" name="${this.fieldName}"></div>`)
+            }
+        if (currentCount.length === this.additionalFields) {
+            addLink.classList.add('hide-sources')
+        }
+    }
+}
