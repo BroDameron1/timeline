@@ -1,19 +1,22 @@
-
 <div class="hide-sources" id="book-fields">
     <div class="form-field">
-        <label for="author">Author(s)</label>
+        <label for="book-author">Author(s)</label>
         <% for(let author of data.book.author) { %>    
-            <div class="form-field"><input type="text" class="book-author" name="book[author][]" value="<%= author %>"></div>
+            <input type="text" class="book-author" name="book[author][]" value="<%= author %>">
         <% } %> 
         <a href="#" id="add-author">Add another author</a>
+    </div>
+    <div class="form-field">
+        <label for="book-series">Series</label>
+        <input type="text" id="book-series" name="book[series]" value="<%= data.book.series %>">
     </div>
     <div class="form-field">
         <label for="publisher">Publisher</label>
         <input type="text" id="publisher" name="book[publisher]" value="<%= data.book.publisher %>">
     </div>
     <div class="form-field">
-        <label for="releaseDate">Initial Release Date</label>
-        <input type="date" id="releaseDate" name="book[releaseDate]" value="<%= data.book.releaseDate %>">
+        <label for="bookReleaseDate">Initial Release Date</label>
+        <input type="date" class="date" id="bookReleaseDate" name="book[releaseDate]" min="1977-05-25" value="<%= data.book.releaseDate %>">
     </div>
     <div class="form-field">
         <label for="isbn10">ISBN-10</label>
@@ -21,14 +24,79 @@
     </div>
 </div> 
 <div class="hide-sources" id="movie-fields">
-    Movie Test
+    <div class="form-field">
+        <label for="movie-director">Director(s)</label>
+        <% for(let director of data.movie.director) { %>    
+            <input type="text" class="movie-director" name="movie[director][]" value="<%= director %>">
+        <% } %> 
+        <a href="#" id="add-director">Add another director</a>
+    </div>
+    <div class="form-field">
+        <label for="movie-writer">Writer(s)</label>
+        <% for(let writer of data.movie.writer) { %>    
+            <input type="text" class="movie-writer" name="movie[writer][]" value="<%= writer %>">
+        <% } %> 
+        <a href="#" id="add-writer">Add another writer</a>
+    </div>
+    <div class="form-field">
+        <label for="movieReleaseDate">Initial Release Date</label>
+        <input type="date" class="date" id="movieReleaseDate" name="movie[releaseDate]" min="1977-05-25" value="<%= data.movie.releaseDate %>">
+    </div>
 </div> 
 <div class="hide-sources" id="comic-fields">
-    Comic Test
+    <div class="form-field">
+        <label for="comic-writer">Writer</label>
+        <input type="text" id="comic-writer" name="comic[writer]" value="<%= data.comic.writer %>">
+    </div>
+    <div class="form-field">
+        <label for="art-contributor">Art Contributor(s)</label>
+        <% for(let artist of data.comic.artContributor) { %>    
+            <div class="form-field"><input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>"></div>
+        <% } %>   
+        <a href="#" id="add-artist">Add another art contributor</a>
+    </div>
+    <div class="form-field">
+        <label for="comic-series">Series</label>
+        <input type="text" id="comic-series" name="comic[series]" value="<%= data.comic.series %>">
+    </div>
+    <div class="form-field">
+        <label for="comic-issue">Issue</label>
+        <input type="number" id="comic-issue" name="comic[issueNum]" value="<%= data.comic.issueNum %>" min="0">
+    </div>
+    <div class="form-field">
+        <label for="comicReleaseDate">Initial Release Date</label>
+        <input type="date" class="date" id="comicReleaseDate" name="comic[releaseDate]" min="1977-05-25" value="<%= data.comic.releaseDate %>">
+    </div>
 </div> 
 <div class="hide-sources" id="tv-fields">
-    TV Show Test
+    <div class="form-field">
+        <label for="tv-series">Series</label>
+        <input type="text" id="tv-series" name="tv[series]" value="<%= data.tv.series %>">
+    </div>
+    <div class="form-field">
+        <label for="tv-season">Season</label>
+        <input type="number" id="tv-season" name="tv[season]" min="1" value="<%= data.tv.season %>">
+    </div>
+    <div class="form-field">
+        <label for="tv-episode">Episode</label>
+        <input type="number" id="tv-episode" name="tv[episode]" min="1" value="<%= data.tv.episode %>">
+    </div>
+    <div class="form-field">
+        <label for="tvReleaseDate">Initial Release Date</label>
+        <input type="date" class="date" id="tvReleaseDate" name="tv[releaseDate]" min="1977-05-25" value="<%= data.tv.releaseDate %>">
+    </div>
 </div> 
 <div class="hide-sources" id="game-fields">
-    Video Game Test
+    <div class="form-field">
+        <label for="vg-studio">Production Studio</label>
+        <input type="text" id="vg-studio" name="videoGame[studio]" value="<%= data.videoGame.studio %>">
+    </div>
+    <div class="form-field">
+        <label for="vg-publisher">Series</label>
+        <input type="text" id="vg-publisher" name="videoGame[publisher]" value="<%= data.videoGame.releaseDate %>">
+    </div>
+    <div class="form-field">
+        <label for="vgReleaseDate">Initial Release Date</label>
+        <input type="date" class="date" id="vgReleaseDate" name="videoGame[releaseDate]" min="1977-05-25" value="<%= data.videoGame.releaseDate %>">
+    </div>
 </div> 

@@ -44,6 +44,7 @@ const SourceSchema = new Schema({
             required: true
         },
         publisher: String,
+        series: String,
         releaseDate: {
             type: Date,
             get: formDate
@@ -53,25 +54,37 @@ const SourceSchema = new Schema({
     movie: {
         director: [ String ],
         writer: [ String ],
-        releaseDate: Date,
+        releaseDate: {
+            type: Date,
+            get: formDate
+        }
     },
     comic: {
         writer: String,
-        artContributors: [ String ],
+        artContributor: [ String ],
         series: String,
         issueNum: Number,
-        releaseDate: Date
+        releaseDate: {
+            type: Date,
+            get: formDate
+        }
     },
     tv: {
         series: String,
         season: Number,
         episode: Number,
-        releaseDate: Date
+        releaseDate: {
+            type: Date,
+            get: formDate
+        }
     },
     videoGame: {
         studio: String,
         publisher: String,
-        releaseDate: Date
+        releaseDate: {
+            type: Date,
+            get: formDate
+        }
     }
 },
     { timestamps: true, get: formatDate  });
@@ -100,9 +113,14 @@ function formatDate (date) { //formats and passes through the last updated time 
 }
 
 function formDate (date) {
-    return date.toISOString().substring(0, 10)
+    if (date) {
+        console.log('test1')
+        return date.toISOString().substring(0, 10)
+    } else {
+        console.log(date, 'test2')
+        return null
 }
-
+}
 
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);
 const publicSource = mongoose.model('PublicSource', SourceSchema);

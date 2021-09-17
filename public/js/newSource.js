@@ -12,7 +12,9 @@ const comicFields = document.querySelector('#comic-fields')
 const addAuthor = document.querySelector('#add-author')
 const addDirector = document.querySelector('#add-director')
 const addWriter = document.querySelector('#add-writer')
+const addArtist = document.querySelector('#add-artist')
 const sourceImage = document.querySelector('#sourceImage')
+const removeAuthor = document.querySelector('#book-fields')
 
 window.addEventListener('load', event => {
     let today = new Date();
@@ -30,7 +32,6 @@ window.addEventListener('load', event => {
         
     today = yyyy + '-' + mm + '-' + dd;
     const dateFields = document.querySelectorAll('.date')
-    console.log(dateFields)
     dateFields.forEach(date => {
         date.setAttribute("max", today)
     })
@@ -81,43 +82,45 @@ mediaType.addEventListener('input', event => {
     }
 })
 
-
-addAuthor.addEventListener('click', event => {
-    const authorCount = document.querySelectorAll('.book-author')
-    if (authorCount.length <= 3) {
-        addAuthor.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="book-author" name="book[author][]"></div>`)
+movieFields.addEventListener('click', event => {
+    const directorUpdate = new FieldManager('add-director', 'movie-director', 'movie[director][]', 1)
+    const writerUpdate = new FieldManager('add-writer', 'movie-writer', 'movie[writer][]', 3)
+    if (event.target && event.target.matches("a#add-director")) {
+        directorUpdate.addField('remove-director')
     }
-    if (authorCount.length === 3) {
-        addAuthor.classList.add('hide-sources')
+    if (event.target && event.target.matches("a.remove-director")) {
+        directorUpdate.deleteField(event.target.id)
+    }
+    
+    if (event.target && event.target.matches("a#add-writer")) {
+        writerUpdate.addField('remove-writer')
+    }
+    if (event.target && event.target.matches("a.remove-writer")) {
+        writerUpdate.deleteField(event.target.id)
     }
 })
 
-addDirector.addEventListener('click', event => {
-    const addFields = new FieldManager('add-director', 'movie-director', 'movie[director][]', 1)
-    addFields.addField()
-    // const directorCount = document.querySelectorAll('.movie-director')
-    // if (directorCount.length <= 1) {
-    //     addDirector.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="movie-director" name="movie[director][]"></div>`)
-    // }
-    // if (directorCount.length === 1) {
-    //     addDirector.classList.add('hide-sources')
-    // }
+comicFields.addEventListener('click', event => {
+    const fieldUpdate = new FieldManager('add-artist', 'art-contributor', 'comic[artContributor][]', 3)
+    if (event.target && event.target.matches("a#add-artist")) {
+        fieldUpdate.addField('remove-artist')
+    }
+    if (event.target && event.target.matches("a.remove-artist")) {
+        fieldUpdate.deleteField(event.target.id)
+        }
 })
 
-addWriter.addEventListener('click', event => {
-    const addFields = new FieldManager('add-writer', 'movie-writer', 'movie[writer][]', 3)
-    addFields.addField()
+
+bookFields.addEventListener('click', event => {
+    const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
+    if (event.target && event.target.matches("a#add-author")) {
+        fieldUpdate.addField('remove-author')
+    }
+    if (event.target && event.target.matches("a.remove-author")) {
+        fieldUpdate.deleteField(event.target.id)
+    }
 })
 
-// addWriter.addEventListener('click', event => {
-//     const writerCount = document.querySelectorAll('.movie-writer')
-//     if (writerCount.length <= 3) {
-//         addWriter.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="movie-writer" name="movie[writer][]"></div>`)
-//     }
-//     if (writerCount.length === 3) {
-//         addWriter.classList.add('hide-sources')
-//     }
-// })
 
 sourceImage.addEventListener('change', event => {
     const imgPreview = document.querySelector('.image-preview')
@@ -135,4 +138,3 @@ sourceImage.addEventListener('change', event => {
 
     document.querySelector('.file-name').textContent = file.name
 })
-

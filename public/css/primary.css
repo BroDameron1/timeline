@@ -109,7 +109,7 @@ input, select, .file-name {
     width: 100%;
     font-size: 1rem;
     padding: .5rem;
-    margin: 0;
+    margin-bottom: 0;
     box-sizing: border-box;
     height: 2.5rem;
     font-family: Verdana, Geneva, Tahoma, sans-serif;

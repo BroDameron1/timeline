@@ -29,9 +29,13 @@
 
         <div class="hide-sources" id="book-fields">
             <div class="form-field">
-                <label for="author">Author(s)</label>
+                <label for="book-author">Author(s)</label>
                     <input type="text" class="book-author" name="book[author][]">
                 <a href="#" id="add-author">Add another author</a>
+            </div>
+            <div class="form-field">
+                <label for="book-series">Series</label>
+                <input type="text" id="book-series" name="book[series]">
             </div>
             <div class="form-field">
                 <label for="publisher">Publisher</label>
@@ -48,13 +52,13 @@
         </div> 
         <div class="hide-sources" id="movie-fields">
             <div class="form-field">
-                <label for="author">Director(s)</label>
-                    <input type="text" class="movie-director" name="movie[director][]">
+                <label for="movie-director">Director(s)</label>
+                    <input type="text" id="movie-director" class="movie-director" name="movie[director][]">
                 <a href="#" id="add-director">Add another director</a>
             </div>
             <div class="form-field">
-                <label for="author">Writer(s)</label>
-                    <input type="text" class="movie-writer" name="movie[writer][]">
+                <label for="movie-writer">Writer(s)</label>
+                    <input type="text" id="movie-writer" class="movie-writer" name="movie[writer][]">
                 <a href="#" id="add-writer">Add another writer</a>
             </div>
             <div class="form-field">
@@ -68,8 +72,8 @@
                 <input type="text" id="comic-writer" name="comic[writer]">
             </div>
             <div class="form-field">
-                <label for="artists">Art Contributor(s)</label>
-                    <input type="text" class="art-contributor" name="comic[artContributor][]">
+                <label for="art-contributor">Art Contributor(s)</label>
+                    <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]">
                 <a href="#" id="add-artist">Add another art contributor</a>
             </div>
             <div class="form-field">
@@ -78,7 +82,7 @@
             </div>
             <div class="form-field">
                 <label for="comic-issue">Issue</label>
-                <input type="number" id="comic-issue" name="comic[issue]">
+                <input type="number" id="comic-issue" name="comic[issue]" mix="0">
             </div>
             <div class="form-field">
                 <label for="comicReleaseDate">Initial Release Date</label>

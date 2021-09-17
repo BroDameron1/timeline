@@ -120,14 +120,25 @@ export class FieldManager {
         this.additionalFields = additionalFields
     }
 
-    addField () {
+    addField (removeClass) {
         const addLink = document.querySelector(`#${this.linkClass}`)
         const currentCount = document.querySelectorAll(`.${this.countClass}`)
         if (currentCount.length <= this.additionalFields) {
-            addLink.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="${this.countClass}" name="${this.fieldName}"></div>`)
+            addLink.insertAdjacentHTML('beforebegin', `<div class="form-field" id="${this.linkClass}${currentCount.length}"><input type="text" class="${this.countClass}" name="${this.fieldName}">
+            <a href="#" class="${removeClass}" id="${currentCount.length}">Remove</a></div>`)
             }
         if (currentCount.length === this.additionalFields) {
             addLink.classList.add('hide-sources')
+        }
+    }
+
+    deleteField (fieldId) {
+        const addLink = document.querySelector(`#${this.linkClass}`)
+        const element = document.querySelector(`#${this.linkClass}${fieldId}`)
+        element.remove()
+        const currentCount = document.querySelectorAll(`.${this.countClass}`) //current number of fields after removing the element.
+        if (currentCount.length <= this.additionalFields) {
+            addLink.classList.remove('hide-sources')
         }
     }
 }

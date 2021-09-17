@@ -1,4 +1,4 @@
-import { idleLogout, Duplicate, StateManager } from "./utils.js"
+import { idleLogout, Duplicate, StateManager, FieldManager } from "./utils.js"
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
@@ -11,8 +11,29 @@ const tvFields = document.querySelector('#tv-fields')
 const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
 const addAuthor = document.querySelector('#add-author')
+const addDirector = document.querySelector('#add-director')
+const addWriter = document.querySelector('#add-writer')
 
+window.addEventListener('load', event => {
+    let today = new Date();
+    let dd = today.getDate();
+    let mm = today.getMonth() + 1; //January is 0!
+    const yyyy = today.getFullYear();
 
+    if (dd < 10) {
+        dd = '0' + dd;
+    }
+
+    if (mm < 10) {
+        mm = '0' + mm;
+    } 
+        
+    today = yyyy + '-' + mm + '-' + dd;
+    const dateFields = document.querySelectorAll('.date')
+    dateFields.forEach(date => {
+        date.setAttribute("max", today)
+    })
+})
 
 window.addEventListener('load', async event => {
     const state = new StateManager(true, sourceId, 'ReviewSource')
@@ -113,4 +134,16 @@ addAuthor.addEventListener('click', event => {
     if (authorCount.length === 3) {
         addAuthor.classList.add('hide-sources')
     }
+})
+
+addDirector.addEventListener('click', event => {
+    const addFields = new FieldManager('add-director', 'movie-director', 'movie[director][]', 1)
+    addFields.addField()
+    // const directorCount = document.querySelectorAll('.movie-director')
+    // if (directorCount.length <= 1) {
+    //     addDirector.insertAdjacentHTML('beforebegin', `<div class="form-field"><input type="text" class="movie-director" name="movie[director][]"></div>`)
+    // }
+    // if (directorCount.length === 1) {
+    //     addDirector.classList.add('hide-sources')
+    // }
 })

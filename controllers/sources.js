@@ -19,7 +19,7 @@ module.exports.renderSource = async (req, res) => {
 //controller for get route for rendering the New Source submission form.
 module.exports.renderNewSource = async (req, res) => {
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/newSource', { mediaTypes, data: {} })
+    res.render('sources/newSource', { mediaTypes })
 }
 
 //controller for the post route for submitting a New Source to be approved.
