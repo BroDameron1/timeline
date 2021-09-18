@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const ExpressError = require('../utils/expressError');
 const Schema = mongoose.Schema;
 
 const SourceSchema = new Schema({
@@ -117,7 +116,6 @@ function formDate (date) {
         console.log('test1')
         return date.toISOString().substring(0, 10)
     } else {
-        console.log(date, 'test2')
         return null
 }
 }

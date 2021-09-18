@@ -12,27 +12,7 @@
     <div class="form">
         <h1>Edit Submission</h1>
             <form action="/sources/review/<%= data._id %>/edit?_method=PUT" method="POST" id="editSource" enctype="multipart/form-data">
-        <div class="form-field">
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title" value="<%= data.title %>" required autofocus>
-        </div>
-        <div class="form-field">
-            <label for="media-type">Media Type</label>
-            <select name="mediaType" id="mediaType" disabled>
-                <% for(let mediaType of mediaTypes) { %>
-                    <option value="<%= mediaType %>" <%= data.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
-                <% } %> 
-            </select>
-        </div>
-        <div class="form-field">
-            Upload Image
-            <div class="file-name" id="file-name"></div>
-            <input type="file" name="sourceImage" id="sourceImage" class="inputfile">
-            <label for="sourceImage" class="btn-browse">Browse...</label>
-        </div>
-        <div class="imgpreview-wrapper">
-            <img src="<%= data.images.url %>" class="image-preview">
-        </div>  
+
         
         <%- include('../partials/sourceforms.ejs') %>
 

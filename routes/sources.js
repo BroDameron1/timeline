@@ -15,8 +15,8 @@ router.route('/new')
 //routes for publishing a source to public
 router.route('/review/:sourceId')
     .get(isLoggedIn, catchAsync(sources.renderReviewSource))
-    .put(isLoggedIn, isAdmin, catchAsync(sources.publishReviewSource))
-    .post(isLoggedIn, isAdmin, catchAsync(sources.publishReviewSource))
+    .put(isLoggedIn, isAdmin, upload.single('sourceImage'), catchAsync(sources.publishReviewSource))
+    .post(isLoggedIn, isAdmin, upload.single('sourceImage'), catchAsync(sources.publishReviewSource))
     .delete(isLoggedIn, catchAsync(sources.deleteReviewSource))
 
 //routes for editing a pending submission
@@ -33,6 +33,6 @@ router.route('/:sourceId')
 
 router.route('/:sourceId/edit')
     .get(isLoggedIn, catchAsync(sources.renderEditSource))
-    .post(isLoggedIn, catchAsync(sources.submitEditSource))
+    .post(isLoggedIn, upload.single('sourceImage'), catchAsync(sources.submitEditSource))
 
 module.exports = router;

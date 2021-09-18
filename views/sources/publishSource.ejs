@@ -13,24 +13,16 @@
 <main>
     <div class="form">
         <h1>Review Submission</h1>
-        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id) && reviewSourceData.state === 'new') {%>
-            <form action="/sources/review/<%= reviewSourceData._id %>" method="POST" id="editSource">
+        <% if (currentUser.role === 'admin' && !data.author[0].equals(currentUser._id) && data.state === 'new') {%>
+            <form action="/sources/review/<%= data._id %>" method="POST" id="editSource" enctype="multipart/form-data">
         <% } %> 
-        <% if (currentUser.role === 'admin' && !reviewSourceData.author[0].equals(currentUser._id) && reviewSourceData.state === 'update') {%>
-            <form action="/sources/review/<%= reviewSourceData._id %>?_method=PUT" method="POST" id="editSource">
+        <% if (currentUser.role === 'admin' && !data.author[0].equals(currentUser._id) && data.state === 'update') {%>
+            <form action="/sources/review/<%= data._id %>?_method=PUT" method="POST" id="editSource" enctype="multipart/form-data">
         <% } %> 
-        <div class="form-field">
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title" value="<%= reviewSourceData.title %>" required autofocus>
-        </div>
-        <div class="form-field">
-            <label for="media-type">Media Type</label>
-            <select name="mediaType" id="mediaType" disabled>
-                <% for(let mediaType of mediaTypes) { %>
-                    <option value="<%= mediaType %>" <%= reviewSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
-                <% } %> 
-            </select>
-        </div>
+ 
+
+        <%- include('../partials/sourceforms.ejs') %>
+
         <div>
             <button class="btn-submit">Publish</button>
         </div>
@@ -42,6 +34,6 @@
 
 
 <script>
-    const sourceId = '<%- reviewSourceData._id %>'
+    const sourceId = '<%- data._id %>'
 </script>
 <script type="module" src="/js/publishSource.js"></script>

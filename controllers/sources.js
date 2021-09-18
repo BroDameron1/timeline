@@ -31,6 +31,7 @@ module.exports.submitNewSource = async (req, res) => {
         return res.redirect('/sources/new')
     }
     reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
+    console.log(req.file)
     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
     reviewSourceData.state = 'new'
     await reviewSourceData.save()
@@ -55,10 +56,12 @@ module.exports.renderReviewSource = async (req, res) => {
         return res.redirect('/dashboard')
     }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/publishSource', { mediaTypes, reviewSourceData })
+    res.render('sources/publishSource', { mediaTypes, data: reviewSourceData })
 }
 
-//allows the publishing of any review record (whether a new record or an updated one)
+//allows the publishing of any review record (whether a new record or an updated one)w
+//TODO: SAVE THE REVIEW CHANGES AND THEN SET PUBLIC BODY TO EQUAL REVIEW BODY?!?
+//currently using req.body to capture changes made by the admin.
 module.exports.publishReviewSource = async (req, res) => {
     const { sourceId } = req.params
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
@@ -76,6 +79,14 @@ module.exports.publishReviewSource = async (req, res) => {
     if (reviewSourceData.author[0].equals(req.user._id)) {
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
         return res.redirect('/dashboard')
+    }
+    if (req.file) {
+        await cloudinary.uploader.destroy(reviewSourceData.images.filename)
+        reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+        publicSourceData.images = { url: req.file.path, filename: req.file.filename}
+    } else {
+        publicSourceData.images.url = reviewSourceData.images.url
+        publicSourceData.images.filename = reviewSourceData.images.filename
     }
     publicSourceData.state = 'published'
     publicSourceData.checkedOut = false
@@ -112,7 +123,6 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
     const { sourceId } = req.params
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     reviewSourceData.set({ ...req.body })
-    console.log(req.file, 'test')
     if (req.file) {
         await cloudinary.uploader.destroy(reviewSourceData.images.filename)
         reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
@@ -143,8 +153,13 @@ module.exports.deleteReviewSource = async (req, res) => {
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     if (!reviewSourceData.author[0].equals(req.user._id)) {
         req.flash('error', "You don't have permission to do that.")
-        res.redirect('/dashboard')
+        return res.redirect('/dashboard')
     }
+    if (reviewSourceData.state === 'published' || reviewSourceData.state === 'rejected') {
+        req.flash('error', 'This record has already been reviewed and cannot be deleted.')
+        return res.redirect('/dashboard')
+    }
+    await cloudinary.uploader.destroy(reviewSourceData.images.filename)
     await Source.reviewSource.findByIdAndDelete(sourceId)
     if (reviewSourceData.publicId) {
         const publicSourceData = await Source.publicSource.findById(reviewSourceData.publicId)
@@ -168,7 +183,7 @@ module.exports.renderEditSource = async (req, res) => {
         return res.redirect('/dashboard')
     }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/updatePublicSource', { publicSourceData, mediaTypes})
+    res.render('sources/updatePublicSource', { data: publicSourceData, mediaTypes})
 }
 
 //allows a user to submit an update for an existing source
@@ -180,6 +195,12 @@ module.exports.submitEditSource = async (req, res) => {
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
         return res.redirect(`/sources/${sourceId}`)
+    }
+    if (req.file) {
+        reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+    } else {
+        reviewSourceData.images.url = publicSourceData.images.url
+        reviewSourceData.images.filename = publicSourceData.images.filename
     }
     reviewSourceData.author.unshift(req.user._id)
     reviewSourceData.publicId = sourceId;

@@ -9,12 +9,8 @@ const movieFields = document.querySelector('#movie-fields')
 const tvFields = document.querySelector('#tv-fields')
 const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
-const addAuthor = document.querySelector('#add-author')
-const addDirector = document.querySelector('#add-director')
-const addWriter = document.querySelector('#add-writer')
-const addArtist = document.querySelector('#add-artist')
 const sourceImage = document.querySelector('#sourceImage')
-const removeAuthor = document.querySelector('#book-fields')
+
 
 window.addEventListener('load', event => {
     let today = new Date();

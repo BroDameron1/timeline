@@ -11,19 +11,11 @@
 <main>
     <div class="form">
         <h1>Submit Update</h1>
-        <form action="/sources/<%= publicSourceData._id %>/edit" method="POST" id="editSource">
-        <div class="form-field">
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title" value="<%= publicSourceData.title %>" required autofocus>
-        </div>
-        <div class="form-field">
-            <label for="media-type">Media Type</label>
-            <select name="mediaType" id="mediaType" disabled>
-                <% for(let mediaType of mediaTypes) { %>
-                    <option value="<%= mediaType %>" <%= publicSourceData.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
-                <% } %> 
-            </select>
-        </div>
+        <form action="/sources/<%= data._id %>/edit" method="POST" id="editSource" enctype="multipart/form-data">
+
+
+        <%- include('../partials/sourceforms.ejs') %>
+
         <div>
             <button class="btn-submit">Submit for Review</button>
         </div>
@@ -33,6 +25,6 @@
 </main>
 
 <script>
-    const sourceId = '<%- publicSourceData._id %>'
+    const sourceId = '<%- data._id %>'
 </script>
 <script type="module" src="/js/editPublicSource.js"></script>

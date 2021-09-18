@@ -1,3 +1,26 @@
+<div class="form-field">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" value="<%= data.title %>" required autofocus>
+</div>
+<div class="form-field">
+    <label for="media-type">Media Type</label>
+    <select name="mediaType" id="mediaType">
+        <% for(let mediaType of mediaTypes) { %>
+            <option value="<%= mediaType %>" <%= data.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
+        <% } %> 
+    </select>
+</div>
+<div class="form-field">
+    Upload Image
+    <div class="file-name" id="file-name"></div>
+    <input type="file" name="sourceImage" id="sourceImage" class="inputfile">
+    <label for="sourceImage" class="btn-browse">Browse...</label>
+</div>
+<div class="imgpreview-wrapper">
+    <img src="<%= data.images.url %>" class="image-preview">
+</div>  
+
+
 <div class="hide-sources" id="book-fields">
     <div class="form-field">
         <label for="book-author">Author(s)</label>
