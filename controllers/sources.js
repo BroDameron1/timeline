@@ -84,6 +84,10 @@ module.exports.publishReviewSource = async (req, res) => {
         await cloudinary.uploader.destroy(reviewSourceData.images.filename)
         reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
         publicSourceData.images = { url: req.file.path, filename: req.file.filename}
+    } else if (reviewSourceData.images.url !== publicSourceData.images.url) {
+        await cloudinary.uploader.destroy(publicSourceData.images.filename)
+        publicSourceData.images.url = reviewSourceData.images.url
+        publicSourceData.images.filename = reviewSourceData.images.filename
     } else {
         publicSourceData.images.url = reviewSourceData.images.url
         publicSourceData.images.filename = reviewSourceData.images.filename

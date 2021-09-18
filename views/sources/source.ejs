@@ -4,6 +4,7 @@
     <div>Title: <%= publicSourceData.title %></div>
     <div>Type: <%= publicSourceData.mediaType %></div>
     <div>Most Recent Contributors: <%= publicSourceData.author[0].username %></div>
+    <div><img src="<%= publicSourceData.images.url %>"> </div>
 <% if (currentUser) { %> 
     <div><a href="/sources/<%= publicSourceData._id %>/edit">Edit</a></div>
 <% } %> 
