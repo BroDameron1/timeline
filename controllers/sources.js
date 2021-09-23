@@ -5,10 +5,10 @@ const duplicateChecker = require('../utils/duplicateChecker')
 const { cloudinary } = require('../utils/cloudinary')
 
 //controller for get route for rendering any existing source.
-//TODO: Handle failed to cast errors
+//TODO: Handle failed to cast errors in other sections
 module.exports.renderSource = async (req, res) => {
-    const { sourceId } = req.params
-    const publicSourceData = await Source.publicSource.findById(sourceId).populate('author', 'username')
+    const { slug } = req.params
+    const publicSourceData = await Source.publicSource.findOne({slug}).populate('author', 'username')
     if (!publicSourceData) {
         req.flash('error', 'This record does not exist.')
         return res.redirect('/dashboard')
@@ -104,7 +104,7 @@ module.exports.publishReviewSource = async (req, res) => {
     reviewSourceData.state = 'approved'
     await reviewSourceData.save()
     await publicSourceData.save()
-    res.redirect(`/sources/${publicSourceData._id}`)
+    res.redirect(`/sources/${publicSourceData.slug}`)
 }
 
 //renders the page for a user to update an already submitted review record
@@ -182,8 +182,8 @@ module.exports.deleteReviewSource = async (req, res) => {
 
 //renders the page for update to an existing source
 module.exports.renderEditSource = async (req, res) => {
-    const { sourceId } = req.params
-    const publicSourceData = await Source.publicSource.findById(sourceId)
+    const { slug } = req.params
+    const publicSourceData = await Source.publicSource.findOne({ slug })
     if (!publicSourceData) {
         req.flash('error', 'This record does not exist')
         return res.redirect('/dashboard')
@@ -198,13 +198,13 @@ module.exports.renderEditSource = async (req, res) => {
 
 //allows a user to submit an update for an existing source
 module.exports.submitEditSource = async (req, res) => {
-    const { sourceId } = req.params
-    const publicSourceData = await Source.publicSource.findById(sourceId)
+    const { slug } = req.params
+    const publicSourceData = await Source.publicSource.findOne({ slug })
     const reviewSourceData = new Source.reviewSource(req.body)
-    const duplicateCheck = await duplicateChecker.editPublic(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
+    const duplicateCheck = await duplicateChecker.editPublic(reviewSourceData.title, reviewSourceData.mediaType, publicSourceData._id)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
-        return res.redirect(`/sources/${sourceId}`)
+        return res.redirect(`/sources/${slug}`)
     }
     if (req.file) {
         reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
@@ -213,7 +213,7 @@ module.exports.submitEditSource = async (req, res) => {
         reviewSourceData.images.filename = publicSourceData.images.filename
     }
     reviewSourceData.author.unshift(req.user._id)
-    reviewSourceData.publicId = sourceId;
+    reviewSourceData.publicId = publicSourceData._id;
     reviewSourceData.state = 'update';
     publicSourceData.checkedOut = true;
     await publicSourceData.save()

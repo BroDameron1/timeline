@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const slugify = require('slugify')
 
 const SourceSchema = new Schema({
     title: {
         type: String,
         required: true
+    },
+    slug: {
+        type: String,
     },
     mediaType: {
         type: String,
@@ -92,6 +96,16 @@ const SourceSchema = new Schema({
 },
     { timestamps: true, get: formatDate  });
 
+//virtual to access slugified URLs
+// SourceSchema.virtual('slug')
+//     .get(function () {
+//         const url = slugify(this.title, {
+//             replacement: '_',
+//             lower: true
+//         })
+//         return url
+//     })
+
 //adds new author to the front of the array of authors, removes any duplicates and stores the last 
 //five total authors
 SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
@@ -105,6 +119,11 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
 //sets the date/time for updateDate.  Not sure why we can't use the timestamps.  TODO
 SourceSchema.pre('save', function(next) { 
     this.updateDate = Date.now()
+    this.slug = slugify(this.title + '_' + this.mediaType, {
+        replacement: '_',
+        lower: true,
+        strict: true
+    })
     next()
 })
 

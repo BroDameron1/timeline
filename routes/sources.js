@@ -28,10 +28,13 @@ router.route('/data')
     .get(isLoggedIn, catchAsync(sources.getData))
     .put(isLoggedIn, catchAsync(sources.putData))
 
-router.route('/:sourceId')
-    .get(catchAsync(sources.renderSource))
+// router.route('/:sourceId/:slug')
+//     .get(catchAsync(sources.renderSource))
 
-router.route('/:sourceId/edit')
+router.route('/:slug')
+     .get(catchAsync(sources.renderSource))
+
+router.route('/:slug/edit')
     .get(isLoggedIn, catchAsync(sources.renderEditSource))
     .post(isLoggedIn, upload.single('sourceImage'), catchAsync(sources.submitEditSource))
 

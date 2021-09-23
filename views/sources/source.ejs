@@ -6,7 +6,7 @@
     <div>Most Recent Contributors: <%= publicSourceData.author[0].username %></div>
     <div><img src="<%= publicSourceData.images.url %>"> </div>
 <% if (currentUser) { %> 
-    <div><a href="/sources/<%= publicSourceData._id %>/edit">Edit</a></div>
+    <div><a href="/sources/<%= publicSourceData.slug %>/edit">Edit</a></div>
 <% } %> 
 <% if (currentUser.role === 'admin') { %>
     <div>
