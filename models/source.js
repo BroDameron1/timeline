@@ -30,6 +30,10 @@ const SourceSchema = new Schema({
         type: [ Schema.Types.ObjectId ],
         ref: 'User'
     },
+    lastApprover: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     publicId: {
         type: String
     },

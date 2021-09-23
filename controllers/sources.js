@@ -72,6 +72,7 @@ module.exports.publishReviewSource = async (req, res) => {
         publicSourceData.set({ ...req.body })
     }
     const duplicateCheck = await duplicateChecker.publishRecord(publicSourceData.title, publicSourceData.mediaType, sourceId)
+
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
         return res.redirect('/dashboard')
@@ -80,19 +81,24 @@ module.exports.publishReviewSource = async (req, res) => {
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
         return res.redirect('/dashboard')
     }
+    //updates the image if the admin changed the image.
+    //TODO: Fix it so the reviewSourceData image doesn't have to be deleted.
     if (req.file) {
         await cloudinary.uploader.destroy(reviewSourceData.images.filename)
         reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
         publicSourceData.images = { url: req.file.path, filename: req.file.filename}
-    } else if (reviewSourceData.images.url !== publicSourceData.images.url) {
+    //if the reviewsource image was updated, this will check if there is a public image already and delete it if it's url is different than the reviewsource image.
+    } else if (publicSourceData.images.url && reviewSourceData.images.url !== publicSourceData.images.url) {
         await cloudinary.uploader.destroy(publicSourceData.images.filename)
         publicSourceData.images.url = reviewSourceData.images.url
         publicSourceData.images.filename = reviewSourceData.images.filename
     } else {
+    //will set the publicsource image data to the review source image data
         publicSourceData.images.url = reviewSourceData.images.url
         publicSourceData.images.filename = reviewSourceData.images.filename
     }
     publicSourceData.state = 'published'
+    publicSourceData.lastApprover = req.user._id
     publicSourceData.checkedOut = false
     publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])
     reviewSourceData.state = 'approved'

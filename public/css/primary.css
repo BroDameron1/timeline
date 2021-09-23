@@ -281,6 +281,19 @@ a.button-edit {
     color: white;
 }
 
+.button-locked {
+    font-size: 100%;
+    box-sizing: border-box;
+    cursor: not-allowed;
+    border-radius: 6px;
+    background-color: rgba(129, 129, 129, 0.425);
+    border: none;
+    padding: .5rem;
+    width: 80%;
+    justify-self: end;
+    color: white;
+}
+
 /* use to hide a fieldset */
 
 .hide-sources {
