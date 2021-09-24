@@ -1,4 +1,5 @@
 const User = require('./models/user');
+const Source = require('./models/source');
 const ExpressError = require('./utils/expressError')
 const { userSchema } = require('./schemas');
 
@@ -52,9 +53,20 @@ const isAdmin = async (req, res, next) => {
     next()
 }
 
+const isAuthor = async (req, res, next) => {
+    const { sourceId } = req.params
+    const reviewSourceData = await Source.reviewSource.findById(sourceId)
+    if (!reviewSourceData.author[0].equals(req.user._id)) {
+        req.flash('error', "You do not have the correct permissions.")
+        return res.redirect('/dashboard')
+    }
+    next()
+}
+
 module.exports = {
     isLoggedIn,
     validateUser,
     notLoggedIn,
-    isAdmin
+    isAdmin,
+    isAuthor
 }

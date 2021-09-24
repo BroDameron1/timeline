@@ -1,22 +1,5 @@
 <% layout('layouts/boilerplate.ejs') %>
 
-<% for(let pendingRequest of viewablePendingRequests) { %>
-
-        <div class="column-entry">
-            <div class="record-title">Record: <%= pendingRequest.title %></div>
-            <div class="record-date">Last Update: <%= pendingRequest.updateDate %></div>
-            <div class="record-state">
-                <div class="state-container">
-                    <%= pendingRequest.state %>
-                </div>
-            </div>
-            <div class="record-delete">
-                <a href="google.com" class="button-edit">View Notes</a>
-            </div>
-        </div>
-<% } %>
-
-
 <div class="pending-container">
     <div class="user-header">
         test

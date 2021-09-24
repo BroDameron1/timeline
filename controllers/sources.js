@@ -123,11 +123,6 @@ module.exports.renderUpdateReviewSource = async (req, res) => {
         req.flash('error', 'This record is currently in use.')
         return res.redirect('/dashboard')
     }
-    //TODO: Test this
-    if (!reviewSourceData.author[0].equals(req.user._id)) {
-        req.flash('error', "You do not have permission to edit this submission.")
-        return res.redirect('/dashboard')
-    }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
     res.render('sources/updateReviewSource', { data: reviewSourceData, mediaTypes})
 }
@@ -147,10 +142,6 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
         //TODO: fix this so it dumps them back to the form still filled out?
         return res.redirect(`/dashboard`)
     }
-    if (!reviewSourceData.author[0].equals(req.user._id)) {
-        req.flash('error', "You do not have permission to edit this submission.")
-        return res.redirect('/dashboard')
-    }
     if (reviewSourceData.state === 'approved' || reviewSourceData.state === 'rejected') {
         req.flash('error', 'This record is not eligible to be updated.')
         return res.redirect('/dashboard')
@@ -165,10 +156,6 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
 module.exports.deleteReviewSource = async (req, res) => {
     const { sourceId } = req.params
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
-    if (!reviewSourceData.author[0].equals(req.user._id)) {
-        req.flash('error', "You don't have permission to do that.")
-        return res.redirect('/dashboard')
-    }
     if (reviewSourceData.state === 'published' || reviewSourceData.state === 'rejected') {
         req.flash('error', 'This record has already been reviewed and cannot be deleted.')
         return res.redirect('/dashboard')
