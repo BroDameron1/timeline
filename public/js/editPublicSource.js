@@ -65,6 +65,15 @@ window.addEventListener('beforeunload', async event => {
 
 form.addEventListener('submit', async event => {
     event.preventDefault()
+
+    //sets all fields with  no data to disabled so they do not pass in empty strings
+    const inputs = document.querySelectorAll("input")
+    inputs.forEach((input) => {
+        if (input.value.length === 0) {
+            input.setAttribute('disabled', 'disabled')
+        }
+    })
+
     const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, 'editPublic')
     const duplicateResult = await submittedRecord.validateDuplicates()
     //TODO: Revisit this conditional    

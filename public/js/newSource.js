@@ -35,9 +35,25 @@ window.addEventListener('load', event => {
 
 form.addEventListener('submit', async event => {
     event.preventDefault()
+
+})
+
+form.addEventListener('submit', async event => {
+    event.preventDefault()
+    //sets all fields with  no data to disabled so they do not pass in empty strings
+    const inputs = document.querySelectorAll("input")
+    inputs.forEach((input) => {
+        if (input.value.length === 0) {
+            input.setAttribute('disabled', 'disabled')
+        }
+    })
+
+    //ensures users chooses a mediaType
     if (mediaType.value === 'default') {
         return div.textContent = 'Please select a media type.'
     }
+
+    //checks for duplicates from the frontend
     const submittedRecord = new Duplicate(title.value, mediaType.value, null, 'submitNew')
     const duplicateResult = await submittedRecord.validateDuplicates()
     if(!duplicateResult) {
