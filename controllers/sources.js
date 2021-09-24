@@ -115,6 +115,10 @@ module.exports.renderUpdateReviewSource = async (req, res) => {
         req.flash('error', 'This record does not exist')
         return res.redirect('/dashboard')
     }
+    if (reviewSourceData.state === 'approved' || reviewSourceData.state === 'rejected') {
+        req.flash('error', 'This record has already been reviewed.')
+        return res.redirect('/dashboard')
+    }
     if (reviewSourceData.checkedOut) {
         req.flash('error', 'This record is currently in use.')
         return res.redirect('/dashboard')
