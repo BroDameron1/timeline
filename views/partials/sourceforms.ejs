@@ -3,12 +3,13 @@
     <input type="text" id="title" name="title" value="<%= data.title %>" required autofocus>
 </div>
 <div class="form-field">
-    <label for="media-type">Media Type</label>
-    <select name="mediaType" id="mediaType">
+    <label for="mediaType">Media Type</label>
+    <select name="mediaType" id="mediaType" disabled>
         <% for(let mediaType of mediaTypes) { %>
             <option value="<%= mediaType %>" <%= data.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
         <% } %> 
     </select>
+    <input type="hidden" name="mediaType" value="<%= data.mediaType %>">
 </div>
 <div class="form-field">
     Upload Image
@@ -24,8 +25,12 @@
 <div class="hide-sources" id="book-fields">
     <div class="form-field">
         <label for="book-author">Author(s)</label>
-        <% for(let author of data.book.author) { %>    
-            <input type="text" class="book-author" name="book[author][]" value="<%= author %>">
+        <% if (data.book.author.length > 0) { %> 
+            <% for(let author of data.book.author) { %>    
+                <input type="text" class="book-author" name="book[author][]" value="<%= author %>">
+            <% } %>
+        <% } else { %>
+            <input type="text" class="book-author" name="book[author][]">
         <% } %> 
         <a href="#" id="add-author">Add another author</a>
     </div>
@@ -49,15 +54,23 @@
 <div class="hide-sources" id="movie-fields">
     <div class="form-field">
         <label for="movie-director">Director(s)</label>
-        <% for(let director of data.movie.director) { %>    
-            <input type="text" class="movie-director" name="movie[director][]" value="<%= director %>">
+        <% if (data.movie.director.length > 0) { %> 
+            <% for(let director of data.movie.director) { %>    
+                <input type="text" class="movie-director" name="movie[director][]" value="<%= director %>">
+            <% } %>
+        <% } else { %>
+            <input type="text" class="movie-director" name="movie[director][]">
         <% } %> 
         <a href="#" id="add-director">Add another director</a>
     </div>
     <div class="form-field">
         <label for="movie-writer">Writer(s)</label>
-        <% for(let writer of data.movie.writer) { %>    
-            <input type="text" class="movie-writer" name="movie[writer][]" value="<%= writer %>">
+        <% if (data.movie.writer.length > 0) { %> 
+            <% for(let writer of data.movie.writer) { %>    
+                <input type="text" class="movie-writer" name="movie[writer][]" value="<%= writer %>">
+            <% } %>
+        <% } else { %>
+            <input type="text" class="movie-writer" name="movie[writer][]">
         <% } %> 
         <a href="#" id="add-writer">Add another writer</a>
     </div>
@@ -73,9 +86,13 @@
     </div>
     <div class="form-field">
         <label for="art-contributor">Art Contributor(s)</label>
-        <% for(let artist of data.comic.artContributor) { %>    
-            <div class="form-field"><input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>"></div>
-        <% } %>   
+        <% if (data.comic.artContributor.length > 0) { %> 
+            <% for(let artist of data.comic.artContributor) { %>    
+                <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>"></div>
+            <% } %>
+        <% } else { %>
+            <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]">
+        <% } %> 
         <a href="#" id="add-artist">Add another art contributor</a>
     </div>
     <div class="form-field">

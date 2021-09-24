@@ -2,7 +2,7 @@ const Source = require('../models/source');
 const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
-const { cloudinary } = require('../utils/cloudinary')
+const { cloudinary, I, ImageHandler } = require('../utils/cloudinary')
 
 //controller for get route for rendering any existing source.
 //TODO: Handle failed to cast errors in other sections
@@ -31,8 +31,11 @@ module.exports.submitNewSource = async (req, res) => {
         return res.redirect('/sources/new')
     }
     reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
-    console.log(req.file)
-    reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+    if(req.file) {
+        // reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+        const image = new ImageHandler(req.file.path, req.file.filename, reviewSourceData)
+        image.newReviewImage()
+    }
     reviewSourceData.state = 'new'
     await reviewSourceData.save()
     req.flash('info', 'Your new Source has been submitted for approval.')
@@ -84,18 +87,20 @@ module.exports.publishReviewSource = async (req, res) => {
     //updates the image if the admin changed the image.
     //TODO: Fix it so the reviewSourceData image doesn't have to be deleted.
     if (req.file) {
-        await cloudinary.uploader.destroy(reviewSourceData.images.filename)
-        reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
-        publicSourceData.images = { url: req.file.path, filename: req.file.filename}
-    //if the reviewsource image was updated, this will check if there is a public image already and delete it if it's url is different than the reviewsource image.
-    } else if (publicSourceData.images.url && reviewSourceData.images.url !== publicSourceData.images.url) {
-        await cloudinary.uploader.destroy(publicSourceData.images.filename)
-        publicSourceData.images.url = reviewSourceData.images.url
-        publicSourceData.images.filename = reviewSourceData.images.filename
-    } else {
-    //will set the publicsource image data to the review source image data
-        publicSourceData.images.url = reviewSourceData.images.url
-        publicSourceData.images.filename = reviewSourceData.images.filename
+    //     await cloudinary.uploader.destroy(reviewSourceData.images.filename)
+    //     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+    //     publicSourceData.images = { url: req.file.path, filename: req.file.filename}
+    // //if the reviewsource image was updated, this will check if there is a public image already and delete it if it's url is different than the reviewsource image.
+    // } else if (publicSourceData.images.url && reviewSourceData.images.url !== publicSourceData.images.url) {
+    //     await cloudinary.uploader.destroy(publicSourceData.images.filename)
+    //     publicSourceData.images.url = reviewSourceData.images.url
+    //     publicSourceData.images.filename = reviewSourceData.images.filename
+    // } else {
+    // //will set the publicsource image data to the review source image data
+    //     publicSourceData.images.url = reviewSourceData.images.url
+    //     publicSourceData.images.filename = reviewSourceData.images.filename
+        const image = new ImageHandler(req.file.path, req.file.filename, reviewSourceData, publicSourceData)
+        image.publishImage()
     }
     publicSourceData.state = 'published'
     publicSourceData.lastApprover = req.user._id
@@ -133,9 +138,17 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     reviewSourceData.set({ ...req.body })
     if (req.file) {
-        await cloudinary.uploader.destroy(reviewSourceData.images.filename)
-        reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+        const image = new ImageHandler(req.file.path, req.file.filename, reviewSourceData)
+        await image.updateReviewImage()
     }
+    
+    // if (req.file && reviewSourceData.images.filename) {
+    //     await cloudinary.uploader.destroy(reviewSourceData.images.filename)
+    //     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+    // }
+    // if (req.file) {
+    //     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+    // }
     const duplicateCheck = await duplicateChecker.updateReview(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
@@ -160,6 +173,7 @@ module.exports.deleteReviewSource = async (req, res) => {
         req.flash('error', 'This record has already been reviewed and cannot be deleted.')
         return res.redirect('/dashboard')
     }
+    //TODO: This is probably destroying public images
     await cloudinary.uploader.destroy(reviewSourceData.images.filename)
     await Source.reviewSource.findByIdAndDelete(sourceId)
     if (reviewSourceData.publicId) {

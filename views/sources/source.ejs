@@ -5,8 +5,12 @@
     <div>Type: <%= publicSourceData.mediaType %></div>
     <div>Most Recent Contributors: <%= publicSourceData.author[0].username %></div>
     <div><img src="<%= publicSourceData.images.url %>"> </div>
-<% if (currentUser) { %> 
-    <div><a href="/sources/<%= publicSourceData.slug %>/edit">Edit</a></div>
+<% if (currentUser) { %>
+    <% if (!publicSourceData.checkedOut) { %> 
+        <div><a href="/sources/<%= publicSourceData.slug %>/edit" class="button-edit">Edit</a></div>
+    <% } else { %> 
+        <div><a href="#" class="button-locked">Locked</a></div>
+    <% } %> 
 <% } %> 
 <% if (currentUser && currentUser.role === 'admin') { %>
     <div>
@@ -15,3 +19,4 @@
         </form>
     </div>
 <% } %> 
+
