@@ -146,7 +146,7 @@ input, select, .file-name {
 
 
 
-.countdown-popup {
+.warning-popup {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -275,7 +275,6 @@ a.button-edit {
     width: 80%;
     justify-self: end;
     color: white;
-
 }
 
 .button-delete {
@@ -357,4 +356,11 @@ a.button-edit {
     padding: .5rem;
     margin-top: 1rem;
     width: 5rem;
-}   
+}
+
+.popup-btn-container {
+    display: flex;
+    margin: 1rem;
+    justify-content: space-evenly;
+    text-align: center;
+}

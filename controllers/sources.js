@@ -2,7 +2,7 @@ const Source = require('../models/source');
 const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
-const { cloudinary, I, ImageHandler } = require('../utils/cloudinary')
+const { cloudinary, ImageHandler } = require('../utils/cloudinary')
 
 //controller for get route for rendering any existing source.
 //TODO: Handle failed to cast errors in other sections
@@ -174,7 +174,9 @@ module.exports.deleteReviewSource = async (req, res) => {
         return res.redirect('/dashboard')
     }
     //TODO: This is probably destroying public images
-    await cloudinary.uploader.destroy(reviewSourceData.images.filename)
+    // await cloudinary.uploader.destroy(reviewSourceData.images.filename)
+    const image = new ImageHandler(reviewSourceData.images.url, reviewSourceData.images.filename, reviewSourceData)
+    await image.deleteImage()
     await Source.reviewSource.findByIdAndDelete(sourceId)
     if (reviewSourceData.publicId) {
         const publicSourceData = await Source.publicSource.findById(reviewSourceData.publicId)
@@ -225,6 +227,11 @@ module.exports.submitEditSource = async (req, res) => {
     await reviewSourceData.save()
     req.flash('info', 'Your update request has been submitted')
     res.redirect('/dashboard')
+}
+
+module.exports.deletePublicSource = async (req,res) => {
+    const { slug } = req.params
+    
 }
 
 //controller to check for duplicate data by passing the title, mediaType, and sometimes review Id through

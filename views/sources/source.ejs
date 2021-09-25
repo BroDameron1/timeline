@@ -14,7 +14,7 @@
 <% } %> 
 <% if (currentUser && currentUser.role === 'admin') { %>
     <div>
-        <form action="/sources/<%= publicSourceData._id %>?_method=DELETE" method="POST">
+        <form action="/sources/<%= publicSourceData.slug %>?_method=DELETE" method="POST">
             <button class="btn-delete">Delete Record</button>
         </form>
     </div>

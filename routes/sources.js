@@ -33,6 +33,7 @@ router.route('/data')
 
 router.route('/:slug')
      .get(catchAsync(sources.renderSource))
+     .delete(isLoggedIn, isAdmin, catchAsync(sources.deletePublicSource))
 
 router.route('/:slug/edit')
     .get(isLoggedIn, catchAsync(sources.renderEditSource))

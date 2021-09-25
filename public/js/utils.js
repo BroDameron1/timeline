@@ -59,26 +59,26 @@ export class StateManager {
 }
 
 //variables and function for idling out a user while they are editing a record.
-const countdown = document.querySelector('.countdown-popup')
+const warningPopup = document.querySelector('.warning-popup')
 const countdownTimer = document.querySelector('.countdown-timer')
 const blurBackground = document.querySelector('.disableDiv')
 const timerButton = document.querySelector('#timerButton')
 
-const startingMinutes = 20 //sets timeout for page
+const startingMinutes = 1 //sets timeout for page
 const warningTime = 1 * 60 //sets time when warning will pop up
 let time = startingMinutes * 60 //timer for use in idleLogout function, should not change
 
 export const idleLogout = () => { //function for kicking user out of the page if they don't take any action
 
     const closePopup = () => { //closes the warning popup and resets everything
-        countdown.style.display = 'none'
+        warningPopup.style.display = 'none'
         blurBackground.style.display = 'none'
         time = startingMinutes * 60
     }
     
     const openPopup = () => { //opens a popup at the warning time to tell user they will be kicked out
         countdownTimer.innerHTML = `${minutes}:${seconds}`
-        countdown.style.display = 'block'
+        warningPopup.style.display = 'block'
         blurBackground.style.display = 'block'
         timerButton.addEventListener('click', closePopup)
     }
