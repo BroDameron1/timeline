@@ -176,7 +176,7 @@ module.exports.deleteReviewSource = async (req, res) => {
     //TODO: This is probably destroying public images
     // await cloudinary.uploader.destroy(reviewSourceData.images.filename)
     const image = new ImageHandler(reviewSourceData.images.url, reviewSourceData.images.filename, reviewSourceData)
-    await image.deleteImage()
+    await image.deleteReviewImage()
     await Source.reviewSource.findByIdAndDelete(sourceId)
     if (reviewSourceData.publicId) {
         const publicSourceData = await Source.publicSource.findById(reviewSourceData.publicId)
@@ -231,7 +231,13 @@ module.exports.submitEditSource = async (req, res) => {
 
 module.exports.deletePublicSource = async (req,res) => {
     const { slug } = req.params
-    
+    const publicSourceData = await Source.publicSource.findOne({ slug })
+    if (publicSourceData.images.url) {
+        const image = new ImageHandler(publicSourceData.images.url, publicSourceData.images.filename, null, publicSourceData)
+        await image.deletePublicImage()
+    }
+    await publicSourceData.delete()
+    res.redirect('/dashboard')
 }
 
 //controller to check for duplicate data by passing the title, mediaType, and sometimes review Id through

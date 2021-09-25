@@ -47,10 +47,17 @@ class ImageHandler {
         this.publicData.images = { url: this.url, filename: this.filename}
     }
     //TODO: Test this to make sure it doesn't delete public data
-    async deleteImage() {
-        const publicSourceData = Source.publicSource.find({ images: {filename: this.filename}})
+    async deleteReviewImage() {
+        const publicSourceData = await Source.publicSource.find({ images: {filename: this.filename}})
         if (!publicSourceData) {
             await cloudinary.uploader.destroy(this.reviewData.images.filename)
+        }
+    }
+    
+    async deletePublicImage() {
+        const reviewSourceData = await Source.reviewSource.find({ images: { filename: this.filename }})
+        if (!reviewSourceData) {
+            await cloudinary.uploader.destroy(this.publicData.images.filename)
         }
     }
 }
