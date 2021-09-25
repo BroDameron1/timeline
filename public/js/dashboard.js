@@ -1,7 +1,7 @@
 const warningPopup = document.querySelector('.warning-popup')
 const blurBackground = document.querySelector('.disableDiv')
 const deleteConfirmation = document.querySelector('#delete-confirmation')
-let deleteButtons = document.querySelectorAll('.delete-review')
+let deleteButtons = document.querySelectorAll('.delete-record')
 const cancelDelete = document.querySelector('.button-edit')
 
 deleteButtons.forEach((deleteBtn) => {

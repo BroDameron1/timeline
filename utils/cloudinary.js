@@ -53,7 +53,7 @@ class ImageHandler {
             await cloudinary.uploader.destroy(this.reviewData.images.filename)
         }
     }
-    
+    //TODO: Test
     async deletePublicImage() {
         const reviewSourceData = await Source.reviewSource.find({ images: { filename: this.filename }})
         if (!reviewSourceData) {

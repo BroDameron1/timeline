@@ -36,7 +36,7 @@
                     <% if (!pendingRequest.checkedOut) { %> 
                     <div class="record-edit"><a href="sources/review/<%= pendingRequest._id %>/edit/" class="button-edit">Edit</a></div>
                     <div class="record-delete">
-                        <form action="/sources/review/<%= pendingRequest._id %>?_method=DELETE" method="POST" class="delete-review">
+                        <form action="/sources/review/<%= pendingRequest._id %>?_method=DELETE" method="POST" class="delete-record">
                             <button class="button-delete">Delete</button>
                         </form>
                     </div>

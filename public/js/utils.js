@@ -64,7 +64,7 @@ const countdownTimer = document.querySelector('.countdown-timer')
 const blurBackground = document.querySelector('.disableDiv')
 const timerButton = document.querySelector('#timerButton')
 
-const startingMinutes = 1 //sets timeout for page
+const startingMinutes = 20 //sets timeout for page
 const warningTime = 1 * 60 //sets time when warning will pop up
 let time = startingMinutes * 60 //timer for use in idleLogout function, should not change
 
