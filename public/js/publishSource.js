@@ -12,6 +12,25 @@ const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
 const addAuthor = document.querySelector('#add-author')
 
+document.querySelector('.reject-record').addEventListener('click', async event => {
+    try {
+        const response = await fetch('/sources/data', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sourceId,
+                state: 'rejected',
+                collection: 'ReviewSource'
+            })
+        })
+        location.href="/dashboard"
+    } catch (err) {
+        console.log('Something went wrong.', err)
+    }
+})
+
 window.addEventListener('load', event => {
     let today = new Date();
     let dd = today.getDate();
@@ -169,3 +188,4 @@ sourceImage.addEventListener('change', event => {
 
     document.querySelector('.file-name').textContent = file.name
 })
+

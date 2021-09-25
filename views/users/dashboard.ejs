@@ -1,8 +1,17 @@
 <% layout('layouts/boilerplate.ejs') %>
 
+<div class="disableDiv">
+    <div class="countdown-popup">
+        Confirm you want to delete this record by typing DELETE and clicking "Delete".
+            <input type="text" id="delete-confirm">
+            <button class="button-delete">Delete</button>
+    </div>
+</div>
+
+
 <div class="pending-container">
     <div class="user-header">
-        test
+        Placeholder for user info
     </div>
     <div class="record-column">
         <div class="column-header">
@@ -21,7 +30,7 @@
                     <% if (!pendingRequest.checkedOut) { %> 
                     <div class="record-edit"><a href="sources/review/<%= pendingRequest._id %>/edit/" class="button-edit">Edit</a></div>
                     <div class="record-delete">
-                        <form action="/sources/review/<%= pendingRequest._id %>?_method=DELETE" method="POST">
+                        <form action="/sources/review/<%= pendingRequest._id %>?_method=DELETE" method="POST" class="delete-review">
                             <button class="button-delete">Delete</button>
                         </form>
                     </div>
@@ -81,6 +90,17 @@
         <% } %>
         </div>
     <% } %>
+</div>
 
-    </div>
 
+<script>
+
+const form = document.querySelector('.delete-review')
+
+// form.addEventListener('submit', event => {
+//     event.preventDefault()
+//     const response = confirm('Are you sure you want to delete this item')
+//     console.log(response)
+// })
+
+</script>

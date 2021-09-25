@@ -99,6 +99,7 @@ main {
     padding: .5rem;
     margin-top: 1rem;
     width: 100%;
+    cursor: pointer;
 }
 
 .btn-delete {
@@ -109,6 +110,7 @@ main {
     padding: .5rem;
     margin-top: 1rem;
     width: 100%;
+    cursor: pointer;
 }
 
 input, select, .file-name {

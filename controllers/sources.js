@@ -249,12 +249,27 @@ module.exports.getData = async (req, res) => {
     }
 }
 
-//controller for put route that let's JS files update data.  Right now only for
+
+// module.exports.putData = async (req, res) => {
+//     const { checkedOut, sourceId, collection, state } = req.body
+//     const dataToUpdate = await mongoose.model(collection).findById(sourceId)
+//     console.log(collection, state)
+//     if (state) {
+//         dataToUpdate.state = state
+//         await dataToUpdate.save()
+//         return res.status(200).end()
+//     }
+//     dataToUpdate.checkedOut = checkedOut
+//     await dataToUpdate.save()
+//     res.status(200).end()
+// }
+
+//controller for put route that lets JS files update data.  Right now only for
 //updating state of record
 module.exports.putData = async (req, res) => {
-    const { checkedOut, sourceId, collection } = req.body
+    const { sourceId, collection} = req.body
     const dataToUpdate = await mongoose.model(collection).findById(sourceId)
-    dataToUpdate.checkedOut = checkedOut
+    dataToUpdate.set({ ...req.body })
     await dataToUpdate.save()
     res.status(200).end()
 }
