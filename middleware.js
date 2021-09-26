@@ -63,10 +63,22 @@ const isAuthor = async (req, res, next) => {
     next()
 }
 
+const isCheckedOut = async (req, res, next) => {
+    const { sourceId, slug } = req.params
+    const reviewSourceData = await Source.reviewSource.findById(sourceId)
+    const publicSourceData = await Source.publicSource.findOne({ slug })
+    if ((reviewSourceData && reviewSourceData.checkedOut) || (publicSourceData && publicSourceData.checkedOut)) {
+        req.flash('error', 'This record is already in use.')
+        return res.redirect('/dashboard')
+    }
+    next()
+}
+
 module.exports = {
     isLoggedIn,
     validateUser,
     notLoggedIn,
     isAdmin,
-    isAuthor
+    isAuthor,
+    isCheckedOut
 }

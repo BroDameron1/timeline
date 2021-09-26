@@ -56,10 +56,10 @@ module.exports.renderReviewSource = async (req, res) => {
         req.flash('error', 'This article has already been reviewed.')
         return res.redirect('/dashboard')
     }
-    if (reviewSourceData.checkedOut) {
-        req.flash('error', 'This record is currently in use.')
-        return res.redirect('/dashboard')
-    }
+    // if (reviewSourceData.checkedOut) {
+    //     req.flash('error', 'This record is currently in use.')
+    //     return res.redirect('/dashboard')
+    // }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
     res.render('sources/publishSource', { mediaTypes, data: reviewSourceData })
 }
@@ -129,10 +129,10 @@ module.exports.renderUpdateReviewSource = async (req, res) => {
         req.flash('error', 'This record has already been reviewed.')
         return res.redirect('/dashboard')
     }
-    if (reviewSourceData.checkedOut) {
-        req.flash('error', 'This record is currently in use.')
-        return res.redirect('/dashboard')
-    }
+    // if (reviewSourceData.checkedOut) {
+    //     req.flash('error', 'This record is currently in use.')
+    //     return res.redirect('/dashboard')
+    // }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
     res.render('sources/updateReviewSource', { data: reviewSourceData, mediaTypes})
 }
@@ -200,10 +200,10 @@ module.exports.renderEditSource = async (req, res) => {
         req.flash('error', 'This record does not exist')
         return res.redirect('/dashboard')
     }
-    if (publicSourceData.checkedOut) {
-        req.flash('error', 'This record is currently in use.')
-        return res.redirect('/dashboard')
-    }
+    // if (publicSourceData.checkedOut) {
+    //     req.flash('error', 'This record is currently in use.')
+    //     return res.redirect('/dashboard')
+    // }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
     res.render('sources/updatePublicSource', { data: publicSourceData, mediaTypes})
 }

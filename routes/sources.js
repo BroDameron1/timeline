@@ -5,7 +5,7 @@ const sources = require('../controllers/sources');
 const multer = require('multer') //adds multer to process file uploads
 const { storage } = require('../utils/cloudinary')
 const upload = multer({ storage }) //initialize multer and add location for file uploads
-const { isLoggedIn, isAdmin, isAuthor } = require('../middleware');
+const { isLoggedIn, isAdmin, isAuthor, isCheckedOut } = require('../middleware');
 
 //routes for creating and submitting a new source
 router.route('/new')
@@ -14,14 +14,14 @@ router.route('/new')
 
 //routes for publishing a source to public
 router.route('/review/:sourceId')
-    .get(isLoggedIn, catchAsync(sources.renderReviewSource))
+    .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderReviewSource))
     .put(isLoggedIn, isAdmin, upload.single('sourceImage'), catchAsync(sources.publishReviewSource))
     .post(isLoggedIn, isAdmin, upload.single('sourceImage'), catchAsync(sources.publishReviewSource))
     .delete(isLoggedIn, isAuthor, catchAsync(sources.deleteReviewSource))
 
 //routes for editing a pending submission
 router.route('/review/:sourceId/edit')
-    .get(isLoggedIn, isAuthor, catchAsync(sources.renderUpdateReviewSource))
+    .get(isLoggedIn, isAuthor, isCheckedOut, catchAsync(sources.renderUpdateReviewSource))
     .put(isLoggedIn, isAuthor, upload.single('sourceImage'), catchAsync(sources.submitUpdateReviewSource))
 
 router.route('/data')
@@ -36,7 +36,7 @@ router.route('/:slug')
      .delete(isLoggedIn, isAdmin, catchAsync(sources.deletePublicSource))
 
 router.route('/:slug/edit')
-    .get(isLoggedIn, catchAsync(sources.renderEditSource))
+    .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderEditSource))
     .post(isLoggedIn, upload.single('sourceImage'), catchAsync(sources.submitEditSource))
 
 module.exports = router;

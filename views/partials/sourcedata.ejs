@@ -1,0 +1,17 @@
+<% if (publicSourceData.mediaType === 'Movie') { %>
+    <div class="data-line">
+        Initial Release Date: <%= publicSourceData.movie.releaseDate %> 
+    </div>
+    <div class="data-line">
+        Director(s):
+        <% for (let director of publicSourceData.movie.director) { %>
+            <div><%= director %></div>
+        <% } %> 
+    </div>
+    <div class="data-line">
+        Writer(s):
+        <% for (let writer of publicSourceData.movie.writer) { %>
+            <div><%= writer %></div>
+        <% } %> 
+    </div>s
+<% } %>

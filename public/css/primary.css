@@ -298,7 +298,7 @@ a.button-edit {
     background-color: rgba(129, 129, 129, 0.425);
     border: none;
     padding: .5rem;
-    width: 80%;
+    width: 90%;
     justify-self: end;
     color: white;
 }
@@ -367,7 +367,7 @@ a.button-edit {
 
 .display-container {
     width: 50rem;
-    border: 1px solid black;
+    /* border: 1px solid black; */
 }
 
 .record-header {
@@ -376,6 +376,12 @@ a.button-edit {
 }
 
 .record-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* border: 1px solid black; */
+}
 
-    border: 1px solid black;
+.data-line {
+    margin: 1rem;
 }

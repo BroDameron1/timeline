@@ -28,33 +28,23 @@
                 <img src="/images/placeholder.png">
             <% } %> 
         </div>
-        <div>
+        <div class="data-line">
             Media: <%= publicSourceData.mediaType %>
         </div>
-        <div>
-            Initial Release Date: <%= publicSourceData.movie.releaseDate %> 
-        </div>
-        <div>
-            Director(s):
-            <% for (let director of publicSourceData.movie.director) { %>
-                <div><%= director %></div>
-            <% } %> 
-        </div>
-        <div>
-            Writer(s):
-            <% for (let writer of publicSourceData.movie.writer) { %>
-                <div><%= writer %></div>
-            <% } %> 
-        </div>
 
-        <div>
+
+        <%- include('../partials/sourcedata.ejs') %>
+
+
+
+        <div class="data-line">
             Most Recent Record Contributors:
             <% for (let contributor of publicSourceData.author) { %>
                 <div><%= contributor.username %></div>
             <% } %> 
         </div>
 
-        <div>
+        <div class="data-line">
             Last Update: <%= publicSourceData.updateDate %> approved by <%= publicSourceData.lastApprover.username %> 
         </div>
 
