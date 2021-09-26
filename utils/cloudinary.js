@@ -47,6 +47,7 @@ class ImageHandler {
         this.publicData.images = { url: this.url, filename: this.filename}
     }
     //TODO: Test this to make sure it doesn't delete public data
+    //TODO: Can this logic be used in the previous two methods (and maybe combine them?)
     async deleteReviewImage() {
         const publicSourceData = await Source.publicSource.find({ images: {filename: this.filename}})
         if (!publicSourceData) {

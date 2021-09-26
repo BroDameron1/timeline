@@ -364,3 +364,18 @@ a.button-edit {
     justify-content: space-evenly;
     text-align: center;
 }
+
+.display-container {
+    width: 50rem;
+    border: 1px solid black;
+}
+
+.record-header {
+    font-size: 3rem;
+    text-align: center;
+}
+
+.record-image {
+
+    border: 1px solid black;
+}

@@ -5,34 +5,86 @@
         Confirm you want to delete this record by typing DELETE and clicking "Delete".
         <form action="" id="delete-confirmation">
             <div class="form-field"><input type="text" id="delete-validate"></div>
-        <div class="popup-btn-container">
-            <button class="button-delete">Delete</button>
+            <div class="popup-btn-container">
+                <button class="button-delete">Delete</button>
         </form>
         <a href="#" class="button-edit">Cancel</a>
     </div>
     <div class="failed-match"></div>
-    </div>
+</div>
 </div>
 
-<h1>Source Data</h1>
-    <div>Title: <%= publicSourceData.title %></div>
-    <div>Type: <%= publicSourceData.mediaType %></div>
-    <div>Most Recent Contributors: <%= publicSourceData.author[0].username %></div>
-    <div><img src="<%= publicSourceData.images.url %>"> </div>
-<% if (currentUser) { %>
-    <% if (!publicSourceData.checkedOut) { %> 
-        <div><a href="/sources/<%= publicSourceData.slug %>/edit" class="button-edit">Edit</a></div>
-    <% } else { %> 
-        <div><a href="#" class="button-locked">Locked</a></div>
-    <% } %> 
-<% } %> 
-<% if (currentUser && currentUser.role === 'admin') { %>
-    <div>
-        <form action="/sources/<%= publicSourceData.slug %>?_method=DELETE" method="POST" class="delete-record">
-            <button class="btn-delete">Delete Record</button>
-        </form>
+<main>
+
+    <div class="display-container">
+        <h1>Source</h1>
+        <div class="record-header">
+            <%= publicSourceData.title %>
+        </div>
+        <div class="record-image">
+            <% if (publicSourceData.images.url) { %> 
+                <img src="<%= publicSourceData.displayImage %>">
+            <% } else { %>
+                <img src="/images/placeholder.png">
+            <% } %> 
+        </div>
+        <div>
+            Media: <%= publicSourceData.mediaType %>
+        </div>
+        <div>
+            Initial Release Date: <%= publicSourceData.movie.releaseDate %> 
+        </div>
+        <div>
+            Director(s):
+            <% for (let director of publicSourceData.movie.director) { %>
+                <div><%= director %></div>
+            <% } %> 
+        </div>
+        <div>
+            Writer(s):
+            <% for (let writer of publicSourceData.movie.writer) { %>
+                <div><%= writer %></div>
+            <% } %> 
+        </div>
+
+        <div>
+            Most Recent Record Contributors:
+            <% for (let contributor of publicSourceData.author) { %>
+                <div><%= contributor.username %></div>
+            <% } %> 
+        </div>
+
+        <div>
+            Last Update: <%= publicSourceData.updateDate %> approved by <%= publicSourceData.lastApprover.username %> 
+        </div>
+
+
+        <% if (currentUser) { %>
+            <% if (!publicSourceData.checkedOut) { %>
+                <div>
+                    <a href="/sources/<%= publicSourceData.slug %>/edit" class="button-edit">Edit</a>
+                </div>
+            <% } else { %>
+                <div>
+                    <a href="#" class="button-locked">Locked</a>
+                </div>
+            <% } %>
+        <% } %>
+        <% if (currentUser && currentUser.role==='admin' ) { %>
+            <% if (!publicSourceData.checkedOut) { %>
+                <div>
+                    <form action="/sources/<%= publicSourceData.slug %>?_method=DELETE" method="POST" class="delete-record">
+                    <button class="btn-delete">Delete Record</button>
+                    </form>
+                </div>
+             <% } else { %>
+                <div>
+                    <a href="#" class="button-locked">Locked</a>
+                </div>
+            <% } %>
+        <% } %>
     </div>
-<% } %> 
+</main>
 
 <!-- using the same scripts as dashboard since it's only the delete confirmation script -->
 <script type="module" src="/js/dashboard.js"></script>

@@ -8,7 +8,9 @@ const { cloudinary, ImageHandler } = require('../utils/cloudinary')
 //TODO: Handle failed to cast errors in other sections
 module.exports.renderSource = async (req, res) => {
     const { slug } = req.params
-    const publicSourceData = await Source.publicSource.findOne({slug}).populate('author', 'username')
+    const publicSourceData = await Source.publicSource.findOne({slug})
+        .populate('author', 'username')
+        .populate('lastApprover', 'username')
     if (!publicSourceData) {
         req.flash('error', 'This record does not exist.')
         return res.redirect('/dashboard')
@@ -86,7 +88,6 @@ module.exports.publishReviewSource = async (req, res) => {
     }
     //updates the image if the admin changed the image.
     //TODO: Fix it so the reviewSourceData image doesn't have to be deleted.
-    if (req.file) {
     //     await cloudinary.uploader.destroy(reviewSourceData.images.filename)
     //     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
     //     publicSourceData.images = { url: req.file.path, filename: req.file.filename}
@@ -99,7 +100,11 @@ module.exports.publishReviewSource = async (req, res) => {
     // //will set the publicsource image data to the review source image data
     //     publicSourceData.images.url = reviewSourceData.images.url
     //     publicSourceData.images.filename = reviewSourceData.images.filename
+    if (req.file) {
         const image = new ImageHandler(req.file.path, req.file.filename, reviewSourceData, publicSourceData)
+        image.publishImage()
+    } else {
+        const image = new ImageHandler(reviewSourceData.images.url, reviewSourceData.images.filename, reviewSourceData, publicSourceData)
         image.publishImage()
     }
     publicSourceData.state = 'published'

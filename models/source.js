@@ -106,6 +106,10 @@ const SourceSchema = new Schema({
 //         return url
 //     })
 
+SourceSchema.virtual('displayImage').get(function() {
+    return this.images.url.replace('/upload', '/upload/w_500,h_500,c_limit')
+})
+
 //adds new author to the front of the array of authors, removes any duplicates and stores the last 
 //five total authors
 SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
