@@ -45,6 +45,9 @@ const SourceSchema = new Schema({
         type: Date,
         get: formatDate
     },
+    adminNotes: { 
+        type: String
+    },
     book: {
         author: {
             type: [ String ],

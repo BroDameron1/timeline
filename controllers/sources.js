@@ -86,20 +86,6 @@ module.exports.publishReviewSource = async (req, res) => {
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
         return res.redirect('/dashboard')
     }
-    //updates the image if the admin changed the image.
-    //TODO: Fix it so the reviewSourceData image doesn't have to be deleted.
-    //     await cloudinary.uploader.destroy(reviewSourceData.images.filename)
-    //     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
-    //     publicSourceData.images = { url: req.file.path, filename: req.file.filename}
-    // //if the reviewsource image was updated, this will check if there is a public image already and delete it if it's url is different than the reviewsource image.
-    // } else if (publicSourceData.images.url && reviewSourceData.images.url !== publicSourceData.images.url) {
-    //     await cloudinary.uploader.destroy(publicSourceData.images.filename)
-    //     publicSourceData.images.url = reviewSourceData.images.url
-    //     publicSourceData.images.filename = reviewSourceData.images.filename
-    // } else {
-    // //will set the publicsource image data to the review source image data
-    //     publicSourceData.images.url = reviewSourceData.images.url
-    //     publicSourceData.images.filename = reviewSourceData.images.filename
     if (req.file) {
         const image = new ImageHandler(req.file.path, req.file.filename, reviewSourceData, publicSourceData)
         image.publishImage()
@@ -111,6 +97,8 @@ module.exports.publishReviewSource = async (req, res) => {
     publicSourceData.lastApprover = req.user._id
     publicSourceData.checkedOut = false
     publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])
+    console.log(req.body.adminNotes, 'test')
+    reviewSourceData.adminNotes = req.body.adminNotes
     reviewSourceData.state = 'approved'
     await reviewSourceData.save()
     await publicSourceData.save()

@@ -52,7 +52,7 @@
         <% if (currentUser) { %>
             <% if (!publicSourceData.checkedOut) { %>
                 <div>
-                    <a href="/sources/<%= publicSourceData.slug %>/edit" class="button-edit">Edit</a>
+                    <a href="/sources/<%= publicSourceData.slug %>/edit"><button class="btn-submit">Edit</button></a>
                 </div>
             <% } else { %>
                 <div>

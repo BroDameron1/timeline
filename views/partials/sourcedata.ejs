@@ -13,5 +13,79 @@
         <% for (let writer of publicSourceData.movie.writer) { %>
             <div><%= writer %></div>
         <% } %> 
-    </div>s
+    </div>
+<% } %>
+
+
+<% if (publicSourceData.mediaType === 'TV Show') { %>
+    <div class="data-line">
+        Initial Release Date: <%= publicSourceData.tv.releaseDate %> 
+    </div>
+    <div class="data-line">
+        Series: <%= publicSourceData.tv.series %> 
+    </div>
+    <div class="data-line">
+        Season: <%= publicSourceData.tv.season %>
+    </div>
+    <div class="data-line">
+        Episode: <%= publicSourceData.tv.episode %>
+    </div>
+<% } %>
+
+
+
+<% if (publicSourceData.mediaType === 'Book') { %>
+    <div class="data-line">
+        Initial Release Date: <%= publicSourceData.book.releaseDate %> 
+    </div>
+    <div class="data-line">
+        Author(s):
+        <% for (let author of publicSourceData.book.author) { %>
+            <div><%= author %></div>
+        <% } %> 
+    </div>
+    <div class="data-line">
+        Series: <%= publicSourceData.book.series %> 
+    </div>
+    <div class="data-line">
+        Publisher: <%= publicSourceData.book.publisher %> 
+    </div>
+    <div class="data-line">
+        ISBN-10: <%= publicSourceData.book.isbn10 %> 
+    </div>
+<% } %>
+
+
+<% if (publicSourceData.mediaType === 'Comic') { %>
+    <div class="data-line">
+        Initial Release Date: <%= publicSourceData.movie.releaseDate %> 
+    </div>
+    <div class="data-line">
+        Writer: <%= publicSourceData.comic.writer %> 
+    </div>
+    <div class="data-line">
+        Art Contributors:
+        <% for (let artist of publicSourceData.comic.artContributor) { %>
+            <div><%= artist %></div>
+        <% } %> 
+    </div>
+    <div class="data-line">
+        Series: <%= publicSourceData.comic.series %> 
+    </div>
+    <div class="data-line">
+        Issue Number: <%= publicSourceData.comic.issueNum %> 
+    </div>
+<% } %>
+
+
+<% if (publicSourceData.mediaType === 'Video Game') { %>
+    <div class="data-line">
+        Initial Release Date: <%= publicSourceData.movie.releaseDate %> 
+    </div>
+    <div class="data-line">
+        Studio: <%= publicSourceData.videoGame.studio %> 
+    </div>
+    <div class="data-line">
+        Publisher: <%= publicSourceData.videoGame.publisher %> 
+    </div>
 <% } %>
