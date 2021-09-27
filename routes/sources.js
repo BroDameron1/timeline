@@ -39,4 +39,7 @@ router.route('/:slug/edit')
     .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderEditSource))
     .post(isLoggedIn, upload.single('sourceImage'), catchAsync(sources.submitEditSource))
 
+router.route('/review/:sourceId/view')
+    .get(isLoggedIn, isAuthor, catchAsync(sources.renderPostReviewSource))
+
 module.exports = router;

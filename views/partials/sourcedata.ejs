@@ -1,91 +1,91 @@
-<% if (publicSourceData.mediaType === 'Movie') { %>
+<% if (data.mediaType === 'Movie') { %>
     <div class="data-line">
-        Initial Release Date: <%= publicSourceData.movie.releaseDate %> 
+        Initial Release Date: <%= data.movie.releaseDate %> 
     </div>
     <div class="data-line">
         Director(s):
-        <% for (let director of publicSourceData.movie.director) { %>
+        <% for (let director of data.movie.director) { %>
             <div><%= director %></div>
         <% } %> 
     </div>
     <div class="data-line">
         Writer(s):
-        <% for (let writer of publicSourceData.movie.writer) { %>
+        <% for (let writer of data.movie.writer) { %>
             <div><%= writer %></div>
         <% } %> 
     </div>
 <% } %>
 
 
-<% if (publicSourceData.mediaType === 'TV Show') { %>
+<% if (data.mediaType === 'TV Show') { %>
     <div class="data-line">
-        Initial Release Date: <%= publicSourceData.tv.releaseDate %> 
+        Initial Release Date: <%= data.tv.releaseDate %> 
     </div>
     <div class="data-line">
-        Series: <%= publicSourceData.tv.series %> 
+        Series: <%= data.tv.series %> 
     </div>
     <div class="data-line">
-        Season: <%= publicSourceData.tv.season %>
+        Season: <%= data.tv.season %>
     </div>
     <div class="data-line">
-        Episode: <%= publicSourceData.tv.episode %>
+        Episode: <%= data.tv.episode %>
     </div>
 <% } %>
 
 
 
-<% if (publicSourceData.mediaType === 'Book') { %>
+<% if (data.mediaType === 'Book') { %>
     <div class="data-line">
-        Initial Release Date: <%= publicSourceData.book.releaseDate %> 
+        Initial Release Date: <%= data.book.releaseDate %> 
     </div>
     <div class="data-line">
         Author(s):
-        <% for (let author of publicSourceData.book.author) { %>
+        <% for (let author of data.book.author) { %>
             <div><%= author %></div>
         <% } %> 
     </div>
     <div class="data-line">
-        Series: <%= publicSourceData.book.series %> 
+        Series: <%= data.book.series %> 
     </div>
     <div class="data-line">
-        Publisher: <%= publicSourceData.book.publisher %> 
+        Publisher: <%= data.book.publisher %> 
     </div>
     <div class="data-line">
-        ISBN-10: <%= publicSourceData.book.isbn10 %> 
+        ISBN-10: <%= data.book.isbn10 %> 
     </div>
 <% } %>
 
 
-<% if (publicSourceData.mediaType === 'Comic') { %>
+<% if (data.mediaType === 'Comic') { %>
     <div class="data-line">
-        Initial Release Date: <%= publicSourceData.movie.releaseDate %> 
+        Initial Release Date: <%= data.movie.releaseDate %> 
     </div>
     <div class="data-line">
-        Writer: <%= publicSourceData.comic.writer %> 
+        Writer: <%= data.comic.writer %> 
     </div>
     <div class="data-line">
         Art Contributors:
-        <% for (let artist of publicSourceData.comic.artContributor) { %>
+        <% for (let artist of data.comic.artContributor) { %>
             <div><%= artist %></div>
         <% } %> 
     </div>
     <div class="data-line">
-        Series: <%= publicSourceData.comic.series %> 
+        Series: <%= data.comic.series %> 
     </div>
     <div class="data-line">
-        Issue Number: <%= publicSourceData.comic.issueNum %> 
+        Issue Number: <%= data.comic.issueNum %> 
     </div>
 <% } %>
 
 
-<% if (publicSourceData.mediaType === 'Video Game') { %>
+<% if (data.mediaType === 'Video Game') { %>
     <div class="data-line">
-        Initial Release Date: <%= publicSourceData.movie.releaseDate %> 
+        Initial Release Date: <%= data.movie.releaseDate %> 
     </div>
     <div class="data-line">
-        Studio: <%= publicSourceData.videoGame.studio %> 
+        Studio: <%= data.videoGame.studio %> 
     </div>
     <div class="data-line">
-        Publisher: <%= publicSourceData.videoGame.publisher %> 
+        Publisher: <%= data.videoGame.publisher %> 
     </div>
 <% } %>

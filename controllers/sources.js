@@ -15,7 +15,21 @@ module.exports.renderSource = async (req, res) => {
         req.flash('error', 'This record does not exist.')
         return res.redirect('/dashboard')
     }
-    res.render('sources/source', { publicSourceData })
+    res.render('sources/source', { data: publicSourceData })
+}
+
+//controller for rendering a review record AFTER it has been reviewed.
+module.exports.renderPostReviewSource = async (req, res) => {
+    const { sourceId } = req.params
+    console.log('test')
+    const reviewSourceData = await Source.reviewSource.findById(sourceId)
+        .populate('author', 'username')
+        .populate('lastApprover', 'username')
+    if (!reviewSourceData) {
+        req.flash('error', 'This record does not exist.')
+        return res.redirect('/dashboard')
+    }
+    res.render('sources/source', { data: reviewSourceData })
 }
 
 //controller for get route for rendering the New Source submission form.
@@ -97,8 +111,8 @@ module.exports.publishReviewSource = async (req, res) => {
     publicSourceData.lastApprover = req.user._id
     publicSourceData.checkedOut = false
     publicSourceData.updateAuthor(publicSourceData.author, reviewSourceData.author[0])
-    console.log(req.body.adminNotes, 'test')
     reviewSourceData.adminNotes = req.body.adminNotes
+    reviewSourceData.lastApprover = req.user._id
     reviewSourceData.state = 'approved'
     await reviewSourceData.save()
     await publicSourceData.save()

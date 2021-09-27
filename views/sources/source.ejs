@@ -19,17 +19,17 @@
     <div class="display-container">
         <h1>Source</h1>
         <div class="record-header">
-            <%= publicSourceData.title %>
+            <%= data.title %>
         </div>
         <div class="record-image">
-            <% if (publicSourceData.images.url) { %> 
-                <img src="<%= publicSourceData.displayImage %>">
+            <% if (data.images.url) { %> 
+                <img src="<%= data.displayImage %>">
             <% } else { %>
                 <img src="/images/placeholder.png">
             <% } %> 
         </div>
         <div class="data-line">
-            Media: <%= publicSourceData.mediaType %>
+            Media: <%= data.mediaType %>
         </div>
 
 
@@ -39,20 +39,23 @@
 
         <div class="data-line">
             Most Recent Record Contributors:
-            <% for (let contributor of publicSourceData.author) { %>
+            <% for (let contributor of data.author) { %>
                 <div><%= contributor.username %></div>
             <% } %> 
         </div>
 
         <div class="data-line">
-            Last Update: <%= publicSourceData.updateDate %> approved by <%= publicSourceData.lastApprover.username %> 
+            Last Update: <%= data.updateDate %> approved by <%= data.lastApprover.username %> 
         </div>
 
+        <% if(data.state === 'approved' || data.state === 'rejected') { %>
+            <div class="data-line">Admin Notes: <%= data.adminNotes %> </div>
+        <% } else { %>
 
         <% if (currentUser) { %>
-            <% if (!publicSourceData.checkedOut) { %>
+            <% if (!data.checkedOut) { %>
                 <div>
-                    <a href="/sources/<%= publicSourceData.slug %>/edit"><button class="btn-submit">Edit</button></a>
+                    <a href="/sources/<%= data.slug %>/edit"><button class="btn-submit">Edit</button></a>
                 </div>
             <% } else { %>
                 <div>
@@ -61,9 +64,9 @@
             <% } %>
         <% } %>
         <% if (currentUser && currentUser.role==='admin' ) { %>
-            <% if (!publicSourceData.checkedOut) { %>
+            <% if (!data.checkedOut) { %>
                 <div>
-                    <form action="/sources/<%= publicSourceData.slug %>?_method=DELETE" method="POST" class="delete-record">
+                    <form action="/sources/<%= data.slug %>?_method=DELETE" method="POST" class="delete-record">
                     <button class="btn-delete">Delete Record</button>
                     </form>
                 </div>
@@ -73,6 +76,7 @@
                 </div>
             <% } %>
         <% } %>
+    <% } %> 
     </div>
 </main>
 
