@@ -2,7 +2,7 @@ const warningPopup = document.querySelector('.warning-popup')
 const blurBackground = document.querySelector('.disableDiv')
 const deleteConfirmation = document.querySelector('#delete-confirmation')
 let deleteButtons = document.querySelectorAll('.delete-record')
-const cancelDelete = document.querySelector('.button-edit')
+const cancelDelete = document.querySelector('.btn-blue')
 
 deleteButtons.forEach((deleteBtn) => {
     deleteBtn.addEventListener('submit', event => {

@@ -91,7 +91,7 @@ main {
     font-size: .75rem;
 }
 
-.btn-submit {
+.btn-blue {
     border-radius: 6px;
     background-color: rgb(62, 130, 255);
     border: none;
@@ -100,9 +100,10 @@ main {
     margin-top: 1rem;
     width: 100%;
     cursor: pointer;
+    color: whitesmoke;
 }
 
-.btn-delete {
+.btn-red {
     border-radius: 6px;
     background-color: rgb(196, 63, 63);
     border: none;
@@ -111,6 +112,35 @@ main {
     margin-top: 1rem;
     width: 100%;
     cursor: pointer;
+    color: whitesmoke;
+}
+
+.btn-disabled {
+    /* font-size: 100%;
+    box-sizing: border-box;
+    cursor: not-allowed;
+    border-radius: 6px;
+    background-color: rgba(129, 129, 129, 0.425);
+    border: none;
+    padding: .5rem;
+    width: 90%;
+    justify-self: end;
+    color: whitesmoke; */
+
+    border-radius: 6px;
+    cursor: not-allowed;
+    background-color: rgba(129, 129, 129, 0.425);
+    border: none;
+    font-size: 1em;
+    padding: .5rem;
+    margin-top: 1rem;
+    width: 100%;
+    cursor: pointer;
+    color: whitesmoke;
+}
+
+.btn-margins {
+    margin: auto .5rem .5rem .5rem;
 }
 
 input, select, textarea, .file-name {
@@ -260,7 +290,13 @@ textarea {
     border-radius: 3px;
 }
 
-.record-edit {
+.record-button {
+    display: grid;
+    grid-column: span 1;
+    text-align: center;
+}
+
+/* .record-edit {
     display: grid;
     grid-column: span 1;
     text-align: center;
@@ -270,9 +306,9 @@ textarea {
     display: grid;
     grid-column: span 1;
     text-align: center;
-}
+} */
 
-a.button-edit {
+/* a.button-edit {
     box-sizing: border-box;
     border-radius: 6px;
     background-color: rgb(62, 130, 255);
@@ -281,9 +317,9 @@ a.button-edit {
     width: 80%;
     justify-self: end;
     color: white;
-}
+} */
 
-.button-delete {
+/* .button-delete {
     font-size: 100%;
     box-sizing: border-box;
     cursor: pointer;
@@ -294,9 +330,9 @@ a.button-edit {
     width: 80%;
     justify-self: end;
     color: white;
-}
+} */
 
-.button-locked {
+/* .button-locked {
     font-size: 100%;
     box-sizing: border-box;
     cursor: not-allowed;
@@ -307,7 +343,7 @@ a.button-edit {
     width: 90%;
     justify-self: end;
     color: white;
-}
+} */
 
 /* use to hide a fieldset */
 
@@ -353,7 +389,7 @@ a.button-edit {
 	outline: -webkit-focus-ring-color auto 5px;
 }
 
-
+/* formats browse button for image upload */
 .btn-browse {
     border-radius: 6px;
     background-color: rgb(62, 130, 255);
@@ -362,6 +398,7 @@ a.button-edit {
     padding: .5rem;
     margin-top: 1rem;
     width: 5rem;
+    color: whitesmoke;
 }
 
 .popup-btn-container {

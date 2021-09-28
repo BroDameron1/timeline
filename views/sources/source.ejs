@@ -6,11 +6,10 @@
         <form action="" id="delete-confirmation">
             <div class="form-field"><input type="text" id="delete-validate"></div>
             <div class="popup-btn-container">
-                <button class="button-delete">Delete</button>
+                <button class="btn-red btn-margins">Delete</button>
         </form>
-        <a href="#" class="button-edit">Cancel</a>
+        <button class="btn-blue btn-margins">Cancel</button>
     </div>
-    <div class="failed-match"></div>
 </div>
 </div>
 
@@ -55,11 +54,11 @@
         <% if (currentUser) { %>
             <% if (!data.checkedOut) { %>
                 <div>
-                    <a href="/sources/<%= data.slug %>/edit"><button class="btn-submit">Edit</button></a>
+                    <a href="/sources/<%= data.slug %>/edit"><button class="btn-blue">Edit</button></a>
                 </div>
             <% } else { %>
                 <div>
-                    <a href="#" class="button-locked">Locked</a>
+                    <button class="btn-disabled">Locked</button>
                 </div>
             <% } %>
         <% } %>
@@ -67,12 +66,12 @@
             <% if (!data.checkedOut) { %>
                 <div>
                     <form action="/sources/<%= data.slug %>?_method=DELETE" method="POST" class="delete-record">
-                    <button class="btn-delete">Delete Record</button>
+                    <button class="btn-red">Delete Record</button>
                     </form>
                 </div>
              <% } else { %>
                 <div>
-                    <a href="#" class="button-locked">Locked</a>
+                    <button class="btn-disabled">Locked</button>
                 </div>
             <% } %>
         <% } %>

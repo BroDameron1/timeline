@@ -6,11 +6,10 @@
         <form action="" id="delete-confirmation">
             <div class="form-field"><input type="text" id="delete-validate"></div>
         <div class="popup-btn-container">
-            <button class="button-delete">Delete</button>
+            <button class="btn-red btn-margins">Delete</button>
         </form>
-        <a href="#" class="button-edit">Cancel</a>
+        <button class="btn-blue btn-margins">Cancel</button>
     </div>
-    <div class="failed-match"></div>
     </div>
 </div>
 
@@ -34,15 +33,15 @@
                         </div>
                     </div>
                     <% if (!pendingRequest.checkedOut) { %> 
-                    <div class="record-edit"><a href="sources/review/<%= pendingRequest._id %>/edit/" class="button-edit">Edit</a></div>
-                    <div class="record-delete">
+                    <div class="record-button"><a href="sources/review/<%= pendingRequest._id %>/edit/"><button class="btn-blue">Edit</button></a></div>
+                    <div class="record-button">
                         <form action="/sources/review/<%= pendingRequest._id %>?_method=DELETE" method="POST" class="delete-record">
-                            <button class="button-delete">Delete</button>
+                            <button class="btn-red">Delete</button>
                         </form>
                     </div>
                     <% } else { %>
-                        <div class="record-edit"><a href="#" class="button-locked">Locked</a></div>
-                        <div class="record-delete"><a href="#" class="button-locked">Locked</a></div>
+                        <div class="record-button"><button class="btn-disabled">Locked</button></div>
+                        <div class="record-button"><button class="btn-disabled">Locked</button></div>
                     <% } %> 
                 </div>
             <% } %>
@@ -62,8 +61,9 @@
                             <%= pendingRequest.state %>
                         </div>
                     </div>
-                    <div class="record-delete">
-                        <a href="/sources/review/<%= pendingRequest._id %>/view/" class="button-edit">View Notes</a>
+                    <div class="record-button"></div>
+                    <div class="record-button">
+                        <a href="/sources/review/<%= pendingRequest._id %>/view/"><button class="btn-blue">View Notes</button></a>
                     </div>
                 </div>
             <% } %>
@@ -81,14 +81,14 @@
                         <div class="record-date">Last Update: <%= pendingRequest.updateDate %></div>
                         <div class="record-state">
                             <div class="state-container">
-                                State
+                                <%= pendingRequest.state %>
                             </div>
                         </div>
                         <div></div>
                         <% if (!pendingRequest.checkedOut) { %> 
-                        <div class="record-edit"><a href="/sources/review/<%= pendingRequest._id %>" class="button-edit">Review</a></div>
+                        <div class="record-button"><a href="/sources/review/<%= pendingRequest._id %>"><button class="btn-blue">Review</button></a></div>
                         <% } else { %> 
-                        <div class="record-edit"><a href="#" class="button-locked">Locked</a></div>
+                        <div class="record-button"><button class="btn-disabled">Locked</button></div>
                         <% } %> 
                     </div>
                 
