@@ -19,8 +19,10 @@ deleteButtons.forEach((deleteBtn) => {
             }
         })
         cancelDelete.addEventListener('click', event => {
+            let deleteValidate = document.querySelector('#delete-validate')
             warningPopup.style.display = 'none'
             blurBackground.style.display = 'none'
+            deleteValidate.value = ''
         })
     })
 })

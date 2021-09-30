@@ -156,7 +156,6 @@ input, select, textarea, .file-name {
 }
 
 textarea {
-    width: 100%;
     height: auto;
     resize: vertical;
 }

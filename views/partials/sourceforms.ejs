@@ -51,6 +51,8 @@
         <input type="text" id="isbn10" name="book[isbn10]" value="<%= data.book.isbn10 %>">
     </div>
 </div> 
+
+
 <div class="hide-sources" id="movie-fields">
     <div class="form-field">
         <label for="movie-director">Director(s)</label>
@@ -79,6 +81,7 @@
         <input type="date" class="date" id="movieReleaseDate" name="movie[releaseDate]" min="1977-05-25" value="<%= data.movie.releaseDate %>">
     </div>
 </div> 
+
 <div class="hide-sources" id="comic-fields">
     <div class="form-field">
         <label for="comic-writer">Writer</label>
@@ -88,7 +91,7 @@
         <label for="art-contributor">Art Contributor(s)</label>
         <% if (data.comic.artContributor.length > 0) { %> 
             <% for(let artist of data.comic.artContributor) { %>    
-                <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>"></div>
+                <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>">
             <% } %>
         <% } else { %>
             <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]">
@@ -108,6 +111,7 @@
         <input type="date" class="date" id="comicReleaseDate" name="comic[releaseDate]" min="1977-05-25" value="<%= data.comic.releaseDate %>">
     </div>
 </div> 
+
 <div class="hide-sources" id="tv-fields">
     <div class="form-field">
         <label for="tv-series">Series</label>
@@ -126,13 +130,14 @@
         <input type="date" class="date" id="tvReleaseDate" name="tv[releaseDate]" min="1977-05-25" value="<%= data.tv.releaseDate %>">
     </div>
 </div> 
+
 <div class="hide-sources" id="game-fields">
     <div class="form-field">
         <label for="vg-studio">Production Studio</label>
         <input type="text" id="vg-studio" name="videoGame[studio]" value="<%= data.videoGame.studio %>">
     </div>
     <div class="form-field">
-        <label for="vg-publisher">Series</label>
+        <label for="vg-publisher">Publisher</label>
         <input type="text" id="vg-publisher" name="videoGame[publisher]" value="<%= data.videoGame.releaseDate %>">
     </div>
     <div class="form-field">
