@@ -5,12 +5,12 @@ const sources = require('../controllers/sources');
 const multer = require('multer') //adds multer to process file uploads
 const { storage } = require('../utils/cloudinary')
 const upload = multer({ storage }) //initialize multer and add location for file uploads
-const { isLoggedIn, isAdmin, isAuthor, isCheckedOut } = require('../middleware');
+const { isLoggedIn, isAdmin, isAuthor, isCheckedOut, validateSource } = require('../middleware');
 
 //routes for creating and submitting a new source
 router.route('/new')
     .get(isLoggedIn, catchAsync(sources.renderNewSource))
-    .post(isLoggedIn, upload.single('sourceImage'), catchAsync(sources.submitNewSource))
+    .post(isLoggedIn, upload.single('sourceImage'), validateSource, catchAsync(sources.submitNewSource))
 
 //routes for publishing a source to public
 router.route('/review/:sourceId')

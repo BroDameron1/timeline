@@ -47,6 +47,15 @@ form.addEventListener('submit', async event => {
         return div.textContent = 'Please select a media type.'
     }
 
+        //loops through all fields and finds any empty ones and disables them so they don't send empty strings
+    //TODO: Check if needed after Joi
+    const inputs = document.querySelectorAll("input")
+    inputs.forEach((input) => {
+        if (input.value.length === 0) {
+            input.setAttribute('disabled', 'disabled')
+        }
+    })
+
     //checks for duplicates from the frontend
     const submittedRecord = new Duplicate(title.value, mediaType.value, null, 'submitNew')
     const duplicateResult = await submittedRecord.validateDuplicates()
@@ -57,14 +66,7 @@ form.addEventListener('submit', async event => {
         return div.textContent = duplicateResult
     }
 
-    //loops through all fields and finds any empty ones and disables them so they don't send empty strings
-    //TODO: Check if needed after Joi
-    const inputs = document.querySelectorAll("input")
-    inputs.forEach((input) => {
-        if (input.value.length === 0) {
-            input.setAttribute('disabled', 'disabled')
-        }
-    })
+
 })
 
 

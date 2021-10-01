@@ -48,3 +48,35 @@ module.exports.userSchema = Joi.object({
             "string.empty": 'You must enter an email address.'
         })
 }).unknown()
+
+module.exports.sourceSchema = Joi.object({
+    title: Joi.string()
+        .required()
+        //add a regex pattern to match against
+        //.pattern()
+        .escapeHTML()
+        .min(3)
+        .max(100),
+    slug: Joi.string(),
+    mediaType: Joi.string()
+        .required()
+        .valid('Movie', 'TV Show', 'Book', 'Comic', 'Video Game')
+        .escapeHTML(),
+    state: Joi.string()
+        .valid('new', 'update', 'approved', 'published', 'rejected'),
+    author: Joi.array()
+        .items(Joi.object())
+        .max(5)
+        .unique(),
+    lastApprover: Joi.string()
+        .alphanum()
+        .escapeHTML(),
+    //TODO: Can validate date?
+    // updateDate: Joi.date(),
+    //     .greater('now')
+    //     .iso(),
+    adminNotes: Joi.string()
+        .alphanum()
+        .escapeHTML()
+        .max(500)
+}).unknown()

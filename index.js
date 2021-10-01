@@ -54,9 +54,6 @@ db.once('open', () => {
 const userRoutes = require('./routes/users');
 const sourceRoutes = require('./routes/sources');
 
-//delete this if it doesn't break
-//const user = require('./models/user');
-
 //execute EJS and EJS mate
 app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs')
@@ -142,10 +139,10 @@ app.use((req, res, next) => {
 })
 
 // caching disabled for every route
-// app.use(function(req, res, next) {
-//     res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-//     next();
-//   });
+app.use(function(req, res, next) {
+    res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    next();
+  });
 
 //direct requests to the user routes
 app.use('/', userRoutes);

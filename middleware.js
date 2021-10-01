@@ -1,7 +1,7 @@
 const User = require('./models/user');
 const Source = require('./models/source');
 const ExpressError = require('./utils/expressError')
-const { userSchema } = require('./schemas');
+const { userSchema, sourceSchema } = require('./schemas');
 
 const isLoggedIn = async (req, res, next) => {
     //checks to see if a user is already logged in.  If so, get their info from the DB so it can be checked
@@ -29,6 +29,26 @@ const validateUser = (req, res, next) => {
         throw new ExpressError(errorMsg, 400)
     } else {
         next();
+    }
+}
+
+const validateSource = (req, res, next) => {
+    const { error } = sourceSchema.validate(req.body)
+    if (error) {
+        const errorMsg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(errorMsg, 400)
+    } else {
+        next();
+    }
+}
+
+const validateSourceTest = (data) => {
+    const { error } = sourceSchema.validate(data)
+    if (error) {
+        const errorMsg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(errorMsg, 400)
+    } else {
+        return true
     }
 }
 
@@ -77,6 +97,8 @@ const isCheckedOut = async (req, res, next) => {
 module.exports = {
     isLoggedIn,
     validateUser,
+    validateSource,
+    validateSourceTest,
     notLoggedIn,
     isAdmin,
     isAuthor,

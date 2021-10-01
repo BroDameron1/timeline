@@ -2,7 +2,8 @@ const Source = require('../models/source');
 const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
-const { cloudinary, ImageHandler } = require('../utils/cloudinary')
+const { ImageHandler } = require('../utils/cloudinary')
+const { validateSourceTest } = require('../middleware')
 
 //controller for get route for rendering any existing source.
 //TODO: Handle failed to cast errors in other sections
@@ -40,6 +41,7 @@ module.exports.renderNewSource = async (req, res) => {
 
 //controller for the post route for submitting a New Source to be approved.
 module.exports.submitNewSource = async (req, res) => {
+    console.log(req.body)
     const reviewSourceData = new Source.reviewSource(req.body)
     const duplicateCheck = await duplicateChecker.submitNew(reviewSourceData.title, reviewSourceData.mediaType)
     if (duplicateCheck) {
@@ -53,6 +55,7 @@ module.exports.submitNewSource = async (req, res) => {
         image.newReviewImage()
     }
     reviewSourceData.state = 'new'
+    const validate = validateSourceTest(reviewSourceData)
     await reviewSourceData.save()
     req.flash('info', 'Your new Source has been submitted for approval.')
     res.redirect('/dashboard');
@@ -148,14 +151,6 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
         const image = new ImageHandler(req.file.path, req.file.filename, reviewSourceData)
         await image.updateReviewImage()
     }
-    
-    // if (req.file && reviewSourceData.images.filename) {
-    //     await cloudinary.uploader.destroy(reviewSourceData.images.filename)
-    //     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
-    // }
-    // if (req.file) {
-    //     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
-    // }
     const duplicateCheck = await duplicateChecker.updateReview(reviewSourceData.title, reviewSourceData.mediaType, sourceId)
     if (duplicateCheck) {
         req.flash('error', 'This record already exists.')
