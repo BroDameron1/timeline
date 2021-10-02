@@ -33,22 +33,14 @@ const validateUser = (req, res, next) => {
 }
 
 const validateSource = (req, res, next) => {
+    console.log(req.body)
     const { error } = sourceSchema.validate(req.body)
+    console.log(req.body, 'test2')
     if (error) {
         const errorMsg = error.details.map(el => el.message).join(',')
         throw new ExpressError(errorMsg, 400)
     } else {
         next();
-    }
-}
-
-const validateSourceTest = (data) => {
-    const { error } = sourceSchema.validate(data)
-    if (error) {
-        const errorMsg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(errorMsg, 400)
-    } else {
-        return true
     }
 }
 
@@ -98,7 +90,6 @@ module.exports = {
     isLoggedIn,
     validateUser,
     validateSource,
-    validateSourceTest,
     notLoggedIn,
     isAdmin,
     isAuthor,

@@ -51,7 +51,6 @@ const SourceSchema = new Schema({
     book: {
         author: {
             type: [ String ],
-            required: true
         },
         publisher: String,
         series: String,

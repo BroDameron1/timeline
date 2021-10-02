@@ -69,14 +69,96 @@ module.exports.sourceSchema = Joi.object({
         .max(5)
         .unique(),
     lastApprover: Joi.string()
-        .alphanum()
         .escapeHTML(),
     //TODO: Can validate date?
     // updateDate: Joi.date(),
     //     .greater('now')
     //     .iso(),
     adminNotes: Joi.string()
-        .alphanum()
         .escapeHTML()
-        .max(500)
+        .max(500),
+    book: Joi.object({
+        author: Joi.array()
+            .items(Joi.string()
+                .max(80)
+                .escapeHTML() 
+            )
+            .max(4)
+            .unique(),
+        publisher: Joi.string()
+            .escapeHTML()
+            .max(100),
+        series: Joi.string()
+            .escapeHTML()
+            .max(80),
+        // TODO: try to fix to validate date
+        // releaseDate: Joi.any(),
+        isbn10: Joi.string()
+            .escapeHTML()
+            .max(50)
+    }).unknown(),
+    movie: Joi.object({
+        director: Joi.array()
+            .items(Joi.string()
+                .max(80)
+                .escapeHTML()
+            )
+            .max(2)
+            .unique(),
+        writer: Joi.array()
+            .items(Joi.string()
+                .max(80)
+                .escapeHTML()
+            )
+            .max(4)
+            .unique(),
+        //releasedate
+        //TODO: take unknown out when releasedate is fixed
+    }).unknown(),
+    comic: Joi.object({
+        writer: Joi.string()
+            .escapeHTML()
+            .max(80),
+        artContributor: Joi.array()
+            .items(Joi.string()
+                .max(80)
+                .escapeHTML()
+            )
+            .max(4)
+            .unique(),
+        series: Joi.string()
+            .escapeHTML()
+            .max(80),
+        issueNum: Joi.number()
+            .integer()
+            .max(101)
+            .positive(),
+        //TODO: Date
+    }).unknown(),
+    tv: Joi.object({
+        series: Joi.string()
+            .escapeHTML()
+            .max(80),
+        season: Joi.number()
+            .integer()
+            .max(20)
+            .positive(),
+        episode: Joi.number()
+            .integer()
+            .max(50)
+            .positive(),
+        //TODO: Add dates
+    }).unknown(),
+    videoGame: Joi.object({
+        studio: Joi.string()
+            .escapeHTML()
+            .max(80),
+        publisher: Joi.string()
+            .escapeHTML()
+            .max(80),
+        //TODO: Add dates
+    }).unknown()
 }).unknown()
+
+
+
