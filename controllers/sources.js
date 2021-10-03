@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
 const { ImageHandler } = require('../utils/cloudinary')
-const { userSchema, sourceSchema } = require('../schemas');
 
 //controller for get route for rendering any existing source.
 //TODO: Handle failed to cast errors in other sections
@@ -22,7 +21,6 @@ module.exports.renderSource = async (req, res) => {
 //controller for rendering a review record AFTER it has been reviewed.
 module.exports.renderPostReviewSource = async (req, res) => {
     const { sourceId } = req.params
-    console.log('test')
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
         .populate('author', 'username')
         .populate('lastApprover', 'username')
@@ -41,7 +39,6 @@ module.exports.renderNewSource = async (req, res) => {
 
 //controller for the post route for submitting a New Source to be approved.
 module.exports.submitNewSource = async (req, res) => {
-    console.log(req.body, 'test3')
     const reviewSourceData = new Source.reviewSource(req.body)
     const duplicateCheck = await duplicateChecker.submitNew(reviewSourceData.title, reviewSourceData.mediaType)
     if (duplicateCheck) {

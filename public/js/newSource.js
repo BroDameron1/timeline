@@ -45,12 +45,13 @@ form.addEventListener('submit', async event => {
 
         //loops through all fields and finds any empty ones and disables them so they don't send empty strings
     //TODO: Check if needed after Joi
-    const inputs = document.querySelectorAll("input")
-    inputs.forEach((input) => {
-        if (input.value.length === 0) {
-            input.setAttribute('disabled', 'disabled')
-        }
-    })
+    //handled on the backend, will delete if breaks
+    // const inputs = document.querySelectorAll("input")
+    // inputs.forEach((input) => {
+    //     if (input.value.length === 0) {
+    //         input.setAttribute('disabled', 'disabled')
+    //     }
+    // })
 
     //checks for duplicates from the frontend
     const submittedRecord = new Duplicate(title.value, mediaType.value, null, 'submitNew')

@@ -33,14 +33,39 @@ const validateUser = (req, res, next) => {
 }
 
 const validateSource = (req, res, next) => {
+
+    //checks the req.body object for any empty fields and changes them to undefined so they don't get stored.
+    for (let [key, value] of Object.entries(req.body)) {
+        if (req.body[key] === '' || req.body[key] === null) {
+            req.body[key] === undefined
+        }
+        //loops through any fields that are objects and changes their subvalues to undefined if empty.
+        if (typeof req.body[key] === 'object') {
+            for (let [subkey, subvalue] of Object.entries(req.body[key])) {
+                if (req.body[key][subkey] === '') {
+                    req.body[key][subkey] = undefined
+                //loops through any arrays removes any empty strings and then sets the empty array to undefined.
+                } else if (Array.isArray(req.body[key][subkey])) {
+                    req.body[key][subkey] = req.body[key][subkey].filter(entry => entry !== '')
+                    if (req.body[key][subkey].length === 0) {
+                        req.body[key][subkey] = undefined
+                    }
+                }
+            }
+        }
+    }
+
+    //valites the now altered req.body against the Joi schema definitions.
     const { error } = sourceSchema.validate(req.body)
     if (error) {
         const errorMsg = error.details.map(el => el.message).join(',')
+        console.log('test2')
         throw new ExpressError(errorMsg, 400)
     } else {
         next();
     }
 }
+
 
 const notLoggedIn = (req, res, next) => {
     if(req.user) {

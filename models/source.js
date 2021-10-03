@@ -51,6 +51,7 @@ const SourceSchema = new Schema({
     book: {
         author: {
             type: [ String ],
+            default: undefined
         },
         publisher: String,
         series: String,
@@ -61,8 +62,14 @@ const SourceSchema = new Schema({
         isbn10: String
     },
     movie: {
-        director: [ String ],
-        writer: [ String ],
+        director: {
+            type: [ String ],
+            default: undefined
+        },
+        writer: {
+            type: [ String ],
+            default: undefined
+        },
         releaseDate: {
             type: Date,
             get: formDate
@@ -70,7 +77,10 @@ const SourceSchema = new Schema({
     },
     comic: {
         writer: String,
-        artContributor: [ String ],
+        artContributor: {
+            type: [ String ],
+            default: undefined
+        },
         series: String,
         issueNum: Number,
         releaseDate: {
