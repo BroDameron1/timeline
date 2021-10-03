@@ -42,7 +42,7 @@ const validateSource = (req, res, next) => {
         //loops through any fields that are objects and changes their subvalues to undefined if empty.
         if (typeof req.body[key] === 'object') {
             for (let [subkey, subvalue] of Object.entries(req.body[key])) {
-                if (req.body[key][subkey] === '') {
+                if (req.body[key][subkey] === '' || req.body[key][subkey] === null) {
                     req.body[key][subkey] = undefined
                 //loops through any arrays removes any empty strings and then sets the empty array to undefined.
                 } else if (Array.isArray(req.body[key][subkey])) {

@@ -32,15 +32,15 @@ window.addEventListener('load', event => {
     })
 })
 
-window.addEventListener('load', async event => {
-    const state = new StateManager(true, sourceId, 'ReviewSource')
-    const stateResult = await state.updateState()
-    if (stateResult !== 200) {
-        location.href="/dashboard"
-        console.log('Something went wrong, please contact an admin.', state)
-    }
-    setInterval(idleLogout, 1000)
-})
+// window.addEventListener('load', async event => {
+//     const state = new StateManager(true, sourceId, 'ReviewSource')
+//     const stateResult = await state.updateState()
+//     if (stateResult !== 200) {
+//         location.href="/dashboard"
+//         console.log('Something went wrong, please contact an admin.', state)
+//     }
+//     setInterval(idleLogout, 1000)
+// })
 
 let unloadCheck = false //flag to determine if the beforeunload event fires on submit
 
@@ -171,7 +171,17 @@ bookFields.addEventListener('click', event => {
     }
 })
 
-
+window.addEventListener('load', event => {
+    const inputBoxes = document.querySelectorAll('.book-author')
+    console.log(inputBoxes)
+    if(inputBoxes.length > 1) {
+        for (let i = 1; i < inputBoxes.length; i++) {
+            let input = inputBoxes[i]
+            input.parentElement.setAttribute("id", `add-author${i}`)
+            input.insertAdjacentHTML('afterend', `<a href="#" class="remove-author" id="${i}">Remove</a>`)
+        }
+    }
+})
 
 
 // addAuthor.addEventListener('click', event => {
