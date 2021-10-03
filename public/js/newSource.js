@@ -33,10 +33,6 @@ window.addEventListener('load', event => {
     })
 })
 
-form.addEventListener('submit', async event => {
-    event.preventDefault()
-
-})
 
 form.addEventListener('submit', async event => {
     event.preventDefault()

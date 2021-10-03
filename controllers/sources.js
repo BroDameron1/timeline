@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
 const { ImageHandler } = require('../utils/cloudinary')
+const { userSchema, sourceSchema } = require('../schemas');
 
 //controller for get route for rendering any existing source.
 //TODO: Handle failed to cast errors in other sections

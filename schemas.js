@@ -33,7 +33,7 @@ module.exports.userSchema = Joi.object({
         .messages({
             "string.alphanum": 'Your username may only contain letters and numbers.',
             "string.min": "Your username must be at least 5 characters.",
-            "string.max": "Your username must be no more than 10 charaters",
+            "string.max": "Your username must be no more than 10 characters",
             "string.empty":"A username is required to register."
                 }),
     password: Joi.string()
@@ -49,12 +49,13 @@ module.exports.userSchema = Joi.object({
         })
 }).unknown()
 
+const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.? ]+$/i
+
 module.exports.sourceSchema = Joi.object({
     title: Joi.string()
         .required()
-        //add a regex pattern to match against
-        //.pattern()
         .escapeHTML()
+        .pattern(regex)
         .min(3)
         .max(100),
     slug: Joi.string(),
@@ -70,38 +71,42 @@ module.exports.sourceSchema = Joi.object({
         .unique(),
     lastApprover: Joi.string()
         .escapeHTML(),
-    //TODO: Can validate date?
-    // updateDate: Joi.date(),
-    //     .greater('now')
-    //     .iso(),
     adminNotes: Joi.string()
         .escapeHTML()
+        .pattern(regex)
         .max(500),
     book: Joi.object({
         author: Joi.array()
             .items(Joi.string()
                 .max(80)
-                .escapeHTML() 
+                .escapeHTML()
+                .pattern(regex) 
             )
             .max(4)
             .unique(),
         publisher: Joi.string()
             .escapeHTML()
-            .max(100),
+            .pattern(regex)
+            .max(80),
         series: Joi.string()
             .escapeHTML()
+            .pattern(regex)
             .max(80),
         // TODO: try to fix to validate date
-        // releaseDate: Joi.any(),
+        releaseDate: Joi.date()
+            .less('now')
+            .iso(),
         isbn10: Joi.string()
             .escapeHTML()
+            .pattern(regex)
             .max(50)
-    }).unknown(),
+    }),
     movie: Joi.object({
         director: Joi.array()
             .items(Joi.string()
                 .max(80)
                 .escapeHTML()
+                .pattern(regex)
             )
             .max(2)
             .unique(),
@@ -109,35 +114,43 @@ module.exports.sourceSchema = Joi.object({
             .items(Joi.string()
                 .max(80)
                 .escapeHTML()
+                .pattern(regex)
             )
             .max(4)
             .unique(),
-        //releasedate
-        //TODO: take unknown out when releasedate is fixed
-    }).unknown(),
+        releaseDate: Joi.date()
+            .less('now')
+            .iso(),
+    }),
     comic: Joi.object({
         writer: Joi.string()
             .escapeHTML()
+            .pattern(regex)
             .max(80),
         artContributor: Joi.array()
             .items(Joi.string()
                 .max(80)
                 .escapeHTML()
+                .pattern(regex)
             )
             .max(4)
             .unique(),
         series: Joi.string()
             .escapeHTML()
+            .pattern(regex)
             .max(80),
         issueNum: Joi.number()
             .integer()
             .max(101)
             .positive(),
-        //TODO: Date
-    }).unknown(),
+        releaseDate: Joi.date()
+            .less('now')
+            .iso(),
+    }),
     tv: Joi.object({
         series: Joi.string()
             .escapeHTML()
+            .pattern(regex)
             .max(80),
         season: Joi.number()
             .integer()
@@ -152,13 +165,17 @@ module.exports.sourceSchema = Joi.object({
     videoGame: Joi.object({
         studio: Joi.string()
             .escapeHTML()
+            .pattern(regex)
             .max(80),
         publisher: Joi.string()
             .escapeHTML()
+            .pattern(regex)
             .max(80),
-        //TODO: Add dates
-    }).unknown()
-}).unknown()
+        releaseDate: Joi.date()
+            .less('now')
+            .iso(),
+    })
+})
 
 
 

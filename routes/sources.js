@@ -15,14 +15,14 @@ router.route('/new')
 //routes for publishing a source to public
 router.route('/review/:sourceId')
     .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderReviewSource))
-    .put(isLoggedIn, isAdmin, upload.single('sourceImage'), catchAsync(sources.publishReviewSource))
-    .post(isLoggedIn, isAdmin, upload.single('sourceImage'), catchAsync(sources.publishReviewSource))
+    .put(isLoggedIn, isAdmin, upload.single('sourceImage'), validateSource, catchAsync(sources.publishReviewSource))
+    .post(isLoggedIn, isAdmin, upload.single('sourceImage'), validateSource, catchAsync(sources.publishReviewSource))
     .delete(isLoggedIn, isAuthor, catchAsync(sources.deleteReviewSource))
 
 //routes for editing a pending submission
 router.route('/review/:sourceId/edit')
     .get(isLoggedIn, isAuthor, isCheckedOut, catchAsync(sources.renderUpdateReviewSource))
-    .put(isLoggedIn, isAuthor, upload.single('sourceImage'), catchAsync(sources.submitUpdateReviewSource))
+    .put(isLoggedIn, isAuthor, upload.single('sourceImage'), validateSource, catchAsync(sources.submitUpdateReviewSource))
 
 router.route('/data')
     .get(isLoggedIn, catchAsync(sources.getData))
@@ -37,7 +37,7 @@ router.route('/:slug')
 
 router.route('/:slug/edit')
     .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderEditSource))
-    .post(isLoggedIn, upload.single('sourceImage'), catchAsync(sources.submitEditSource))
+    .post(isLoggedIn, upload.single('sourceImage'), validateSource, catchAsync(sources.submitEditSource))
 
 router.route('/review/:sourceId/view')
     .get(isLoggedIn, isAuthor, catchAsync(sources.renderPostReviewSource))

@@ -68,7 +68,7 @@ module.exports.resetPassword = async (req, res, next) => {
     const user = await User.findById(req.user.id);
     await user.changePassword(oldPassword, newPassword, err => {
         if (err) return next(err);
-        res.redirect('/register');
+        res.redirect('/dashboard');
     });
     
 }

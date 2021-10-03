@@ -33,9 +33,7 @@ const validateUser = (req, res, next) => {
 }
 
 const validateSource = (req, res, next) => {
-    console.log(req.body)
     const { error } = sourceSchema.validate(req.body)
-    console.log(req.body, 'test2')
     if (error) {
         const errorMsg = error.details.map(el => el.message).join(',')
         throw new ExpressError(errorMsg, 400)

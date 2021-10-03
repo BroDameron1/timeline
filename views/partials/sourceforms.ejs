@@ -27,7 +27,7 @@
         <label for="book-author">Author(s)</label>
         <% if (data.book.author.length > 0) { %> 
             <% for(let author of data.book.author) { %>    
-                <input type="text" class="book-author" name="book[author][]" value="<%= author %>">
+                <div class="form-field"><input type="text" class="book-author" name="book[author][]" value="<%= author %>"></div>
             <% } %>
         <% } else { %>
             <input type="text" class="book-author" name="book[author][]">

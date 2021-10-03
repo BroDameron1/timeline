@@ -172,6 +172,7 @@ bookFields.addEventListener('click', event => {
 
 
 
+
 // addAuthor.addEventListener('click', event => {
 //     const authorCount = document.querySelectorAll('.book-author')
 //     console.log(authorCount.length)
