@@ -103,6 +103,11 @@ main {
     color: whitesmoke;
 }
 
+.btn-blue:disabled {
+    background-color: rgba(62, 130, 255, 0.6);
+    cursor: not-allowed;
+}
+
 .btn-red {
     border-radius: 6px;
     background-color: rgb(196, 63, 63);

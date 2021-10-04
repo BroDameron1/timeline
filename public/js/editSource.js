@@ -167,7 +167,7 @@ if (existingSource) {
 //old code that sets blank fields to disabled which has been solved in the backend and also checks for duplicate entries.
 form.addEventListener('submit', async event => {
     event.preventDefault()
-
+    event.submitter.disabled = true
     //sets all fields with  no data to disabled so they do not pass in empty strings
     //fixed on the backend, delete later if this doesn't break anything
     // const inputs = document.querySelectorAll("input")
@@ -176,7 +176,6 @@ form.addEventListener('submit', async event => {
     //         input.setAttribute('disabled', 'disabled')
     //     }
     // })
-
     const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, duplicateCheckType)
     const duplicateResult = await submittedRecord.validateDuplicates()
     //TODO: Revisit this conditional    
@@ -184,6 +183,7 @@ form.addEventListener('submit', async event => {
         unloadCheck = true
         return form.submit()
     }
+    event.submitter.disabled = false
     return div.textContent = duplicateResult
 })
 
