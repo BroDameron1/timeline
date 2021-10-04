@@ -105,6 +105,8 @@ window.addEventListener('load', event => {
         tvFields.classList.add('hide-sources')
     }
     if (mediaType.value === 'Comic') {
+        const fieldUpdate = new FieldManagerTwo('comic', 'artist', 3)
+        fieldUpdate.loadField()
         comicFields.classList.remove('hide-sources')
     } else {
         comicFields.classList.add('hide-sources')
@@ -114,11 +116,6 @@ window.addEventListener('load', event => {
     } else {
         gameFields.classList.add('hide-sources')
     }
-
-    // const authorCount = document.querySelectorAll('.book-author')
-    // if (authorCount.length === 4) {
-    //     addAuthor.classList.add('hide-sources')
-    // }
 })
 
 sourceImage.addEventListener('change', event => {
@@ -141,9 +138,6 @@ sourceImage.addEventListener('change', event => {
 movieFields.addEventListener('click', event => {
     const directorUpdate = new FieldManagerTwo('movie', 'director', 1)
     const writerUpdate = new FieldManagerTwo('movie', 'writer', 3)
-    
-    // const directorUpdate = new FieldManager('add-director', 'movie-director', 'movie[director][]', 1)
-    // const writerUpdate = new FieldManager('add-writer', 'movie-writer', 'movie[writer][]', 3)
     if (event.target && event.target.matches("a#add-director")) {
         directorUpdate.addField()
     }
@@ -159,17 +153,6 @@ movieFields.addEventListener('click', event => {
     }
 })
 
-//SAVE: WORKING CODE FOR ADDING FIELDS TO COMICS
-comicFields.addEventListener('click', event => {
-    const fieldUpdate = new FieldManager('add-artist', 'art-contributor', 'comic[artContributor][]', 3)
-    if (event.target && event.target.matches("a#add-artist")) {
-        fieldUpdate.addField('remove-artist')
-    }
-    if (event.target && event.target.matches("a.remove-artist")) {
-        fieldUpdate.deleteField(event.target.id)
-        }
-})
-
 bookFields.addEventListener('click', event => {
     const fieldUpdate = new FieldManagerTwo('book', 'author', 3)
     //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
@@ -183,6 +166,29 @@ bookFields.addEventListener('click', event => {
     }
 })
 
+
+comicFields.addEventListener('click', event => {
+    const fieldUpdate = new FieldManagerTwo('comic', 'artist', 3)
+    if (event.target && event.target.matches("a#add-artist")) {
+        fieldUpdate.addField('remove-artist')
+    }
+    if (event.target && event.target.matches("a.remove-artist")) {
+        fieldUpdate.deleteField(event.target.parentElement)
+        }
+})
+
+
+
+bookFields.addEventListener('click', event => {
+    const fieldUpdate = new FieldManagerTwo('book', 'author', 3)
+    //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
+    if (event.target && event.target.matches("a#add-author")) {
+        fieldUpdate.addField('remove-author')
+    }
+    if (event.target && event.target.matches("a.remove-author")) {
+        fieldUpdate.deleteField(event.target.parentElement)
+    }
+})
 
 //SAVE: WORKING CODE FOR ADDING FIELDS TO AUTHORS
 // bookFields.addEventListener('click', event => {
@@ -225,4 +231,15 @@ bookFields.addEventListener('click', event => {
 //     if (event.target && event.target.matches("a.remove-writer")) {
 //         writerUpdate.deleteField(event.target.id)
 //     }
+// })
+
+//SAVE: WORKING CODE FOR ADDING FIELDS TO COMICS
+// comicFields.addEventListener('click', event => {
+//     const fieldUpdate = new FieldManager('add-artist', 'comic-artist', 'comic-artist', 3)
+//     if (event.target && event.target.matches("a#add-artist")) {
+//         fieldUpdate.addField('remove-artist')
+//     }
+//     if (event.target && event.target.matches("a.remove-artist")) {
+//         fieldUpdate.deleteField(event.target.id)
+//         }
 // })

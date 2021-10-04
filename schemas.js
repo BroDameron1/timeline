@@ -127,7 +127,7 @@ module.exports.sourceSchema = Joi.object({
             .escapeHTML()
             .pattern(regex)
             .max(80),
-        artContributor: Joi.array()
+        artist: Joi.array()
             .items(Joi.string()
                 .max(80)
                 .escapeHTML()

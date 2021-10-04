@@ -77,7 +77,7 @@ const SourceSchema = new Schema({
     },
     comic: {
         writer: String,
-        artContributor: {
+        artist: {
             type: [ String ],
             default: undefined
         },

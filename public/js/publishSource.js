@@ -153,7 +153,7 @@ movieFields.addEventListener('click', event => {
 })
 
 comicFields.addEventListener('click', event => {
-    const fieldUpdate = new FieldManager('add-artist', 'art-contributor', 'comic[artContributor][]', 3)
+    const fieldUpdate = new FieldManager('add-artist', 'comic-artist', 'comic[artist][]', 3)
     if (event.target && event.target.matches("a#add-artist")) {
         fieldUpdate.addField('remove-artist')
     }

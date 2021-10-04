@@ -140,7 +140,7 @@ export class FieldManager {
 
     deleteField (fieldId) {
         const addLink = document.querySelector(`#${this.inputClass}`)
-        const element = document.querySelector(`#${this.inputClass}${fieldId}`)
+        const element = document.querySelector(`#${this.addClass}${fieldId}`)
         element.remove()
         const currentCount = document.querySelectorAll(`.${this.countClass}`) //current number of fields after removing the element.
         if (currentCount.length <= this.additionalFields) {

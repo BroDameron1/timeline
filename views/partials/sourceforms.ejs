@@ -88,13 +88,13 @@
         <input type="text" id="comic-writer" name="comic[writer]" value="<%= data.comic.writer %>">
     </div>
     <div class="form-field">
-        <label for="art-contributor">Art Contributor(s)</label>
-        <% if (data.comic.artContributor && data.comic.artContributor.length > 0) { %> 
-            <% for(let artist of data.comic.artContributor) { %>    
-                <div class="form-field"><input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>"></div>
+        <label for="comic-artist">Art Contributor(s)</label>
+        <% if (data.comic.artist && data.comic.artist.length > 0) { %> 
+            <% for(let artist of data.comic.artist) { %>    
+                <div class="form-field"><input type="text" id="comic-artist" class="comic-artist" name="comic[artist][]" value="<%= artist %>"></div>
             <% } %>
         <% } else { %>
-            <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]">
+            <input type="text" id="comic-artist" class="comic-artist" name="comic[artist][]">
         <% } %> 
         <a href="#" id="add-artist">Add another art contributor</a>
     </div>
