@@ -9,7 +9,6 @@ const movieFields = document.querySelector('#movie-fields')
 const tvFields = document.querySelector('#tv-fields')
 const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
-const addAuthor = document.querySelector('#add-author')
 
 window.addEventListener('load', event => {
     let today = new Date();
@@ -82,17 +81,42 @@ form.addEventListener('submit', async event => {
     return div.textContent = duplicateResult
 })
 
+const comicArtistDetails = {
+    media: 'comic',
+    job: 'artist',
+    addableFields: 3
+}
+
+const movieDirectorDetails = {
+    media: 'movie',
+    job: 'director',
+    addableFields: 1
+}
+
+const movieWriterDetails = {
+    media: 'movie',
+    job: 'writer',
+    addableFields: 3
+}
+
+const bookAuthorDetails = {
+    media: 'book',
+    job: 'author',
+    addableFields: 3
+}
+
+
 window.addEventListener('load', event => {
     if (mediaType.value === 'Book') {
-        const fieldUpdate = new FieldManagerTwo('book', 'author', 3)
+        const fieldUpdate = new FieldManagerTwo(...Object.values(bookAuthorDetails))
         fieldUpdate.loadField()
         bookFields.classList.remove('hide-sources')
     } else {
         bookFields.classList.add('hide-sources')
     }
     if (mediaType.value === 'Movie') {
-        const directorUpdate = new FieldManagerTwo('movie', 'director', 1)
-        const writerUpdate = new FieldManagerTwo('movie', 'writer', 3)
+        const directorUpdate = new FieldManagerTwo(...Object.values(movieDirectorDetails))
+        const writerUpdate = new FieldManagerTwo(...Object.values(movieWriterDetails))
         directorUpdate.loadField()
         writerUpdate.loadField()
         movieFields.classList.remove('hide-sources')
@@ -105,7 +129,9 @@ window.addEventListener('load', event => {
         tvFields.classList.add('hide-sources')
     }
     if (mediaType.value === 'Comic') {
-        const fieldUpdate = new FieldManagerTwo('comic', 'artist', 3)
+         
+        const fieldUpdate = new FieldManagerTwo(...Object.values(comicArtistDetails))
+        //const fieldUpdate = new FieldManagerTwo('comic', 'artist', 3)
         fieldUpdate.loadField()
         comicFields.classList.remove('hide-sources')
     } else {
@@ -121,7 +147,6 @@ window.addEventListener('load', event => {
 sourceImage.addEventListener('change', event => {
     const imgPreview = document.querySelector('.image-preview')
     const file = document.querySelector('input[type=file]').files[0]
-    console.log(file)
     const reader = new FileReader()
 
     reader.addEventListener('load', function () {
@@ -131,13 +156,12 @@ sourceImage.addEventListener('change', event => {
     if (file) {
         reader.readAsDataURL(file)
     }
-
     document.querySelector('.file-name').textContent = file.name
 })
 
 movieFields.addEventListener('click', event => {
-    const directorUpdate = new FieldManagerTwo('movie', 'director', 1)
-    const writerUpdate = new FieldManagerTwo('movie', 'writer', 3)
+    const directorUpdate = new FieldManagerTwo(...Object.values(movieDirectorDetails))
+    const writerUpdate = new FieldManagerTwo(...Object.values(movieDirectorDetails))
     if (event.target && event.target.matches("a#add-director")) {
         directorUpdate.addField()
     }
@@ -153,22 +177,9 @@ movieFields.addEventListener('click', event => {
     }
 })
 
-bookFields.addEventListener('click', event => {
-    const fieldUpdate = new FieldManagerTwo('book', 'author', 3)
-    //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
-    if (event.target && event.target.matches("a#add-author")) {
-        fieldUpdate.addField('remove-author')
-    }
-    //NEEDED TO BE REMOVED TO TEST NEW DYNAMIC EVENT LISTENER.
-    if (event.target && event.target.matches("a.remove-author")) {
-        // fieldUpdate.deleteField(event.target.id)
-        fieldUpdate.deleteField(event.target.parentElement)
-    }
-})
-
-
 comicFields.addEventListener('click', event => {
-    const fieldUpdate = new FieldManagerTwo('comic', 'artist', 3)
+    //const fieldUpdate = new FieldManagerTwo('comic', 'artist', 3)
+    const fieldUpdate = new FieldManagerTwo(...Object.values(comicArtistDetails))
     if (event.target && event.target.matches("a#add-artist")) {
         fieldUpdate.addField('remove-artist')
     }
@@ -177,10 +188,8 @@ comicFields.addEventListener('click', event => {
         }
 })
 
-
-
 bookFields.addEventListener('click', event => {
-    const fieldUpdate = new FieldManagerTwo('book', 'author', 3)
+    const fieldUpdate = new FieldManagerTwo(...Object.values(bookAuthorDetails))
     //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
     if (event.target && event.target.matches("a#add-author")) {
         fieldUpdate.addField('remove-author')
@@ -189,57 +198,3 @@ bookFields.addEventListener('click', event => {
         fieldUpdate.deleteField(event.target.parentElement)
     }
 })
-
-//SAVE: WORKING CODE FOR ADDING FIELDS TO AUTHORS
-// bookFields.addEventListener('click', event => {
-//     const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
-//     if (event.target && event.target.matches("a#add-author")) {
-//         fieldUpdate.addField('remove-author')
-//     }
-//     if (event.target && event.target.matches("a.remove-author")) {
-//         fieldUpdate.deleteField(event.target.id)
-//     }
-// })
-
-
-//SAVE UNTIL IMPLEMENTED INTO CLASS. USED FOR ADDING BOXES ON LOAD.
-// window.addEventListener('load', event => {
-//     const inputBoxes = document.querySelectorAll('.book-author')
-//     if(inputBoxes.length > 1) {
-//         for (let i = 1; i < inputBoxes.length; i++) {
-//             let input = inputBoxes[i]
-//             input.parentElement.setAttribute("id", `add-author${i}`)
-//             input.insertAdjacentHTML('afterend', `<a href="#" class="remove-author" id="${i}">Remove</a>`)
-//         }
-//     }
-// })
-
-//SAVE working code for movies
-// movieFields.addEventListener('click', event => {
-//     const directorUpdate = new FieldManager('add-director', 'movie-director', 'movie[director][]', 1)
-//     const writerUpdate = new FieldManager('add-writer', 'movie-writer', 'movie[writer][]', 3)
-//     if (event.target && event.target.matches("a#add-director")) {
-//         directorUpdate.addField('remove-director')
-//     }
-//     if (event.target && event.target.matches("a.remove-director")) {
-//         directorUpdate.deleteField(event.target.id)
-//     }
-    
-//     if (event.target && event.target.matches("a#add-writer")) {
-//         writerUpdate.addField('remove-writer')
-//     }
-//     if (event.target && event.target.matches("a.remove-writer")) {
-//         writerUpdate.deleteField(event.target.id)
-//     }
-// })
-
-//SAVE: WORKING CODE FOR ADDING FIELDS TO COMICS
-// comicFields.addEventListener('click', event => {
-//     const fieldUpdate = new FieldManager('add-artist', 'comic-artist', 'comic-artist', 3)
-//     if (event.target && event.target.matches("a#add-artist")) {
-//         fieldUpdate.addField('remove-artist')
-//     }
-//     if (event.target && event.target.matches("a.remove-artist")) {
-//         fieldUpdate.deleteField(event.target.id)
-//         }
-// })
