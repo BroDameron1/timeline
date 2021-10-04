@@ -58,7 +58,7 @@
         <label for="movie-director">Director(s)</label>
         <% if (data.movie.director && data.movie.director.length > 0) { %> 
             <% for(let director of data.movie.director) { %>    
-                <input type="text" class="movie-director" name="movie[director][]" value="<%= director %>">
+                <div class="form-field"><input type="text" class="movie-director" name="movie[director][]" value="<%= director %>"></div>
             <% } %>
         <% } else { %>
             <input type="text" class="movie-director" name="movie[director][]">
@@ -69,7 +69,7 @@
         <label for="movie-writer">Writer(s)</label>
         <% if (data.movie.writer && data.movie.writer.length > 0) { %> 
             <% for(let writer of data.movie.writer) { %>    
-                <input type="text" class="movie-writer" name="movie[writer][]" value="<%= writer %>">
+                <div class="form-field"><input type="text" class="movie-writer" name="movie[writer][]" value="<%= writer %>"></div>
             <% } %>
         <% } else { %>
             <input type="text" class="movie-writer" name="movie[writer][]">
@@ -91,7 +91,7 @@
         <label for="art-contributor">Art Contributor(s)</label>
         <% if (data.comic.artContributor && data.comic.artContributor.length > 0) { %> 
             <% for(let artist of data.comic.artContributor) { %>    
-                <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>">
+                <div class="form-field"><input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>"></div>
             <% } %>
         <% } else { %>
             <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]">

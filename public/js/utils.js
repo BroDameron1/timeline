@@ -113,18 +113,24 @@ export const idleLogout = () => { //function for kicking user out of the page if
 }
 
 export class FieldManager {
-    constructor (linkClass, countClass, fieldName, additionalFields) {
-        this.linkClass = linkClass,
-        this.countClass = countClass,
-        this.fieldName = fieldName,
+    constructor (addClass, inputClass, inputName, additionalFields) {
+        //class of the add link.  Used to determine where the link is to place other objects
+        //OR hide the link if the maximum fields have been added
+        this.addClass = addClass,
+        //class for the input field(s).  Used to add the appropriate class to the new fields or count the existing
+        //number of fields.
+        this.inputClass = inputClass,
+        //used to give the appropriate name to the field.
+        this.inputName = inputName,
+        //number of additional fields that can be added.
         this.additionalFields = additionalFields
     }
 
     addField (removeClass) {
-        const addLink = document.querySelector(`#${this.linkClass}`)
-        const currentCount = document.querySelectorAll(`.${this.countClass}`)
+        const addLink = document.querySelector(`#${this.addClass}`)
+        const currentCount = document.querySelectorAll(`.${this.inputClass}`)
         if (currentCount.length <= this.additionalFields) {
-            addLink.insertAdjacentHTML('beforebegin', `<div class="form-field" id="${this.linkClass}${currentCount.length}"><input type="text" class="${this.countClass}" name="${this.fieldName}">
+            addLink.insertAdjacentHTML('beforebegin', `<div class="form-field" id="${this.addClass}${currentCount.length}"><input type="text" class="${this.inputClass}" name="${this.inputName}">
             <a href="#" class="${removeClass}" id="${currentCount.length}">Remove</a></div>`)
             }
         if (currentCount.length === this.additionalFields) {
@@ -133,12 +139,127 @@ export class FieldManager {
     }
 
     deleteField (fieldId) {
-        const addLink = document.querySelector(`#${this.linkClass}`)
-        const element = document.querySelector(`#${this.linkClass}${fieldId}`)
+        const addLink = document.querySelector(`#${this.inputClass}`)
+        const element = document.querySelector(`#${this.inputClass}${fieldId}`)
         element.remove()
         const currentCount = document.querySelectorAll(`.${this.countClass}`) //current number of fields after removing the element.
         if (currentCount.length <= this.additionalFields) {
             addLink.classList.remove('hide-sources')
         }
     }
+
+    loadField (removeClass) {
+        const inputBoxes = document.querySelectorAll(`.${this.inputClass}`)
+        if(inputBoxes.length > 1) {
+            for (let i = 1; i < inputBoxes.length; i++) {
+            let input = inputBoxes[i]
+            input.parentElement.setAttribute("id", `${this.inputClass}${i}`)
+            input.insertAdjacentHTML('afterend', `<a href="#" class="${removeClass}" id="${i}">Remove</a>`)
+             }
+        }
+    }
+}
+
+
+export class FieldManagerTwo {
+    constructor (media, job, additionalFields) {
+        this.media = media,
+        this.job = job,
+        this.additionalFields = additionalFields
+    }
+
+    //creates a remove link, needed for the addField method and loadField method
+    createRemoveLink(job) {
+        //create link to remove the associated input
+        let removeButton = document.createElement('a')
+        //set link text to Remove
+        removeButton.textContent = 'Remove'
+        //don't let the link go anywhere.
+        removeButton.href = "#"
+        //set class so the event listener can find it
+        removeButton.setAttribute('class', `remove-${job}`)
+        return removeButton
+    }
+
+    //add a new input function
+    addField () {
+        //find the link so new elements can be placed in reference to it
+        const addFieldLink = document.querySelector(`#add-${this.job}`)
+        //create a node list of current input fields.
+        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
+
+        //check if the number of input fields is less than or equal to the number of specified fields.
+        if (totalFieldList.length <= this.additionalFields) {
+            //create div and add before link
+            let newDiv = document.createElement('div')
+            //set new div to have a class of form-field (styling only)
+            newDiv.setAttribute('class', 'form-field')
+            //set the new div to have a unique id specific to this field
+            newDiv.setAttribute('id', `${this.media}-${this.job}${totalFieldList.length}`)
+            //place the new div before the add field link
+            addFieldLink.parentNode.insertBefore(newDiv, addFieldLink)
+
+            //create input field
+            let newInput = document.createElement('input')
+            //set to text input
+            newInput.type = 'text'
+            //set to same class that totalFieldList looks for
+            newInput.setAttribute('class', `${this.media}-${this.job}`)
+            //set name to allow it to be passed in the request body.  This name is the same on each input.
+            newInput.setAttribute('name', `${this.media}[${this.job}][]`)
+            //adds new input field into the previously created div
+            newDiv.append(newInput)
+
+
+            //Create a link with the method and add it inside the new div
+            newDiv.append(this.createRemoveLink(this.job))
+        }
+        //Check if we have the max number of inputs and then remove the add link if true
+        if (totalFieldList.length === this.additionalFields) {
+            addFieldLink.classList.add('hide-sources')
+        }
+    }
+
+    //delete an existing input function (except the first one)
+    deleteField (elementToDelete) {
+        //remove parent element of link
+        elementToDelete.remove()
+        //identify the Add input link.
+        const addFieldLink = document.querySelector(`#add-${this.job}`)
+        //indetify the total number of current inputs.
+        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
+
+        //readd the add input link if there are less than the max fields.
+        if (totalFieldList.length <= this.additionalFields) {
+            addFieldLink.classList.remove('hide-sources')
+        }
+    }
+
+    //when the page loads, all the input fields are dynamically added by a loop in the
+    //EJS file.  The EJS file can't add the dynamic ids of the fields, this method does that on load of the page
+    //so that the fields have the remove capability.
+    loadField () {
+        //find the link so new elements can be placed in reference to it
+        const addFieldLink = document.querySelector(`#add-${this.job}`)
+        //identify all input fields
+        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
+        //if there is more than one entry, start the loop
+        if (totalFieldList.length > 1) {
+            //loop over each field starting at position one (skipping the first one)
+            for (let i = 1; i < totalFieldList.length; i++) {
+                //set input to the current field in the nodelist
+                let input = totalFieldList[i]
+                //add the dynamic id to the div housing the input.
+                input.parentElement.setAttribute("id", `${this.media}-${this.job}${i}`)
+
+                //create remove link with method and insert it after the input.
+                input.parentNode.insertBefore(this.createRemoveLink(this.job), input.nextSibling)
+            }
+        }
+
+        //Check if we have the max number of inputs and then remove the add link if true
+        if (totalFieldList.length > this.additionalFields) {
+            addFieldLink.classList.add('hide-sources')
+        }
+    }    
 }
