@@ -49,6 +49,7 @@ module.exports.userSchema = Joi.object({
         })
 }).unknown()
 
+//regex string for all text input boxes
 const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.? ]+$/i
 
 module.exports.sourceSchema = Joi.object({
