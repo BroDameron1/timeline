@@ -290,8 +290,9 @@ textarea {
 .state-container {
     background-color: rgba(194, 194, 194, 0.7);
     width: 10rem;
-    padding: 5px;
+    padding: .3rem;
     border-radius: 3px;
+    margin-top: 1rem;
 }
 
 .record-button {

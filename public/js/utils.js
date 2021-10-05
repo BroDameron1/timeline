@@ -207,6 +207,8 @@ export class FieldManager {
             newInput.setAttribute('class', `${this.media}-${this.job}`)
             //set name to allow it to be passed in the request body.  This name is the same on each input.
             newInput.setAttribute('name', `${this.media}[${this.job}][]`)
+            //sets the max length of the new field
+            newInput.setAttribute('maxlength', '80')
             //adds new input field into the previously created div
             newDiv.append(newInput)
 
