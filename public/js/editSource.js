@@ -1,4 +1,6 @@
 import { idleLogout, Duplicate, StateManager, FieldManager } from "./utils.js"
+// import autocomplete from "../autocompleter/autocomplete.js"
+import autocomplete from "autocompleter"
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
@@ -20,6 +22,8 @@ let form = document.querySelector('#editSource')
 let duplicateCheckType
 let unloadCheck = false //flag to determine if the beforeunload event fires on submit
 let sourceLocation //variable to set if we need to change the status of a public or review record
+
+
 
 //this statement determines which type path the js file is being loaded into to update the above variables
 //the first conditional is for an admin publishing a review record to public
@@ -135,7 +139,7 @@ if (existingSource) {
 } else {
     //on new records, loads the proper fields for the chosen mediaType
     mediaType.addEventListener('input', event => {
-        event.preventDefault()
+        //event.preventDefault()
         if (mediaType.value === 'Book') {
             bookFields.classList.remove('hide-sources')
         } else {
@@ -161,13 +165,19 @@ if (existingSource) {
         } else {
             gameFields.classList.add('hide-sources')
         }
+
+        let selects = document.getElementsByTagName('select');
+        console.log(selects.length)
     })
 }
 
 //old code that sets blank fields to disabled which has been solved in the backend and also checks for duplicate entries.
 form.addEventListener('submit', async event => {
     event.preventDefault()
+    // let formData = new FormData(form)
+    // console.log(formData)
     event.submitter.disabled = true
+
     //sets all fields with  no data to disabled so they do not pass in empty strings
     //fixed on the backend, delete later if this doesn't break anything
     // const inputs = document.querySelectorAll("input")
@@ -339,5 +349,27 @@ bookFields.addEventListener('click', event => {
     }
     if (event.target && event.target.matches("a.remove-author")) {
         fieldUpdate.deleteField(event.target.parentElement)
+    }
+})
+
+
+//Autocomplete testing
+
+const series = [
+    { label: 'The Clone Wars', value: 'The Clone Wars' },
+    { label: 'Resistance', value: 'Resistance' }
+]
+
+const tvseries = document.querySelector('#tv-series')
+
+autocomplete({
+    input: tvseries,
+    fetch: function(text, update) {
+        text = text.toLowerCase()
+        let suggestions = series.filter(n => n.label.toLowerCase().startsWith(text))
+        update(suggestions)
+    },
+    onSelect: function(item) {
+        tvseries.value = item.label
     }
 })
