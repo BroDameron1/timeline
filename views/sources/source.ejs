@@ -62,7 +62,7 @@
                 </div>
             <% } %>
         <% } %>
-        <% if (currentUser && currentUser.role==='admin' ) { %>
+        <% if (currentUser && currentUser.role ==='admin') { %>
             <% if (!data.checkedOut) { %>
                 <div>
                     <form action="/sources/<%= data.slug %>?_method=DELETE" method="POST" class="delete-record">

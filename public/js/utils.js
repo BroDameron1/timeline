@@ -21,9 +21,18 @@ export class Duplicate {
     async validateDuplicates () {
         const duplicateResponse = await this.checkDuplicates()
         if (!duplicateResponse) return false
-        //TODO: Fix this so it will properly display a link.
         if (duplicateResponse.title) {
-            return `That record already exists. ${duplicateResponse.title}, ${duplicateResponse._id}`
+            //create the link
+            let duplicateLink = document.createElement('a')
+            duplicateLink.textContent = duplicateResponse.title
+            duplicateLink.href = `/sources/${duplicateResponse.slug}`
+            duplicateLink.setAttribute('target', '_blank')
+            //create a span to put the link in.
+            let warningSpan = document.createElement('span')
+            warningSpan.textContent = 'There is already a record with this title: '
+            warningSpan.setAttribute('class', 'warning-span')
+            warningSpan.append(duplicateLink)
+            return warningSpan //return the span with think link included.
         } else {
             return `A record with that title is already under review.`
         }

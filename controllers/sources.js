@@ -61,7 +61,6 @@ module.exports.submitNewSource = async (req, res) => {
 }
 
 //renders the page for an admin to update and approve any review record
-//TODO: Handle failed to cast
 module.exports.renderReviewSource = async (req, res) => {
     const { sourceId } = req.params
     if (!ObjectID.isValid(sourceId)) {
@@ -123,7 +122,6 @@ module.exports.publishReviewSource = async (req, res) => {
 }
 
 //renders the page for a user to update an already submitted review record
-//TODO: Handle failed to cast
 module.exports.renderUpdateReviewSource = async (req, res) => {
     const { sourceId } = req.params
     if (!ObjectID.isValid(sourceId)) {
@@ -176,8 +174,6 @@ module.exports.deleteReviewSource = async (req, res) => {
         req.flash('error', 'This record has already been reviewed and cannot be deleted.')
         return res.redirect('/dashboard')
     }
-    //TODO: This is probably destroying public images
-    // await cloudinary.uploader.destroy(reviewSourceData.images.filename)
     const image = new ImageHandler(reviewSourceData.images.url, reviewSourceData.images.filename, reviewSourceData)
     await image.deleteReviewImage()
     await Source.reviewSource.findByIdAndDelete(sourceId)
@@ -195,7 +191,7 @@ module.exports.renderEditSource = async (req, res) => {
     const { slug } = req.params
     const publicSourceData = await Source.publicSource.findOne({ slug })
     if (!publicSourceData) {
-        req.flash('error', 'This record does not exist')
+        req.flash('error', 'This record does not exist.')
         return res.redirect('/dashboard')
     }
     // if (publicSourceData.checkedOut) {

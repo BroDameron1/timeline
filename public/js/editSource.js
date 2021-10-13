@@ -1,10 +1,8 @@
 import { idleLogout, Duplicate, StateManager, FieldManager } from "./utils.js"
-// import autocomplete from "../autocompleter/autocomplete.js"
-import autocomplete from "autocompleter"
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
-const div = document.querySelector('#warning')
+const warningDiv = document.querySelector('#warning')
 const bookFields = document.querySelector('#book-fields')
 const movieFields = document.querySelector('#movie-fields')
 const tvFields = document.querySelector('#tv-fields')
@@ -27,6 +25,8 @@ let sourceLocation //variable to set if we need to change the status of a public
 
 //this statement determines which type path the js file is being loaded into to update the above variables
 //the first conditional is for an admin publishing a review record to public
+//TODO: DAMN THESE BREAK IF THE WORDS ARE IN THE SLUG
+console.log(document.location)
 if (currentPath.indexOf('review') > -1 && currentPath.indexOf('edit') === -1) {
     duplicateCheckType = 'publishRecord'
     sourceLocation = 'ReviewSource'
@@ -71,6 +71,7 @@ window.addEventListener('load', event => {
 
 //sets the record to checked out and then starts an idle timer that kicks out the user if the don't perform any action after the specified time (in the utils file)
 if (existingSource) {
+    console.log('test')
     window.addEventListener('load', async event => {
         const state = new StateManager(true, sourceId, sourceLocation)
         const stateResult = await state.updateState()
@@ -102,6 +103,7 @@ if (existingSource) {
     //determines which parts of the form to load based on the mediaType
     //also ensures the additionally added fields load with the "remove" option
     window.addEventListener('load', event => {
+        
         if (mediaType.value === 'Book') {
             const fieldUpdate = new FieldManager(...Object.values(bookAuthorDetails))
             fieldUpdate.loadField()
@@ -171,30 +173,28 @@ if (existingSource) {
     })
 }
 
-//old code that sets blank fields to disabled which has been solved in the backend and also checks for duplicate entries.
 form.addEventListener('submit', async event => {
     event.preventDefault()
-    // let formData = new FormData(form)
-    // console.log(formData)
-    event.submitter.disabled = true
+    //sets the warningDiv to blank so errors don't pile up
+    //this may need to be refactored if there are multiple warnings
+    warningDiv.innerHTML = ''
+    event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
-    //sets all fields with  no data to disabled so they do not pass in empty strings
-    //fixed on the backend, delete later if this doesn't break anything
-    // const inputs = document.querySelectorAll("input")
-    // inputs.forEach((input) => {
-    //     if (input.value.length === 0) {
-    //         input.setAttribute('disabled', 'disabled')
-    //     }
-    // })
+    //checks if mediaType is default and displays a warning if so
+    if (mediaType.value === 'default') {
+        event.submitter.disabled = false
+        return warningDiv.textContent = 'Please select a media type.'
+    }
+
     const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, duplicateCheckType)
     const duplicateResult = await submittedRecord.validateDuplicates()
-    //TODO: Revisit this conditional    
     if (!duplicateResult) {
+        //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.
         unloadCheck = true
         return form.submit()
     }
-    event.submitter.disabled = false
-    return div.textContent = duplicateResult
+    event.submitter.disabled = false //re-enables the submit functionality in the even that a duplicate result was found.
+    warningDiv.append(duplicateResult)
 })
 
 //determines which parts of the form to load based on the mediaType
@@ -355,21 +355,21 @@ bookFields.addEventListener('click', event => {
 
 //Autocomplete testing
 
-const series = [
-    { label: 'The Clone Wars', value: 'The Clone Wars' },
-    { label: 'Resistance', value: 'Resistance' }
-]
+// const series = [
+//     { label: 'The Clone Wars', value: 'The Clone Wars' },
+//     { label: 'Resistance', value: 'Resistance' }
+// ]
 
-const tvseries = document.querySelector('#tv-series')
+// const tvseries = document.querySelector('#tv-series')
 
-autocomplete({
-    input: tvseries,
-    fetch: function(text, update) {
-        text = text.toLowerCase()
-        let suggestions = series.filter(n => n.label.toLowerCase().startsWith(text))
-        update(suggestions)
-    },
-    onSelect: function(item) {
-        tvseries.value = item.label
-    }
-})
+// autocomplete({
+//     input: tvseries,
+//     fetch: function(text, update) {
+//         text = text.toLowerCase()
+//         let suggestions = series.filter(n => n.label.toLowerCase().startsWith(text))
+//         update(suggestions)
+//     },
+//     onSelect: function(item) {
+//         tvseries.value = item.label
+//     }
+// })

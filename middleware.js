@@ -108,7 +108,7 @@ const isAuthor = async (req, res, next) => {
 
 const isCheckedOut = async (req, res, next) => {
     const { sourceId, slug } = req.params
-    if (!ObjectID.isValid(sourceId)) {
+    if (sourceId && !ObjectID.isValid(sourceId)) {
         req.flash('error', 'This record does not exist.')
         return res.redirect('/dashboard')
     }

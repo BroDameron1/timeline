@@ -104,7 +104,6 @@ window.addEventListener('load', event => {
         gameFields.classList.add('hide-sources')
     }
 
-    //TODO: Do I need more of these
     const authorCount = document.querySelectorAll('.book-author')
     if (authorCount.length === 4) {
         addAuthor.classList.add('hide-sources')
