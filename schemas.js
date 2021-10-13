@@ -93,7 +93,6 @@ module.exports.sourceSchema = Joi.object({
             .escapeHTML()
             .pattern(regex)
             .max(80),
-        // TODO: try to fix to validate date
         releaseDate: Joi.date()
             .less('now')
             .iso(),
@@ -161,8 +160,10 @@ module.exports.sourceSchema = Joi.object({
             .integer()
             .max(50)
             .positive(),
-        //TODO: Add dates
-    }).unknown(),
+        releaseDate: Joi.date()
+            .less('now')
+            .iso(),
+    }),
     videoGame: Joi.object({
         studio: Joi.string()
             .escapeHTML()

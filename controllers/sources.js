@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
 const { ImageHandler } = require('../utils/cloudinary')
+const ObjectID = require('mongoose').Types.ObjectId;
 
 //controller for get route for rendering any existing source.
-//TODO: Handle failed to cast errors in other sections
 module.exports.renderSource = async (req, res) => {
     const { slug } = req.params
     const publicSourceData = await Source.publicSource.findOne({slug})
@@ -24,6 +24,10 @@ module.exports.renderPostReviewSource = async (req, res) => {
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
         .populate('author', 'username')
         .populate('lastApprover', 'username')
+    if (!ObjectID.isValid(sourceId)) {
+        req.flash('error', 'This record does not exist.')
+        return res.redirect('/dashboard')
+    }
     if (!reviewSourceData) {
         req.flash('error', 'This record does not exist.')
         return res.redirect('/dashboard')
@@ -47,7 +51,6 @@ module.exports.submitNewSource = async (req, res) => {
     }
     reviewSourceData.updateAuthor(reviewSourceData.author, req.user._id)
     if(req.file) {
-        // reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
         const image = new ImageHandler(req.file.path, req.file.filename, reviewSourceData)
         image.newReviewImage()
     }
@@ -58,8 +61,13 @@ module.exports.submitNewSource = async (req, res) => {
 }
 
 //renders the page for an admin to update and approve any review record
+//TODO: Handle failed to cast
 module.exports.renderReviewSource = async (req, res) => {
     const { sourceId } = req.params
+    if (!ObjectID.isValid(sourceId)) {
+        req.flash('error', 'This record does not exist.')
+        return res.redirect('/dashboard')
+    }
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     if (!reviewSourceData) {
         req.flash('error', 'This record does not exist')
@@ -69,10 +77,6 @@ module.exports.renderReviewSource = async (req, res) => {
         req.flash('error', 'This article has already been reviewed.')
         return res.redirect('/dashboard')
     }
-    // if (reviewSourceData.checkedOut) {
-    //     req.flash('error', 'This record is currently in use.')
-    //     return res.redirect('/dashboard')
-    // }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
     res.render('sources/publishSource', { mediaTypes, data: reviewSourceData })
 }
@@ -119,8 +123,13 @@ module.exports.publishReviewSource = async (req, res) => {
 }
 
 //renders the page for a user to update an already submitted review record
+//TODO: Handle failed to cast
 module.exports.renderUpdateReviewSource = async (req, res) => {
     const { sourceId } = req.params
+    if (!ObjectID.isValid(sourceId)) {
+        req.flash('error', 'This record does not exist.')
+        return res.redirect('/dashboard')
+    }
     const reviewSourceData = await Source.reviewSource.findById(sourceId)
     if (!reviewSourceData) {
         req.flash('error', 'This record does not exist')
@@ -130,10 +139,6 @@ module.exports.renderUpdateReviewSource = async (req, res) => {
         req.flash('error', 'This record has already been reviewed.')
         return res.redirect('/dashboard')
     }
-    // if (reviewSourceData.checkedOut) {
-    //     req.flash('error', 'This record is currently in use.')
-    //     return res.redirect('/dashboard')
-    // }
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
     res.render('sources/updateReviewSource', { data: reviewSourceData, mediaTypes})
 }
@@ -227,6 +232,7 @@ module.exports.submitEditSource = async (req, res) => {
     res.redirect('/dashboard')
 }
 
+//controller that allows an admin to delete a published source
 module.exports.deletePublicSource = async (req,res) => {
     const { slug } = req.params
     const publicSourceData = await Source.publicSource.findOne({ slug })
