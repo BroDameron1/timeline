@@ -14,34 +14,28 @@ const comicFields = document.querySelector('#comic-fields')
 const currentPath = document.location.pathname
 //used in later if statements to determine if the file is for a new record or an existing record
 let existingSource = true
-//allows changing of the form id
-let form = document.querySelector('#editSource')
+//sets the form to the current form of the page by checking the class and id
+let form = document.querySelector(`#${document.querySelector('.sourceForm').id}`)
 //sets the method that should be called in the backend duplicate check
 let duplicateCheckType
 let unloadCheck = false //flag to determine if the beforeunload event fires on submit
 let sourceLocation //variable to set if we need to change the status of a public or review record
 
-
-
 //this statement determines which type path the js file is being loaded into to update the above variables
-//the first conditional is for an admin publishing a review record to public
-//TODO: DAMN THESE BREAK IF THE WORDS ARE IN THE SLUG
-console.log(document.location)
-if (currentPath.indexOf('review') > -1 && currentPath.indexOf('edit') === -1) {
-    duplicateCheckType = 'publishRecord'
-    sourceLocation = 'ReviewSource'
-    console.log('publish')
-//this conditional is for a user updating one of their pending review records
-} else if (currentPath.indexOf('review') > -1 && currentPath.indexOf('edit') > -1) {
+//sets variables for creating a new record
+if(form.id === 'newSource') {
+    existingSource = false
+    duplicateCheckType = 'submitNew'
+//sets variables for a user updating one of their pending updates
+} else if (form.id === 'updateReviewSource') {
     duplicateCheckType = 'updateReview'
     sourceLocation = 'ReviewSource'
-//this conditional is for submitting a new record
-} else if (currentPath.indexOf('new') > -1) {
-    existingSource = false
-    form = document.querySelector('#newSource')
-    duplicateCheckType = 'submitNew'
-//this conditional is for edding a public record
-} else if (currentPath.indexOf('review') === -1 && currentPath.indexOf('edit') > -1) {
+//sets variables for an admin publishing a record to public
+} else if (form.id === 'publishSource') {
+    duplicateCheckType = 'publishRecord'
+    sourceLocation = 'ReviewSource'
+//sets variables for any user submitting an update to a public record
+} else if (form.id === 'updatePublicSource') {
     duplicateCheckType = 'editPublic'
     sourceLocation = 'PublicSource'
 }
