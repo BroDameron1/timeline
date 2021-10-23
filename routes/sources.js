@@ -27,6 +27,7 @@ router.route('/review/:sourceId/edit')
 router.route('/data')
     .get(isLoggedIn, catchAsync(sources.getData))
     .put(isLoggedIn, catchAsync(sources.putData))
+    .post(isLoggedIn, catchAsync(sources.putData))
 
 // router.route('/:sourceId/:slug')
 //     .get(catchAsync(sources.renderSource))

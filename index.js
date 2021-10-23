@@ -61,8 +61,10 @@ app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 //allows express to parse form data as url encoded data
 app.use(express.urlencoded({ extended: true }))
-//allows parsing json data?
+//allows parsing json data
 app.use(express.json());
+//allows parsing text data
+app.use(express.text())
 //this tells express where static assets are held
 app.use(express.static(path.join(__dirname, 'public')))
 //execute methodoverride functionality

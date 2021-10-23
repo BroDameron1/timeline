@@ -1,4 +1,4 @@
-import { idleLogout, Duplicate, StateManager, FieldManager } from "./utils.js"
+import { userActivityThrottler, Duplicate, StateManager, FieldManager, dialogHelper } from "./utils.js"
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
@@ -9,9 +9,6 @@ const tvFields = document.querySelector('#tv-fields')
 const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
 
-
-//determines current path
-const currentPath = document.location.pathname
 //used in later if statements to determine if the file is for a new record or an existing record
 let existingSource = true
 //sets the form to the current form of the page by checking the class and id
@@ -20,6 +17,8 @@ let form = document.querySelector(`#${document.querySelector('.sourceForm').id}`
 let duplicateCheckType
 let unloadCheck = false //flag to determine if the beforeunload event fires on submit
 let sourceLocation //variable to set if we need to change the status of a public or review record
+
+
 
 //this statement determines which type path the js file is being loaded into to update the above variables
 //sets variables for creating a new record
@@ -34,11 +33,35 @@ if(form.id === 'newSource') {
 } else if (form.id === 'publishSource') {
     duplicateCheckType = 'publishRecord'
     sourceLocation = 'ReviewSource'
+    
+    
+    document.querySelector('.reject-record').addEventListener('click', async event => {
+        try {
+            const adminNotes = document.querySelector('#adminNotes').value
+            console.log(adminNotes)
+            const response = await fetch('/sources/data', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sourceId,
+                    adminNotes,
+                    state: 'rejected',
+                    collection: 'ReviewSource'
+                })
+            })
+            location.href = "/dashboard"
+        } catch (err) {
+            console.log('Something went wrong.', err)
+        }
+    })
 //sets variables for any user submitting an update to a public record
 } else if (form.id === 'updatePublicSource') {
     duplicateCheckType = 'editPublic'
     sourceLocation = 'PublicSource'
 }
+
 
 
 //determines the current day and sets the release date calendar to have a max date of today. Also properly formats the date.
@@ -65,30 +88,31 @@ window.addEventListener('load', event => {
 
 //sets the record to checked out and then starts an idle timer that kicks out the user if the don't perform any action after the specified time (in the utils file)
 if (existingSource) {
-    console.log('test')
     window.addEventListener('load', async event => {
         const state = new StateManager(true, sourceId, sourceLocation)
-        const stateResult = await state.updateState()
-        if (stateResult !== 200) {
-            location.href="/dashboard"
-            console.log('Something went wrong, please contact an admin.', state)
-        }
-        setInterval(idleLogout, 1000)
+        await state.updateState()
+        // if (stateResult !== 200) {
+        //     location.href="/dashboard"
+        //     console.log('Something went wrong, please contact an admin.', state)
+        // }
+        
+        userActivityThrottler()
+
     })
 
-    
 
     //sets the record checkedOut flag to false if the page is left (ignored if the form is submitted due to the unloadCheck)
     //TODO: Creates a pop up confirming if a user wants to leave the page, but this interferes with the idle timer above.
     window.addEventListener('beforeunload', async event => {
         event.preventDefault()  
         if (!unloadCheck) {
-            event.returnValue = 'test'
+            dialogHelper(event) //TODO: Add a conditional to the function to only run under certain circumstances.
+            //event.returnValue = 'test' //creates a popup dialog if the user tries to leave the page.  interferes with the inactivity timer.
             const state = new StateManager(false, sourceId, sourceLocation)
-            const stateResult = await state.updateState()
-            if (stateResult !== 200) {
-                return console.log('Something went wrong, please contact an admin.', state)
-            }
+            await state.updateState()
+            // if (stateResult !== 200) {
+            //     return console.log('Something went wrong, please contact an admin.', state)
+            // }
         } else {
             return
         }

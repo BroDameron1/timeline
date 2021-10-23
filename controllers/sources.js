@@ -280,7 +280,12 @@ module.exports.getData = async (req, res) => {
 //controller for put route that lets JS files update data.  Right now only for
 //updating state of record
 module.exports.putData = async (req, res) => {
-    const { sourceId, collection} = req.body
+    console.log(req.body, 'one')
+    if (typeof req.body === 'string') {
+        req.body = JSON.parse(req.body)
+    }
+    console.log(req.body, 'two')
+    const { sourceId, collection } = req.body
     const dataToUpdate = await mongoose.model(collection).findById(sourceId)
     dataToUpdate.set({ ...req.body })
     await dataToUpdate.save()

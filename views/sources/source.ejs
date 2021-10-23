@@ -43,8 +43,12 @@
             <% } %> 
         </div>
 
+
         <div class="data-line">
-            Last Update: <%= data.updateDate %> approved by <%= data.lastApprover.username %> 
+            Last Update: <%= data.updateDate %> 
+            <% if (data.state !== 'rejected') { %> 
+                reviewed by <%= data.lastApprover.username %>
+            <% } %>
         </div>
 
         <% if(data.state === 'approved' || data.state === 'rejected') { %>

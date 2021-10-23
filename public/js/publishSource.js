@@ -24,7 +24,7 @@ document.querySelector('.reject-record').addEventListener('click', async event =
                 collection: 'ReviewSource'
             })
         })
-        location.href="/dashboard"
+        location.href = "/dashboard"
     } catch (err) {
         console.log('Something went wrong.', err)
     }

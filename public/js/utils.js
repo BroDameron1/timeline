@@ -48,22 +48,32 @@ export class StateManager {
     }
 
     async updateState () {
-        try {
-            const response = await fetch('/sources/data', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    checkedOut: this.checkedOut,
-                    sourceId: this.sourceId,
-                    collection: this.targetCollection
-                })
-            })
-            return response.status
-        } catch (err) {
-            console.log('Something went wrong.', err)
+        const checkedOutRequest = JSON.stringify({
+            checkedOut: this.checkedOut,
+            sourceId: this.sourceId,
+            collection: this.targetCollection
+        })
+
+        const beacon = await navigator.sendBeacon('/sources/data', checkedOutRequest)
+        if (!beacon) {
+            console.log('Something went wrong.',  err)
         }
+        // try {
+        //     const response = await fetch('/sources/data', {
+        //         method: 'PUT',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify({
+        //             checkedOut: this.checkedOut,
+        //             sourceId: this.sourceId,
+        //             collection: this.targetCollection
+        //         })
+        //     })
+        //     return response.status
+        // } catch (err) {
+        //     console.log('Something went wrong.', err)
+        // }
     }
 }
 
@@ -73,11 +83,55 @@ const countdownTimer = document.querySelector('.countdown-timer')
 const blurBackground = document.querySelector('.disableDiv')
 const timerButton = document.querySelector('#timerButton')
 
-const startingMinutes = 20 //sets timeout for page
+//create a throttle so the idleLogout function isn't running every single time an event is occurring.
+
+const startingMinutes = 1.2 //sets timeout for page
 const warningTime = 1 * 60 //sets time when warning will pop up
 let time = startingMinutes * 60 //timer for use in idleLogout function, should not change
+let intervalStart = null
+let dialogFlag = true //flag that determines if the page should popup the default dialog box if a users leaves it.
 
-export const idleLogout = () => { //function for kicking user out of the page if they don't take any action
+//function to call to pop the default dialog box when leaving.  If the flag is false, resets it to true.
+export const dialogHelper = (event) => { 
+    if (dialogFlag) {
+        return event.returnValue = ''
+    }
+    dialogFlag = true
+}
+
+
+//starts the countdown after 2 minutes.  If a previously countdown had been started, resets the timer, removes the eventlisteners and stops the countdown and then starts it back up again after 2 minutes.
+//this ensures that the countdown only needs to pick up one event every two minutes in order to reset the timer instead of picking up every event all the time.
+export const userActivityThrottler = () => {
+    
+    if (intervalStart) {
+        if (time > warningTime) {
+            time = startingMinutes * 60
+        }
+        window.removeEventListener('load', userActivityThrottler)
+        window.removeEventListener('mousemove', userActivityThrottler)
+        window.removeEventListener('mousedown', userActivityThrottler) // catches touchscreen presses as well
+        window.removeEventListener('touchstart', userActivityThrottler) // catches touchscreen swipes as well
+        window.removeEventListener('click', userActivityThrottler) // catches touchpad clicks as well
+        window.removeEventListener('keydown', userActivityThrottler)
+        window.removeEventListener('scroll', userActivityThrottler, true);
+        clearInterval(intervalStart)
+    }
+    setTimeout(() => {
+        intervalStart = setInterval(idleLogout, 1000)
+        window.addEventListener('load', userActivityThrottler)
+        window.addEventListener('mousemove', userActivityThrottler)
+        window.addEventListener('mousedown', userActivityThrottler) // catches touchscreen presses as well
+        window.addEventListener('touchstart', userActivityThrottler) // catches touchscreen swipes as well
+        window.addEventListener('click', userActivityThrottler) // catches touchpad clicks as well
+        window.addEventListener('keydown', userActivityThrottler)
+        window.addEventListener('scroll', userActivityThrottler, true); // improved; see comments
+    }, 1000 * 60 * 2)
+
+}
+
+
+const idleLogout = () => { //function for kicking user out of the page if they don't take any action
 
     const closePopup = () => { //closes the warning popup and resets everything
         warningPopup.style.display = 'none'
@@ -91,13 +145,7 @@ export const idleLogout = () => { //function for kicking user out of the page if
         blurBackground.style.display = 'block'
         timerButton.addEventListener('click', closePopup)
     }
-
-    const resetTimer = () => {
-        if (time > warningTime) {
-            time = startingMinutes * 60
-        }
-    }
-    
+   
     const minutes = Math.floor(time / 60)
     let seconds = time % 60
     seconds = seconds < 10 ? '0' + seconds : seconds
@@ -107,18 +155,14 @@ export const idleLogout = () => { //function for kicking user out of the page if
     }
 
     if (time <= 0) {
+        dialogFlag = false //don't want a dialog box, set flag to false.
         location.href = '/dashboard'
     }
 
     console.log(minutes, seconds)
     time--
-    window.onload = resetTimer;
-    window.onmousemove = resetTimer;
-    window.onmousedown = resetTimer;  // catches touchscreen presses as well      
-    window.ontouchstart = resetTimer; // catches touchscreen swipes as well 
-    window.onclick = resetTimer;      // catches touchpad clicks as well
-    window.onkeydown = resetTimer;   
-    window.addEventListener('scroll', resetTimer, true); // improved; see comments
+
+
 }
 
 // export class FieldManager {
