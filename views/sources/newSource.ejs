@@ -35,11 +35,11 @@
             </div>
             <div class="form-field">
                 <label for="book-series">Series</label>
-                <input type="text" id="book-series" maxlength="80" name="book[series]">
+                <input type="text" id="book-series" maxlength="80" class="autocomplete" name="book[series]">
             </div>
             <div class="form-field">
                 <label for="publisher">Publisher</label>
-                <input type="text" id="publisher" maxlength="80" name="book[publisher]">
+                <input type="text" id="publisher" maxlength="80" class="autocomplete" name="book[publisher]">
             </div>
             <div class="form-field">
                 <label for="bookReleaseDate">Initial Release Date</label>
@@ -53,7 +53,7 @@
         <div class="hide-sources" id="movie-fields">
             <div class="form-field">
                 <label for="movie-director">Director(s)</label>
-                    <input type="text" id="movie-director" class="movie-director" name="movie[director][]" maxlength="80">
+                    <input type="text" id="movie-director" class="movie-director autocomplete" name="movie[director][]" maxlength="80">
                 <a href="#" id="add-director">Add another director</a>
             </div>
             <div class="form-field">
@@ -78,7 +78,7 @@
             </div>
             <div class="form-field">
                 <label for="comic-series">Series</label>
-                <input type="text" id="comic-series" name="comic[series]" maxlength="80">
+                <input type="text" id="comic-series" name="comic[series]" class="autocomplete" maxlength="80">
             </div>
             <div class="form-field">
                 <label for="comic-issue">Issue</label>
@@ -92,7 +92,7 @@
         <div class="hide-sources" id="tv-fields">
             <div class="form-field">
                 <label for="tv-series">Series</label>
-                <input type="text" id="tv-series" name="tv[series]" maxlength="80">
+                <input type="text" id="tv-series" name="tv[series]" class="autocomplete" maxlength="80">
             </div>
             <div class="form-field">
                 <label for="tv-season">Season</label>
@@ -133,5 +133,7 @@
 <script>
     const sourceId = null
 </script>
+<script src="/js/nserializejson.min.js"></script>
+<script type="module" src="/js/autocomplete.js"></script>
 <script type="module" src="/js/editSource.js"></script>
 <!-- <script type="module" src="/js/newSource.js"></script> -->

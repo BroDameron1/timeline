@@ -242,7 +242,7 @@ module.exports.deletePublicSource = async (req,res) => {
 
 //controller to check for duplicate data by passing the title, mediaType, and sometimes review Id through
 //to check against the review and public collections
-module.exports.getData = async (req, res) => {
+module.exports.getData = async (req, res) => { 
     const { title, mediaType, type, sourceId } = req.query
     if (type === 'submitNew') {
         const duplicateResult = await duplicateChecker.submitNew(title, mediaType)
@@ -260,6 +260,44 @@ module.exports.getData = async (req, res) => {
         const duplicateResult = await duplicateChecker.editPublic(title, mediaType, sourceId)
         return res.json(duplicateResult)
     }
+    
+    
+    const { field, fieldValue } = req.query
+
+
+    // const autofillResponse = await Source.publicSource.find({ [`${field}`]: {$regex: `^${fieldValue}`, '$options' : 'i'} }).select(`${field} -_id`)
+    try {
+        const autofillResponse = await Source.publicSource.aggregate(
+            [
+                { $unwind: `$${field}`},
+                { $match: {[`${field}`]: {$regex: `^${fieldValue}`, '$options' : 'i'} }},
+                { $group: {_id: `$${field}`}},
+                { $sort: {_id: 1 } }
+            ]
+        )
+        console.log(autofillResponse, 'autofillresponse')
+
+        const autofillArray = autofillResponse.map(option => {
+            return option._id
+        })
+        console.log(autofillArray, 'autofill array')
+        return res.json(autofillArray)
+    } catch (e) {
+        console.log(e)
+    }
+
+
+    //console.log(autofillResponse, 'here')
+    // const autofillArray = autofillResponse.map(element => {
+    //     const mainkey = Object.keys(element.toJSON())
+    //     const subkey = Object.keys(element[mainkey].toJSON())
+    //     return element[mainkey][subkey]
+    // })
+    // console.log(autofillArray, 'here2')
+
+
+    // return res.json(autofillArray)
+    //res.end()
 }
 
 

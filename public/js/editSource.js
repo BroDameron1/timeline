@@ -1,5 +1,7 @@
 import { userActivityThrottler, Duplicate, StateManager, FieldManager, dialogHelper } from "./utils.js"
 
+
+
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
 const warningDiv = document.querySelector('#warning')
@@ -18,7 +20,35 @@ let duplicateCheckType
 let unloadCheck = false //flag to determine if the beforeunload event fires on submit
 let sourceLocation //variable to set if we need to change the status of a public or review record
 
-
+//updates the DB for a rejected record so that it doesn't publish.
+const publishReject = () => {
+    document.querySelector('.reject-record').addEventListener('click', async event => {
+        try {
+            const adminNotes = document.querySelector('#adminNotes').value
+            if (!adminNotes) { //validates that admin notes have been entered.
+                warningDiv.textContent = ''
+                return warningDiv.textContent = 'Please leave a comment.'
+            }
+            const response = await fetch('/sources/data', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sourceId,
+                    adminNotes,
+                    state: 'rejected',
+                    collection: 'ReviewSource'
+                })
+            })
+            unloadCheck = true  //sets unload check to true so unload function doesn't run
+            location.href = "/dashboard"
+            return response
+        } catch (err) {
+            console.log('Something went wrong.', err)
+        }
+    })
+}
 
 //this statement determines which type path the js file is being loaded into to update the above variables
 //sets variables for creating a new record
@@ -33,34 +63,14 @@ if(form.id === 'newSource') {
 } else if (form.id === 'publishSource') {
     duplicateCheckType = 'publishRecord'
     sourceLocation = 'ReviewSource'
-    
-    
-    document.querySelector('.reject-record').addEventListener('click', async event => {
-        try {
-            const adminNotes = document.querySelector('#adminNotes').value
-            console.log(adminNotes)
-            const response = await fetch('/sources/data', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    sourceId,
-                    adminNotes,
-                    state: 'rejected',
-                    collection: 'ReviewSource'
-                })
-            })
-            location.href = "/dashboard"
-        } catch (err) {
-            console.log('Something went wrong.', err)
-        }
-    })
+    publishReject()
 //sets variables for any user submitting an update to a public record
 } else if (form.id === 'updatePublicSource') {
     duplicateCheckType = 'editPublic'
     sourceLocation = 'PublicSource'
 }
+
+
 
 
 
@@ -186,13 +196,17 @@ if (existingSource) {
             gameFields.classList.add('hide-sources')
         }
 
-        let selects = document.getElementsByTagName('select');
-        console.log(selects.length)
+        // let selects = document.getElementsByTagName('select');
+        // console.log(selects.length)
     })
 }
 
 form.addEventListener('submit', async event => {
     event.preventDefault()
+
+    // const serializeForm = NSerializeJson.NSerializeJson.serializeForm(form)
+    // console.log(serializeForm)
+    // console.log(serializeForm.movie.director[0])
     //sets the warningDiv to blank so errors don't pile up
     //this may need to be refactored if there are multiple warnings
     warningDiv.innerHTML = ''
@@ -371,23 +385,3 @@ bookFields.addEventListener('click', event => {
 })
 
 
-//Autocomplete testing
-
-// const series = [
-//     { label: 'The Clone Wars', value: 'The Clone Wars' },
-//     { label: 'Resistance', value: 'Resistance' }
-// ]
-
-// const tvseries = document.querySelector('#tv-series')
-
-// autocomplete({
-//     input: tvseries,
-//     fetch: function(text, update) {
-//         text = text.toLowerCase()
-//         let suggestions = series.filter(n => n.label.toLowerCase().startsWith(text))
-//         update(suggestions)
-//     },
-//     onSelect: function(item) {
-//         tvseries.value = item.label
-//     }
-// })
