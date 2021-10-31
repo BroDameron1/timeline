@@ -1,3 +1,4 @@
+import { autocompleteListener } from "./autocomplete.js"
 
 //TODO: Can it be expanded to work with any record?
 export class Duplicate {
@@ -256,8 +257,9 @@ export class FieldManager {
             let newInput = document.createElement('input')
             //set to text input
             newInput.type = 'text'
-            //set to same class that totalFieldList looks for
-            newInput.setAttribute('class', `${this.media}-${this.job}`)
+            //set to same class that totalFieldList looks for.  ALso adds autocomplete class to allow that functionality.
+            newInput.setAttribute('class', `${this.media}-${this.job} autocomplete`)
+
             //set name to allow it to be passed in the request body.  This name is the same on each input.
             newInput.setAttribute('name', `${this.media}[${this.job}][]`)
             //sets the max length of the new field
@@ -268,6 +270,9 @@ export class FieldManager {
 
             //Create a link with the method and add it inside the new div
             newDiv.append(this.createRemoveLink(this.job))
+
+            //fires the autocompleteListener function again so autocomplete works on the new field
+            autocompleteListener()
         }
         //Check if we have the max number of inputs and then remove the add link if true
         if (totalFieldList.length === this.additionalFields) {

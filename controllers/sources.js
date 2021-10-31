@@ -266,6 +266,7 @@ module.exports.getData = async (req, res) => {
 
 
     // const autofillResponse = await Source.publicSource.find({ [`${field}`]: {$regex: `^${fieldValue}`, '$options' : 'i'} }).select(`${field} -_id`)
+
     try {
         const autofillResponse = await Source.publicSource.aggregate(
             [
@@ -275,45 +276,15 @@ module.exports.getData = async (req, res) => {
                 { $sort: {_id: 1 } }
             ]
         )
-        console.log(autofillResponse, 'autofillresponse')
-
         const autofillArray = autofillResponse.map(option => {
             return option._id
         })
-        console.log(autofillArray, 'autofill array')
         return res.json(autofillArray)
     } catch (e) {
         console.log(e)
     }
-
-
-    //console.log(autofillResponse, 'here')
-    // const autofillArray = autofillResponse.map(element => {
-    //     const mainkey = Object.keys(element.toJSON())
-    //     const subkey = Object.keys(element[mainkey].toJSON())
-    //     return element[mainkey][subkey]
-    // })
-    // console.log(autofillArray, 'here2')
-
-
-    // return res.json(autofillArray)
-    //res.end()
 }
 
-
-// module.exports.putData = async (req, res) => {
-//     const { checkedOut, sourceId, collection, state } = req.body
-//     const dataToUpdate = await mongoose.model(collection).findById(sourceId)
-//     console.log(collection, state)
-//     if (state) {
-//         dataToUpdate.state = state
-//         await dataToUpdate.save()
-//         return res.status(200).end()
-//     }
-//     dataToUpdate.checkedOut = checkedOut
-//     await dataToUpdate.save()
-//     res.status(200).end()
-// }
 
 //controller for put route that lets JS files update data.  Right now only for
 //updating state of record
@@ -329,8 +300,3 @@ module.exports.putData = async (req, res) => {
     await dataToUpdate.save()
     res.status(200).end()
 }
-
-// module.exports.formSession = (req, res) => {
-//     req.session.formAccess = true
-//     res.status(200).end()
-// }
