@@ -1,4 +1,9 @@
 import { userActivityThrottler, Duplicate, StateManager, FieldManager, dialogHelper } from "./utils.js"
+import autocomplete from 'autocompleter';
+// import { NSerializeJson } from 'nserializejson'
+import serialize from 'form-serialize-improved'
+import { sourceSchema } from '../../schemas'
+//import tlds from '/node_modules/@sideway/address/lib/tlds.js'
 
 
 
@@ -204,9 +209,38 @@ if (existingSource) {
 form.addEventListener('submit', async event => {
     event.preventDefault()
 
-    // const serializeForm = NSerializeJson.NSerializeJson.serializeForm(form)
-    // console.log(serializeForm)
-    // console.log(serializeForm.movie.director[0])
+    // let formObject = NSerializeJson.serializeForm(form)
+    // console.log(formObject)
+
+    // for (let [key, value] of Object.entries(formObject)) {
+    //     if (formObject[key] === '' || formObject[key] === null) {
+    //         formObject[key] === undefined
+    //     }
+    //     //loops through any fields that are objects and changes their subvalues to undefined if empty.
+    //     if (typeof formObject[key] === 'object') {
+    //         for (let [subkey, subvalue] of Object.entries(formObject[key])) {
+    //             if (formObject[key][subkey] === '' || formObject[key][subkey] === null) {
+    //                 formObject[key][subkey] = undefined
+    //             //loops through any arrays removes any empty strings and then sets the empty array to undefined.
+    //             } else if (Array.isArray(formObject[key][subkey])) {
+    //                 formObject[key][subkey] = formObject[key][subkey].filter(entry => entry !== '')
+    //                 if (formObject[key][subkey].length === 0) {
+    //                     formObject[key][subkey] = undefined
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    const data = serialize(form, { hash: true })
+    console.log(data)
+
+    const { error } = sourceSchema.validate(data, { abortEarly: false })
+    if (error) {
+        return console.log(error)
+    }
+
+
     //sets the warningDiv to blank so errors don't pile up
     //this may need to be refactored if there are multiple warnings
     warningDiv.innerHTML = ''
@@ -229,77 +263,7 @@ form.addEventListener('submit', async event => {
     warningDiv.append(duplicateResult)
 })
 
-//determines which parts of the form to load based on the mediaType
-//also ensures the additionally added fields load with the "remove" option
 
-// if (existingSource) {
-//     window.addEventListener('load', event => {
-//         if (mediaType.value === 'Book') {
-//             const fieldUpdate = new FieldManagerTwo(...Object.values(bookAuthorDetails))
-//             fieldUpdate.loadField()
-//             bookFields.classList.remove('hide-sources')
-//         } else {
-//             bookFields.classList.add('hide-sources')
-//         }
-//         if (mediaType.value === 'Movie') {
-//             const directorUpdate = new FieldManagerTwo(...Object.values(movieDirectorDetails))
-//             const writerUpdate = new FieldManagerTwo(...Object.values(movieWriterDetails))
-//             directorUpdate.loadField()
-//             writerUpdate.loadField()
-//             movieFields.classList.remove('hide-sources')
-//         } else {
-//             movieFields.classList.add('hide-sources')
-//         }
-//         if (mediaType.value === 'TV Show') {
-//             tvFields.classList.remove('hide-sources')
-//         } else {
-//             tvFields.classList.add('hide-sources')
-//         }
-//         if (mediaType.value === 'Comic') {
-            
-//             const fieldUpdate = new FieldManagerTwo(...Object.values(comicArtistDetails))
-//             //const fieldUpdate = new FieldManagerTwo('comic', 'artist', 3)
-//             fieldUpdate.loadField()
-//             comicFields.classList.remove('hide-sources')
-//         } else {
-//             comicFields.classList.add('hide-sources')
-//         }
-//         if (mediaType.value === 'Video Game') {
-//             gameFields.classList.remove('hide-sources')
-//         } else {
-//             gameFields.classList.add('hide-sources')
-//         }
-//     })
-// } else {
-//     mediaType.addEventListener('input', event => {
-//         event.preventDefault()
-//         if (mediaType.value === 'Book') {
-//             bookFields.classList.remove('hide-sources')
-//         } else {
-//             bookFields.classList.add('hide-sources')
-//         }
-//         if (mediaType.value === 'Movie') {
-//             movieFields.classList.remove('hide-sources')
-//         } else {
-//             movieFields.classList.add('hide-sources')
-//         }
-//         if (mediaType.value === 'TV Show') {
-//             tvFields.classList.remove('hide-sources')
-//         } else {
-//             tvFields.classList.add('hide-sources')
-//         }
-//         if (mediaType.value === 'Comic') {
-//             comicFields.classList.remove('hide-sources')
-//         } else {
-//             comicFields.classList.add('hide-sources')
-//         }
-//         if (mediaType.value === 'Video Game') {
-//             gameFields.classList.remove('hide-sources')
-//         } else {
-//             gameFields.classList.add('hide-sources')
-//         }
-//     })
-// }
 
 //sets properties for properties that can have addable fields.
 const comicArtistDetails = {
@@ -384,4 +348,43 @@ bookFields.addEventListener('click', event => {
     }
 })
 
+
+//autocomplete bundle test
+
+export const autocompleteListener = () => {
+    const autocompleteFields = document.querySelectorAll('.autocomplete')
+    autocompleteFields.forEach((autocompleteField) => {
+        autocompleteField.addEventListener('focus', event => {
+            autocomplete({
+                input: autocompleteField,
+                emtpyMsg: 'No Results',
+                debounceWaitMs: 200,
+                preventSubmit: true,
+                disableAutoSelect: true,
+                fetch: async function(text, update) {
+                    let field = autocompleteField.name
+                    field = field.replace('[]', '')
+                    field = field.replace('[', '.')
+                    field = field.replace(']', '')
+            
+                    const response = await fetch('/sources/data?' + new URLSearchParams({
+                        field,
+                        fieldValue: autocompleteField.value
+                    }))
+                    const autofillOptions = await response.json()
+                    console.log(autofillOptions)
+                    let suggestions = autofillOptions.map(option => {
+                        return { 'label': option, 'value:': option}
+                    })
+                    update(suggestions)
+                },
+                onSelect: function(item) {
+                    autocompleteField.value = item.label
+                } 
+            })
+        })
+    })
+}
+
+autocompleteListener()
 

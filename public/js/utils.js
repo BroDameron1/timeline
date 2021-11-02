@@ -1,4 +1,4 @@
-import { autocompleteListener } from "./autocomplete.js"
+import { autocompleteListener } from "./editSource.js"
 
 //TODO: Can it be expanded to work with any record?
 export class Duplicate {
@@ -59,22 +59,6 @@ export class StateManager {
         if (!beacon) {
             console.log('Something went wrong.',  err)
         }
-        // try {
-        //     const response = await fetch('/sources/data', {
-        //         method: 'PUT',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         },
-        //         body: JSON.stringify({
-        //             checkedOut: this.checkedOut,
-        //             sourceId: this.sourceId,
-        //             collection: this.targetCollection
-        //         })
-        //     })
-        //     return response.status
-        // } catch (err) {
-        //     console.log('Something went wrong.', err)
-        // }
     }
 }
 
@@ -165,54 +149,6 @@ const idleLogout = () => { //function for kicking user out of the page if they d
 
 
 }
-
-// export class FieldManager {
-//     constructor (addClass, inputClass, inputName, additionalFields) {
-//         //class of the add link.  Used to determine where the link is to place other objects
-//         //OR hide the link if the maximum fields have been added
-//         this.addClass = addClass,
-//         //class for the input field(s).  Used to add the appropriate class to the new fields or count the existing
-//         //number of fields.
-//         this.inputClass = inputClass,
-//         //used to give the appropriate name to the field.
-//         this.inputName = inputName,
-//         //number of additional fields that can be added.
-//         this.additionalFields = additionalFields
-//     }
-
-//     addField (removeClass) {
-//         const addLink = document.querySelector(`#${this.addClass}`)
-//         const currentCount = document.querySelectorAll(`.${this.inputClass}`)
-//         if (currentCount.length <= this.additionalFields) {
-//             addLink.insertAdjacentHTML('beforebegin', `<div class="form-field" id="${this.addClass}${currentCount.length}"><input type="text" class="${this.inputClass}" name="${this.inputName}">
-//             <a href="#" class="${removeClass}" id="${currentCount.length}">Remove</a></div>`)
-//             }
-//         if (currentCount.length === this.additionalFields) {
-//             addLink.classList.add('hide-sources')
-//         }
-//     }
-
-//     deleteField (fieldId) {
-//         const addLink = document.querySelector(`#${this.inputClass}`)
-//         const element = document.querySelector(`#${this.addClass}${fieldId}`)
-//         element.remove()
-//         const currentCount = document.querySelectorAll(`.${this.countClass}`) //current number of fields after removing the element.
-//         if (currentCount.length <= this.additionalFields) {
-//             addLink.classList.remove('hide-sources')
-//         }
-//     }
-
-//     loadField (removeClass) {
-//         const inputBoxes = document.querySelectorAll(`.${this.inputClass}`)
-//         if(inputBoxes.length > 1) {
-//             for (let i = 1; i < inputBoxes.length; i++) {
-//             let input = inputBoxes[i]
-//             input.parentElement.setAttribute("id", `${this.inputClass}${i}`)
-//             input.insertAdjacentHTML('afterend', `<a href="#" class="${removeClass}" id="${i}">Remove</a>`)
-//              }
-//         }
-//     }
-// }
 
 
 export class FieldManager {

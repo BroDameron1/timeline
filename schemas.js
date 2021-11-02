@@ -40,7 +40,7 @@ module.exports.userSchema = Joi.object({
         .required()
         .escapeHTML(),
     email: Joi.string()
-        .email()
+        .email({ tlds: {allow: false} })
         .required()
         .escapeHTML()
         .messages({
