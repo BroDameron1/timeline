@@ -10043,8 +10043,7 @@ const comicFields = document.querySelector('#comic-fields')
 //used in later if statements to determine if the file is for a new record or an existing record
 let existingSource = true
 //sets the form to the current form of the page by checking the class and id
-// let form = document.querySelector(`#${document.querySelector('.sourceForm').id}`)
-const form = document.forms[0];
+let form = document.querySelector(`#${document.querySelector('.sourceForm').id}`)
 //sets the method that should be called in the backend duplicate check
 let duplicateCheckType
 let unloadCheck = false //flag to determine if the beforeunload event fires on submit
@@ -10260,7 +10259,8 @@ form.addEventListener('submit', async event => {
     const data = form_serialize_improved__WEBPACK_IMPORTED_MODULE_2___default()(form, { hash: true })
     console.log(data)
 
-    const { error } = _schemas__WEBPACK_IMPORTED_MODULE_3__.sourceSchema.validate(data, { abortEarly: false })
+    const errorTest = _schemas__WEBPACK_IMPORTED_MODULE_3__.sourceSchema.validate(data, { abortEarly: false })
+    return console.log(errorTest)
     if (error) {
         return console.log(error)
     }
@@ -10763,7 +10763,11 @@ module.exports.sourceSchema = Joi.object({
         .escapeHTML()
         .pattern(regex)
         .min(3)
-        .max(100),
+        .max(100)
+        .messages({
+            'string.pattern.base': 'The title contains an illegal character.',
+            'string.min': 'The title must be at least 3 characters.'
+        }),
     slug: Joi.string(),
     mediaType: Joi.string()
         .required()

@@ -235,7 +235,8 @@ form.addEventListener('submit', async event => {
     const data = serialize(form, { hash: true })
     console.log(data)
 
-    const { error } = sourceSchema.validate(data, { abortEarly: false })
+    const errorTest = sourceSchema.validate(data, { abortEarly: false })
+    return console.log(errorTest)
     if (error) {
         return console.log(error)
     }

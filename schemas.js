@@ -58,7 +58,11 @@ module.exports.sourceSchema = Joi.object({
         .escapeHTML()
         .pattern(regex)
         .min(3)
-        .max(100),
+        .max(100)
+        .messages({
+            'string.pattern.base': 'The title contains an illegal character.',
+            'string.min': 'The title must be at least 3 characters.'
+        }),
     slug: Joi.string(),
     mediaType: Joi.string()
         .required()
