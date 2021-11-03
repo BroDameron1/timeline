@@ -209,36 +209,17 @@ if (existingSource) {
 form.addEventListener('submit', async event => {
     event.preventDefault()
 
-    // let formObject = NSerializeJson.serializeForm(form)
-    // console.log(formObject)
-
-    // for (let [key, value] of Object.entries(formObject)) {
-    //     if (formObject[key] === '' || formObject[key] === null) {
-    //         formObject[key] === undefined
-    //     }
-    //     //loops through any fields that are objects and changes their subvalues to undefined if empty.
-    //     if (typeof formObject[key] === 'object') {
-    //         for (let [subkey, subvalue] of Object.entries(formObject[key])) {
-    //             if (formObject[key][subkey] === '' || formObject[key][subkey] === null) {
-    //                 formObject[key][subkey] = undefined
-    //             //loops through any arrays removes any empty strings and then sets the empty array to undefined.
-    //             } else if (Array.isArray(formObject[key][subkey])) {
-    //                 formObject[key][subkey] = formObject[key][subkey].filter(entry => entry !== '')
-    //                 if (formObject[key][subkey].length === 0) {
-    //                     formObject[key][subkey] = undefined
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 
     const data = serialize(form, { hash: true })
-    console.log(data)
-
-    const errorTest = sourceSchema.validate(data, { abortEarly: false })
-    return console.log(errorTest)
+    const { error } = sourceSchema.validate(data, { abortEarly: false })
+    // return console.log(errorList)
     if (error) {
-        return console.log(error)
+        for (let errorDetails of error.details) {
+            console.log(errorDetails, 'test')
+            console.log(errorDetails.message)
+            warningDiv.append(errorDetails.message)
+        }
+        return console.log(error.details)
     }
 
 
