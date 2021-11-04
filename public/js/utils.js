@@ -185,7 +185,7 @@ export class FieldManager {
             //set new div to have a class of form-field (styling only)
             newDiv.setAttribute('class', 'form-field')
             //set the new div to have a unique id specific to this field
-            newDiv.setAttribute('id', `${this.media}-${this.job}${totalFieldList.length}`)
+            newDiv.setAttribute('id', `${this.media}-${this.job}-${totalFieldList.length}`)
             //place the new div before the add field link
             addFieldLink.parentNode.insertBefore(newDiv, addFieldLink)
 
@@ -195,6 +195,10 @@ export class FieldManager {
             newInput.type = 'text'
             //set to same class that totalFieldList looks for.  ALso adds autocomplete class to allow that functionality.
             newInput.setAttribute('class', `${this.media}-${this.job} autocomplete`)
+
+            //set id to allow the box to be highlighted for validation errors
+            //this must be different than the div id for proper selection and highlighting
+            newInput.setAttribute('id', `${this.media}-${this.job}${totalFieldList.length}`)
 
             //set name to allow it to be passed in the request body.  This name is the same on each input.
             newInput.setAttribute('name', `${this.media}[${this.job}][]`)
