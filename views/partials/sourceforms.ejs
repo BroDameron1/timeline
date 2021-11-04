@@ -27,10 +27,10 @@
         <label for="book-author">Author(s)</label>
         <% if (data.book.author && data.book.author.length > 0) { %> 
             <% for(let author of data.book.author) { %>    
-                <div class="form-field"><input type="text" class="book-author autocomplete" name="book[author][]" value="<%= author %>" maxlength="80"></div>
+                <div class="form-field"><input type="text" id="book-author<%= data.book.author.indexOf(author) %>" class="book-author autocomplete" name="book[author][]" value="<%= author %>" maxlength="80"></div>
             <% } %>
         <% } else { %>
-            <input type="text" class="book-author autocomplete" name="book[author][]" maxlength="80">
+            <input type="text" id="book-author0" class="book-author autocomplete" name="book[author][]" maxlength="80">
         <% } %> 
         <a href="#" id="add-author">Add another author</a>
     </div>
@@ -58,10 +58,10 @@
         <label for="movie-director">Director(s)</label>
         <% if (data.movie.director && data.movie.director.length > 0) { %> 
             <% for(let director of data.movie.director) { %>    
-                <div class="form-field"><input type="text" class="movie-director autocomplete" name="movie[director][]" value="<%= director %>" maxlength="80"></div>
+                <div class="form-field"><input type="text" id="movie-director<%= data.movie.director.indexOf(director) %>"  class="movie-director autocomplete" name="movie[director][]" value="<%= director %>" maxlength="80"></div>
             <% } %>
         <% } else { %>
-            <input type="text" class="movie-director autocomplete" name="movie[director][]" maxlength="80">
+            <input type="text" id="movie-director0" class="movie-director autocomplete" name="movie[director][]" maxlength="80">
         <% } %> 
         <a href="#" id="add-director">Add another director</a>
     </div>
@@ -69,10 +69,10 @@
         <label for="movie-writer">Writer(s)</label>
         <% if (data.movie.writer && data.movie.writer.length > 0) { %> 
             <% for(let writer of data.movie.writer) { %>    
-                <div class="form-field"><input type="text" class="movie-writer autocomplete" name="movie[writer][]" value="<%= writer %>" maxlength="80"></div>
+                <div class="form-field"><input type="text" id="movie-writer<%= data.movie.writer.indexOf(writer) %>"  class="movie-writer autocomplete" name="movie[writer][]" value="<%= writer %>" maxlength="80"></div>
             <% } %>
         <% } else { %>
-            <input type="text" class="movie-writer autocomplete" name="movie[writer][]" maxlength="80">
+            <input type="text" id="movie-writer0" class="movie-writer autocomplete" name="movie[writer][]" maxlength="80">
         <% } %> 
         <a href="#" id="add-writer">Add another writer</a>
     </div>
@@ -91,10 +91,10 @@
         <label for="comic-artist">Art Contributor(s)</label>
         <% if (data.comic.artist && data.comic.artist.length > 0) { %> 
             <% for(let artist of data.comic.artist) { %>    
-                <div class="form-field"><input type="text" id="comic-artist" class="comic-artist autocomplete" name="comic[artist][]" value="<%= artist %>" maxlength="80"></div>
+                <div class="form-field"><input type="text" id="comic-artist<%= data.comic.artist.indexOf(artist) %>"  class="comic-artist autocomplete" name="comic[artist][]" value="<%= artist %>" maxlength="80"></div>
             <% } %>
         <% } else { %>
-            <input type="text" id="comic-artist" class="comic-artist autocomplete" name="comic[artist][]" maxlength="80" maxlength="80">
+            <input type="text" id="comic-artist0" class="comic-artist autocomplete" name="comic[artist][]" maxlength="80" maxlength="80">
         <% } %> 
         <a href="#" id="add-artist">Add another art contributor</a>
     </div>

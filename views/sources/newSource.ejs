@@ -30,7 +30,7 @@
         <div class="hide-sources" id="book-fields">
             <div class="form-field">
                 <label for="book-author">Author(s)</label>
-                    <input type="text" class="book-author autocomplete" maxlength="80" name="book[author][]">
+                    <input type="text" id="book-author0" class="book-author autocomplete" maxlength="80" name="book[author][]">
                 <a href="#" id="add-author">Add another author</a>
             </div>
             <div class="form-field">
@@ -53,12 +53,12 @@
         <div class="hide-sources" id="movie-fields">
             <div class="form-field">
                 <label for="movie-director">Director(s)</label>
-                    <input type="text" id="movie-director" class="movie-director autocomplete" name="movie[director][]" maxlength="80">
+                    <input type="text" id="movie-director0" class="movie-director autocomplete" name="movie[director][]" maxlength="80">
                 <a href="#" id="add-director">Add another director</a>
             </div>
             <div class="form-field">
                 <label for="movie-writer">Writer(s)</label>
-                    <input type="text" id="movie-writer" class="movie-writer autocomplete" name="movie[writer][]" maxlength="80">
+                    <input type="text" id="movie-writer0" class="movie-writer autocomplete" name="movie[writer][]" maxlength="80">
                 <a href="#" id="add-writer">Add another writer</a>
             </div>
             <div class="form-field">
@@ -69,11 +69,11 @@
         <div class="hide-sources" id="comic-fields">
             <div class="form-field">
                 <label for="comic-writer">Writer</label>
-                <input type="text" id="comic-writer" name="comic[writer]" class="autocomplete" maxlength="80">
+                <input type="text" id="comic-writer0" name="comic[writer]" class="autocomplete" maxlength="80">
             </div>
             <div class="form-field">
                 <label for="comic-artist">Art Contributor(s)</label>
-                    <input type="text" id="comic-artist" class="comic-artist autocomplete" name="comic[artist][]" maxlength="80">
+                    <input type="text" id="comic-artist0" class="comic-artist autocomplete" name="comic[artist][]" maxlength="80">
                 <a href="#" id="add-artist">Add another art contributor</a>
             </div>
             <div class="form-field">
@@ -133,7 +133,6 @@
 <script>
     const sourceId = null
 </script>
-<!-- <script src="/js/nserializejson.min.js"></script> -->
-<!-- <script type="module" src="/js/autocomplete.js"></script> -->
+
 <script type="module" src="/dist/main.bundle.js"></script>
 

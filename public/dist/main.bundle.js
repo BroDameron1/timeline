@@ -10236,53 +10236,46 @@ form.addEventListener('submit', async event => {
     //sets the warningDiv to blank so errors don't pile up
     //this may need to be refactored if there are multiple warnings
     warningDiv.innerHTML = ''
+    
+    //clears all red borders around all input types
     document.querySelectorAll('input, select, textarea').forEach((element) => {
         element.style.border = ''
     })
+
     const data = form_serialize_improved__WEBPACK_IMPORTED_MODULE_2___default()(form, { hash: true })
-    // console.log(data, 'data')
+    console.log(data, 'test1')
     const { error } = _schemas__WEBPACK_IMPORTED_MODULE_3__.sourceSchema.validate(data, { abortEarly: false })
-    // return console.log(errorList)
     if (error) {
         for (let errorDetails of error.details) {
-            // console.log(errorDetails, 'test')
-            // console.log(errorDetails.message)
             let invalidFieldName = errorDetails.path
             if (invalidFieldName.length === 2) {
                 invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
             } else if (invalidFieldName.length === 3) {
                 //TODO: Add zero to field names in HTML so if statement can be removed
-                if (invalidFieldName[2] === 0) {
-                    invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-                } else {
-                    invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-                }
+
+                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+
+
+                // if (invalidFieldName[2] === 0) {
+                //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+                // } else {
+                //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+                // }
             }
-
-            console.log(invalidFieldName, 'test2')
             
-
-            
+            console.log(invalidFieldName, 'invalid field')
             let validationWarning = document.createElement('div')
             validationWarning.textContent = errorDetails.message
             validationWarning.setAttribute('class', 'field-requirements field-invalid')
             document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
             warningDiv.append(validationWarning)
         }
-        return console.log(error.details)
+        return
     }
-
-
 
     
     event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
-    //checks if mediaType is default and displays a warning if so
-    //replaced with Joi validation
-    // if (mediaType.value === 'default') {
-    //     event.submitter.disabled = false
-    //     return warningDiv.textContent = 'Please select a media type.'
-    // }
 
     const submittedRecord = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.Duplicate(title.value, mediaType.value, sourceId, duplicateCheckType)
     const duplicateResult = await submittedRecord.validateDuplicates()
@@ -10461,6 +10454,7 @@ class Duplicate {
         return response.json()
     }
 
+    //TODO: Fix this so it displays errors like validation.  
     async validateDuplicates () {
         const duplicateResponse = await this.checkDuplicates()
         if (!duplicateResponse) return false
@@ -10471,9 +10465,9 @@ class Duplicate {
             duplicateLink.href = `/sources/${duplicateResponse.slug}`
             duplicateLink.setAttribute('target', '_blank')
             //create a span to put the link in.
-            let warningSpan = document.createElement('span')
+            let warningSpan = document.createElement('div')
             warningSpan.textContent = 'There is already a record with this title: '
-            warningSpan.setAttribute('class', 'warning-span')
+            warningSpan.setAttribute('class', 'field-requirements field-invalid')
             warningSpan.append(duplicateLink)
             return warningSpan //return the span with think link included.
         } else {
@@ -10639,6 +10633,7 @@ class FieldManager {
             newInput.setAttribute('class', `${this.media}-${this.job} autocomplete`)
 
             //set id to allow the box to be highlighted for validation errors
+            //this must be different than the div id for proper selection and highlighting
             newInput.setAttribute('id', `${this.media}-${this.job}${totalFieldList.length}`)
 
             //set name to allow it to be passed in the request body.  This name is the same on each input.
@@ -10691,7 +10686,7 @@ class FieldManager {
                 //set input to the current field in the nodelist
                 let input = totalFieldList[i]
                 //add the dynamic id to the div housing the input.
-                input.parentElement.setAttribute("id", `${this.media}-${this.job}${i}`)
+                input.parentElement.setAttribute("id", `${this.media}-${this.job}-${i}`)
 
                 //create remove link with method and insert it after the input.
                 input.parentNode.insertBefore(this.createRemoveLink(this.job), input.nextSibling)

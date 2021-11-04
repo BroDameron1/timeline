@@ -212,53 +212,46 @@ form.addEventListener('submit', async event => {
     //sets the warningDiv to blank so errors don't pile up
     //this may need to be refactored if there are multiple warnings
     warningDiv.innerHTML = ''
+    
+    //clears all red borders around all input types
     document.querySelectorAll('input, select, textarea').forEach((element) => {
         element.style.border = ''
     })
+
     const data = serialize(form, { hash: true })
-    // console.log(data, 'data')
+    console.log(data, 'test1')
     const { error } = sourceSchema.validate(data, { abortEarly: false })
-    // return console.log(errorList)
     if (error) {
         for (let errorDetails of error.details) {
-            // console.log(errorDetails, 'test')
-            // console.log(errorDetails.message)
             let invalidFieldName = errorDetails.path
             if (invalidFieldName.length === 2) {
                 invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
             } else if (invalidFieldName.length === 3) {
                 //TODO: Add zero to field names in HTML so if statement can be removed
-                if (invalidFieldName[2] === 0) {
-                    invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-                } else {
-                    invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-                }
+
+                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+
+
+                // if (invalidFieldName[2] === 0) {
+                //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+                // } else {
+                //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+                // }
             }
-
-            console.log(invalidFieldName, 'test2')
             
-
-            
+            console.log(invalidFieldName, 'invalid field')
             let validationWarning = document.createElement('div')
             validationWarning.textContent = errorDetails.message
             validationWarning.setAttribute('class', 'field-requirements field-invalid')
             document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
             warningDiv.append(validationWarning)
         }
-        return console.log(error.details)
+        return
     }
-
-
 
     
     event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
-    //checks if mediaType is default and displays a warning if so
-    //replaced with Joi validation
-    // if (mediaType.value === 'default') {
-    //     event.submitter.disabled = false
-    //     return warningDiv.textContent = 'Please select a media type.'
-    // }
 
     const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, duplicateCheckType)
     const duplicateResult = await submittedRecord.validateDuplicates()

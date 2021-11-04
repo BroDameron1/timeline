@@ -19,6 +19,7 @@ export class Duplicate {
         return response.json()
     }
 
+    //TODO: Fix this so it displays errors like validation.  
     async validateDuplicates () {
         const duplicateResponse = await this.checkDuplicates()
         if (!duplicateResponse) return false
@@ -29,9 +30,9 @@ export class Duplicate {
             duplicateLink.href = `/sources/${duplicateResponse.slug}`
             duplicateLink.setAttribute('target', '_blank')
             //create a span to put the link in.
-            let warningSpan = document.createElement('span')
+            let warningSpan = document.createElement('div')
             warningSpan.textContent = 'There is already a record with this title: '
-            warningSpan.setAttribute('class', 'warning-span')
+            warningSpan.setAttribute('class', 'field-requirements field-invalid')
             warningSpan.append(duplicateLink)
             return warningSpan //return the span with think link included.
         } else {
@@ -250,7 +251,7 @@ export class FieldManager {
                 //set input to the current field in the nodelist
                 let input = totalFieldList[i]
                 //add the dynamic id to the div housing the input.
-                input.parentElement.setAttribute("id", `${this.media}-${this.job}${i}`)
+                input.parentElement.setAttribute("id", `${this.media}-${this.job}-${i}`)
 
                 //create remove link with method and insert it after the input.
                 input.parentNode.insertBefore(this.createRemoveLink(this.job), input.nextSibling)
