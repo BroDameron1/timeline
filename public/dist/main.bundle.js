@@ -10236,26 +10236,37 @@ form.addEventListener('submit', async event => {
     //sets the warningDiv to blank so errors don't pile up
     //this may need to be refactored if there are multiple warnings
     warningDiv.innerHTML = ''
+    document.querySelectorAll('input, select, textarea').forEach((element) => {
+        element.style.border = ''
+    })
     const data = form_serialize_improved__WEBPACK_IMPORTED_MODULE_2___default()(form, { hash: true })
-    console.log(data, 'data')
+    // console.log(data, 'data')
     const { error } = _schemas__WEBPACK_IMPORTED_MODULE_3__.sourceSchema.validate(data, { abortEarly: false })
     // return console.log(errorList)
     if (error) {
         for (let errorDetails of error.details) {
-            console.log(errorDetails, 'test')
-            console.log(errorDetails.message)
-            let invalidField = errorDetails.path
-            if (invalidField.length === 2) {
-                invalidField = invalidField[0] + '[' + invalidField[1] + ']'
-            } else if (invalidField.length === 3) {
-                invalidField = invalidField[0] + '-' + invalidField[1] + invalidField[2]
+            // console.log(errorDetails, 'test')
+            // console.log(errorDetails.message)
+            let invalidFieldName = errorDetails.path
+            if (invalidFieldName.length === 2) {
+                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+            } else if (invalidFieldName.length === 3) {
+                //TODO: Add zero to field names in HTML so if statement can be removed
+                if (invalidFieldName[2] === 0) {
+                    invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+                } else {
+                    invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+                }
             }
-            console.log(invalidField)
-            //console.log(document.querySelector(`#${invalidField}`).children)
+
+            console.log(invalidFieldName, 'test2')
+            
+
+            
             let validationWarning = document.createElement('div')
             validationWarning.textContent = errorDetails.message
             validationWarning.setAttribute('class', 'field-requirements field-invalid')
-            document.querySelector(`[name="${invalidField}"]`).style.border = 'rgb(196, 63, 63) solid 2px'
+            document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
             warningDiv.append(validationWarning)
         }
         return console.log(error.details)
@@ -10616,7 +10627,7 @@ class FieldManager {
             //set new div to have a class of form-field (styling only)
             newDiv.setAttribute('class', 'form-field')
             //set the new div to have a unique id specific to this field
-            newDiv.setAttribute('id', `${this.media}-${this.job}${totalFieldList.length}`)
+            newDiv.setAttribute('id', `${this.media}-${this.job}-${totalFieldList.length}`)
             //place the new div before the add field link
             addFieldLink.parentNode.insertBefore(newDiv, addFieldLink)
 
@@ -10626,6 +10637,9 @@ class FieldManager {
             newInput.type = 'text'
             //set to same class that totalFieldList looks for.  ALso adds autocomplete class to allow that functionality.
             newInput.setAttribute('class', `${this.media}-${this.job} autocomplete`)
+
+            //set id to allow the box to be highlighted for validation errors
+            newInput.setAttribute('id', `${this.media}-${this.job}${totalFieldList.length}`)
 
             //set name to allow it to be passed in the request body.  This name is the same on each input.
             newInput.setAttribute('name', `${this.media}[${this.job}][]`)
@@ -10758,12 +10772,13 @@ const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80)
 const stringRulesNoMax = Joi.string().escapeHTML().pattern(regex).min(3)
 
 const customStringErrors = {
-    'string.pattern.base': '{{#label}} contains an illegal character.',
+    'string.pattern.base': '{{#label}} contains one or more illegal characters.',
     'string.min': '{{#label}} must be at least {{#limit}} characters.',
     'string.max': '{{#label}} must be less than {{#limit}} charaters.',
     'any.required': '{{#label}} is a required field.'
 }
 
+//TODO:  Remove fields not in form and test if this still works
 module.exports.sourceSchema = Joi.object({
     title: stringRulesNoMax
         .required()
@@ -10794,7 +10809,7 @@ module.exports.sourceSchema = Joi.object({
         author: Joi.array()
             .items(
                 stringRulesMax
-                .label('Book Author')
+                .label('Author')
                 .messages(customStringErrors)
             )
             .max(4)
@@ -10815,11 +10830,19 @@ module.exports.sourceSchema = Joi.object({
     }),
     movie: Joi.object({
         director: Joi.array()
-            .items(stringRulesMax)
+            .items(
+                stringRulesMax
+                .label('Director')
+                .messages(customStringErrors)
+            )
             .max(2)
             .unique(),
         writer: Joi.array()
-            .items(stringRulesMax)
+            .items(
+                stringRulesMax
+                .label('Writer')
+                .messages(customStringErrors)
+            )
             .max(4)
             .unique(),
         releaseDate: Joi.date()
@@ -10827,12 +10850,20 @@ module.exports.sourceSchema = Joi.object({
             .iso(),
     }),
     comic: Joi.object({
-        writer: stringRulesMax,
+        writer: stringRulesMax
+            .label('Writer')
+            .messages(customStringErrors),
         artist: Joi.array()
-            .items(stringRulesMax)
+            .items(
+                stringRulesMax
+                .label('Art Contributor')
+                .messages(customStringErrors)
+            )
             .max(4)
             .unique(),
-        series: stringRulesMax,
+        series: stringRulesMax
+            .label('Comic Series')
+            .messages(customStringErrors),
         issueNum: Joi.number()
             .integer()
             .max(101)
@@ -10842,7 +10873,9 @@ module.exports.sourceSchema = Joi.object({
             .iso(),
     }),
     tv: Joi.object({
-        series: stringRulesMax,
+        series: stringRulesMax
+            .label("TV Series")
+            .messages(customStringErrors),
         season: Joi.number()
             .integer()
             .max(20)
@@ -10856,8 +10889,12 @@ module.exports.sourceSchema = Joi.object({
             .iso(),
     }),
     videoGame: Joi.object({
-        studio: stringRulesMax,
-        publisher: stringRulesMax,
+        studio: stringRulesMax
+            .label('Production Studio')
+            .messages(customStringErrors),
+        publisher: stringRulesMax
+            .label('Publisher')
+            .messages(customStringErrors),
         releaseDate: Joi.date()
             .less('now')
             .iso(),
