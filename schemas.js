@@ -52,24 +52,32 @@ module.exports.userSchema = Joi.object({
 //regex string for all text input boxes
 const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.? ]+$/i
 
+const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80)
 
+const stringRulesNoMax = Joi.string().escapeHTML().pattern(regex).min(3)
 
+const customStringErrors = {
+    'string.pattern.base': '{{#label}} contains one or more illegal characters.',
+    'string.min': '{{#label}} must be at least {{#limit}} characters.',
+    'string.max': '{{#label}} must be less than {{#limit}} charaters.',
+    'any.required': '{{#label}} is a required field.'
+}
+
+//TODO:  Remove fields not in form and test if this still works
 module.exports.sourceSchema = Joi.object({
-    title: Joi.string()
+    title: stringRulesNoMax
         .required()
-        .escapeHTML()
-        .pattern(regex)
-        .min(3)
         .max(100)
-        .messages({
-            'string.pattern.base': 'The title contains an illegal character.',
-            'string.min': 'The title must be at least 3 characters.'
-        }),
+        .label('Title')
+        .messages(customStringErrors),
     slug: Joi.string(),
     mediaType: Joi.string()
         .required()
         .valid('Movie', 'TV Show', 'Book', 'Comic', 'Video Game')
-        .escapeHTML(),
+        .escapeHTML()
+        .messages({
+            'any.only': 'Please choose a Media Type.'
+        }),
     state: Joi.string()
         .valid('new', 'update', 'approved', 'published', 'rejected'),
     author: Joi.array()
@@ -78,49 +86,47 @@ module.exports.sourceSchema = Joi.object({
         .unique(),
     lastApprover: Joi.string()
         .escapeHTML(),
-    adminNotes: Joi.string()
-        .escapeHTML()
-        .pattern(regex)
-        .max(500),
+    adminNotes: stringRulesNoMax
+        .max(500)
+        .label('Admin Notes')
+        .messages(customStringErrors),
     book: Joi.object({
         author: Joi.array()
-            .items(Joi.string()
-                .max(80)
-                .escapeHTML()
-                .pattern(regex) 
+            .items(
+                stringRulesMax
+                .label('Author')
+                .messages(customStringErrors)
             )
             .max(4)
             .unique(),
-        publisher: Joi.string()
-            .escapeHTML()
-            .pattern(regex)
-            .max(80),
-        series: Joi.string()
-            .escapeHTML()
-            .pattern(regex)
-            .max(80),
+        publisher: stringRulesMax
+            .label('Publisher')
+            .messages(customStringErrors),
+        series: stringRulesMax
+            .label('Book Series')
+            .messages(customStringErrors),
         releaseDate: Joi.date()
             .less('now')
             .iso(),
-        isbn10: Joi.string()
-            .escapeHTML()
-            .pattern(regex)
+        isbn10: stringRulesNoMax
             .max(50)
+            .label('ISBN')
+            .messages(customStringErrors)
     }),
     movie: Joi.object({
         director: Joi.array()
-            .items(Joi.string()
-                .max(80)
-                .escapeHTML()
-                .pattern(regex)
+            .items(
+                stringRulesMax
+                .label('Director')
+                .messages(customStringErrors)
             )
             .max(2)
             .unique(),
         writer: Joi.array()
-            .items(Joi.string()
-                .max(80)
-                .escapeHTML()
-                .pattern(regex)
+            .items(
+                stringRulesMax
+                .label('Writer')
+                .messages(customStringErrors)
             )
             .max(4)
             .unique(),
@@ -129,22 +135,20 @@ module.exports.sourceSchema = Joi.object({
             .iso(),
     }),
     comic: Joi.object({
-        writer: Joi.string()
-            .escapeHTML()
-            .pattern(regex)
-            .max(80),
+        writer: stringRulesMax
+            .label('Writer')
+            .messages(customStringErrors),
         artist: Joi.array()
-            .items(Joi.string()
-                .max(80)
-                .escapeHTML()
-                .pattern(regex)
+            .items(
+                stringRulesMax
+                .label('Art Contributor')
+                .messages(customStringErrors)
             )
             .max(4)
             .unique(),
-        series: Joi.string()
-            .escapeHTML()
-            .pattern(regex)
-            .max(80),
+        series: stringRulesMax
+            .label('Comic Series')
+            .messages(customStringErrors),
         issueNum: Joi.number()
             .integer()
             .max(101)
@@ -154,10 +158,9 @@ module.exports.sourceSchema = Joi.object({
             .iso(),
     }),
     tv: Joi.object({
-        series: Joi.string()
-            .escapeHTML()
-            .pattern(regex)
-            .max(80),
+        series: stringRulesMax
+            .label("TV Series")
+            .messages(customStringErrors),
         season: Joi.number()
             .integer()
             .max(20)
@@ -171,14 +174,12 @@ module.exports.sourceSchema = Joi.object({
             .iso(),
     }),
     videoGame: Joi.object({
-        studio: Joi.string()
-            .escapeHTML()
-            .pattern(regex)
-            .max(80),
-        publisher: Joi.string()
-            .escapeHTML()
-            .pattern(regex)
-            .max(80),
+        studio: stringRulesMax
+            .label('Production Studio')
+            .messages(customStringErrors),
+        publisher: stringRulesMax
+            .label('Publisher')
+            .messages(customStringErrors),
         releaseDate: Joi.date()
             .less('now')
             .iso(),

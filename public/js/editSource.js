@@ -209,30 +209,45 @@ if (existingSource) {
 form.addEventListener('submit', async event => {
     event.preventDefault()
 
-
+    //sets the warningDiv to blank so errors don't pile up
+    //this may need to be refactored if there are multiple warnings
+    warningDiv.innerHTML = ''
     const data = serialize(form, { hash: true })
+    console.log(data, 'data')
     const { error } = sourceSchema.validate(data, { abortEarly: false })
     // return console.log(errorList)
     if (error) {
         for (let errorDetails of error.details) {
             console.log(errorDetails, 'test')
             console.log(errorDetails.message)
-            warningDiv.append(errorDetails.message)
+            let invalidField = errorDetails.path
+            if (invalidField.length === 2) {
+                invalidField = invalidField[0] + '[' + invalidField[1] + ']'
+            } else if (invalidField.length === 3) {
+                invalidField = invalidField[0] + '-' + invalidField[1] + invalidField[2]
+            }
+            console.log(invalidField)
+            //console.log(document.querySelector(`#${invalidField}`).children)
+            let validationWarning = document.createElement('div')
+            validationWarning.textContent = errorDetails.message
+            validationWarning.setAttribute('class', 'field-requirements field-invalid')
+            document.querySelector(`[name="${invalidField}"]`).style.border = 'rgb(196, 63, 63) solid 2px'
+            warningDiv.append(validationWarning)
         }
         return console.log(error.details)
     }
 
 
-    //sets the warningDiv to blank so errors don't pile up
-    //this may need to be refactored if there are multiple warnings
-    warningDiv.innerHTML = ''
+
+    
     event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
     //checks if mediaType is default and displays a warning if so
-    if (mediaType.value === 'default') {
-        event.submitter.disabled = false
-        return warningDiv.textContent = 'Please select a media type.'
-    }
+    //replaced with Joi validation
+    // if (mediaType.value === 'default') {
+    //     event.submitter.disabled = false
+    //     return warningDiv.textContent = 'Please select a media type.'
+    // }
 
     const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, duplicateCheckType)
     const duplicateResult = await submittedRecord.validateDuplicates()
