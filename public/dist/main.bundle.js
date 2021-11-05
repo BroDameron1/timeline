@@ -10130,10 +10130,7 @@ if (existingSource) {
     window.addEventListener('load', async event => {
         const state = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.StateManager(true, sourceId, sourceLocation)
         await state.updateState()
-        // if (stateResult !== 200) {
-        //     location.href="/dashboard"
-        //     console.log('Something went wrong, please contact an admin.', state)
-        // }
+
         
         ;(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.userActivityThrottler)()
 

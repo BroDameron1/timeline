@@ -1,8 +1,8 @@
 import { userActivityThrottler, Duplicate, StateManager, FieldManager, dialogHelper } from "./utils.js"
 import autocomplete from 'autocompleter';
-// import { NSerializeJson } from 'nserializejson'
 import serialize from 'form-serialize-improved'
 import { sourceSchema } from '../../schemas'
+//TODO: fix the TLDS problem
 //import tlds from '/node_modules/@sideway/address/lib/tlds.js'
 
 
@@ -106,10 +106,7 @@ if (existingSource) {
     window.addEventListener('load', async event => {
         const state = new StateManager(true, sourceId, sourceLocation)
         await state.updateState()
-        // if (stateResult !== 200) {
-        //     location.href="/dashboard"
-        //     console.log('Something went wrong, please contact an admin.', state)
-        // }
+
         
         userActivityThrottler()
 
