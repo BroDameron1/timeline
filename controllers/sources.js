@@ -293,7 +293,6 @@ module.exports.putData = async (req, res) => {
     if (typeof req.body === 'string') {
         req.body = JSON.parse(req.body)
     }
-    console.log(req.body, 'two')
     const { sourceId, collection } = req.body
     const dataToUpdate = await mongoose.model(collection).findById(sourceId)
     dataToUpdate.set({ ...req.body })

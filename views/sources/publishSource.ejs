@@ -14,10 +14,10 @@
     <div class="form">
         <h1>Review Submission</h1>
         <% if (currentUser.role === 'admin' && !data.author[0].equals(currentUser._id) && data.state === 'new') {%>
-            <form action="/sources/review/<%= data._id %>" method="POST" id="publishSource" class="sourceForm" enctype="multipart/form-data">
+            <form action="/sources/review/<%= data._id %>" method="POST" id="publishSource" class="sourceForm" data-formtype="publishSubmission" enctype="multipart/form-data">
         <% } %> 
         <% if (currentUser.role === 'admin' && !data.author[0].equals(currentUser._id) && data.state === 'update') {%>
-            <form action="/sources/review/<%= data._id %>?_method=PUT" method="POST" id="publishSource" class="sourceForm" enctype="multipart/form-data">
+            <form action="/sources/review/<%= data._id %>?_method=PUT" method="POST" id="publishSource" class="sourceForm" data-formtype="publishSubmission" enctype="multipart/form-data">
         <% } %> 
  
 
@@ -25,7 +25,7 @@
         
         <div class="form-field">
             <label for="adminNotes">Admin Comments</label>
-            <textarea id="adminNotes" name="adminNotes" rows="5" maxlength="500" required></textarea>
+            <textarea class="admin-notes" id="adminNotes" name="adminNotes" rows="5" maxlength="500"></textarea>
         </div>
         <div class="form-field">
             <button class="btn-blue">Publish</button>
@@ -38,8 +38,6 @@
     </div>
     
 </main>
-
-
 
 <script>
     const sourceId = '<%- data._id %>'

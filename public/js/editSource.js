@@ -1,7 +1,11 @@
-import { userActivityThrottler, Duplicate, StateManager, FieldManager, dialogHelper } from "./utils.js"
+import { userActivityThrottler, Duplicate, StateManager, FieldManager } from "./utils.js"
 import autocomplete from 'autocompleter';
-import serialize from 'form-serialize-improved'
-import { sourceSchema } from '../../schemas'
+import { formValidation } from './submissionFormValidation.js'
+import { adminNoteCheck, rejectPublish } from "./rejectPublish.js"
+import { clearWarning } from './warning'
+import { suppressLeavePrompt, leavePrompt } from './leavePrompt'
+import { gatherFormInfo } from './formIdentifier'
+import { maxDateSelector } from "./calendarSet.js";
 //TODO: fix the TLDS problem
 //import tlds from '/node_modules/@sideway/address/lib/tlds.js'
 
@@ -9,102 +13,28 @@ import { sourceSchema } from '../../schemas'
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
-const warningDiv = document.querySelector('#warning')
 const bookFields = document.querySelector('#book-fields')
 const movieFields = document.querySelector('#movie-fields')
 const tvFields = document.querySelector('#tv-fields')
 const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
 
-//used in later if statements to determine if the file is for a new record or an existing record
-let existingSource = true
-//sets the form to the current form of the page by checking the class and id
-let form = document.querySelector(`#${document.querySelector('.sourceForm').id}`)
-//sets the method that should be called in the backend duplicate check
-let duplicateCheckType
-let unloadCheck = false //flag to determine if the beforeunload event fires on submit
-let sourceLocation //variable to set if we need to change the status of a public or review record
-
-//updates the DB for a rejected record so that it doesn't publish.
-const publishReject = () => {
-    document.querySelector('.reject-record').addEventListener('click', async event => {
-        try {
-            const adminNotes = document.querySelector('#adminNotes').value
-            if (!adminNotes) { //validates that admin notes have been entered.
-                warningDiv.textContent = ''
-                return warningDiv.textContent = 'Please leave a comment.'
-            }
-            const response = await fetch('/sources/data', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    sourceId,
-                    adminNotes,
-                    state: 'rejected',
-                    collection: 'ReviewSource'
-                })
-            })
-            unloadCheck = true  //sets unload check to true so unload function doesn't run
-            location.href = "/dashboard"
-            return response
-        } catch (err) {
-            console.log('Something went wrong.', err)
-        }
-    })
-}
-
-//this statement determines which type path the js file is being loaded into to update the above variables
-//sets variables for creating a new record
-if(form.id === 'newSource') {
-    existingSource = false
-    duplicateCheckType = 'submitNew'
-//sets variables for a user updating one of their pending updates
-} else if (form.id === 'updateReviewSource') {
-    duplicateCheckType = 'updateReview'
-    sourceLocation = 'ReviewSource'
-//sets variables for an admin publishing a record to public
-} else if (form.id === 'publishSource') {
-    duplicateCheckType = 'publishRecord'
-    sourceLocation = 'ReviewSource'
-    publishReject()
-//sets variables for any user submitting an update to a public record
-} else if (form.id === 'updatePublicSource') {
-    duplicateCheckType = 'editPublic'
-    sourceLocation = 'PublicSource'
-}
 
 
 
+//gets all the properties and data from the form to be used for various other functions
+const formProperties = gatherFormInfo()
 
+//turns on a prompt that pops up when the window closes.  Can be disabled with suppressLeavePrompt function where necessary
+leavePrompt()
 
 //determines the current day and sets the release date calendar to have a max date of today. Also properly formats the date.
-window.addEventListener('load', event => {
-    let today = new Date();
-    let dd = today.getDate();
-    let mm = today.getMonth() + 1; //January is 0!
-    const yyyy = today.getFullYear();
+maxDateSelector()
 
-    if (dd < 10) {
-        dd = '0' + dd;
-    }
-
-    if (mm < 10) {
-        mm = '0' + mm;
-    } 
-        
-    today = yyyy + '-' + mm + '-' + dd;
-    const dateFields = document.querySelectorAll('.date')
-    dateFields.forEach(date => {
-        date.setAttribute("max", today)
-    })
-})
-
-//sets the record to checked out and then starts an idle timer that kicks out the user if the don't perform any action after the specified time (in the utils file)
-if (existingSource) {
+if (formProperties.existingSource) {
+    
     window.addEventListener('load', async event => {
-        const state = new StateManager(true, sourceId, sourceLocation)
+        const state = new StateManager(true, sourceId, formProperties.lockLocation)
         await state.updateState()
 
         
@@ -112,22 +42,12 @@ if (existingSource) {
 
     })
 
-
-    //sets the record checkedOut flag to false if the page is left (ignored if the form is submitted due to the unloadCheck)
-    //TODO: Creates a pop up confirming if a user wants to leave the page, but this interferes with the idle timer above.
     window.addEventListener('beforeunload', async event => {
         event.preventDefault()  
-        if (!unloadCheck) {
-            dialogHelper(event) //TODO: Add a conditional to the function to only run under certain circumstances.
-            //event.returnValue = 'test' //creates a popup dialog if the user tries to leave the page.  interferes with the inactivity timer.
-            const state = new StateManager(false, sourceId, sourceLocation)
-            await state.updateState()
-            // if (stateResult !== 200) {
-            //     return console.log('Something went wrong, please contact an admin.', state)
-            // }
-        } else {
-            return
-        }
+        
+        const state = new StateManager(false, sourceId, formProperties.lockLocation)
+        await state.updateState()
+
     })
 
     //determines which parts of the form to load based on the mediaType
@@ -203,62 +123,70 @@ if (existingSource) {
     })
 }
 
-form.addEventListener('submit', async event => {
+formProperties.formData.addEventListener('submit', async event => {
     event.preventDefault()
 
-    //sets the warningDiv to blank so errors don't pile up
-    //this may need to be refactored if there are multiple warnings
-    warningDiv.innerHTML = ''
-    
-    //clears all red borders around all input types
-    document.querySelectorAll('input, select, textarea').forEach((element) => {
-        element.style.border = ''
-    })
-
-    const data = serialize(form, { hash: true })
-    console.log(data, 'test1')
-    const { error } = sourceSchema.validate(data, { abortEarly: false })
-    if (error) {
-        for (let errorDetails of error.details) {
-            let invalidFieldName = errorDetails.path
-            if (invalidFieldName.length === 2) {
-                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-            } else if (invalidFieldName.length === 3) {
-                //TODO: Add zero to field names in HTML so if statement can be removed
-
-                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-
-
-                // if (invalidFieldName[2] === 0) {
-                //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-                // } else {
-                //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-                // }
-            }
-            
-            console.log(invalidFieldName, 'invalid field')
-            let validationWarning = document.createElement('div')
-            validationWarning.textContent = errorDetails.message
-            validationWarning.setAttribute('class', 'field-requirements field-invalid')
-            document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
-            warningDiv.append(validationWarning)
-        }
-        return
-    }
-
-    
     event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
 
-    const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, duplicateCheckType)
+    //sets the warningDiv to blank so errors don't pile up
+    //this may need to be refactored if there are multiple warnings
+    // warningDiv.innerHTML = ''
+    
+    //clears all red borders around all input types
+    // document.querySelectorAll('input, select, textarea').forEach((element) => {
+    //     element.style.border = ''
+    // })
+
+
+
+
+    // const data = serialize(form, { hash: true })
+    // console.log(data, 'test1')
+    // const { error } = sourceSchema.validate(data, { abortEarly: false })
+    // if (error) {
+    //     for (let errorDetails of error.details) {
+    //         let invalidFieldName = errorDetails.path
+    //         if (invalidFieldName.length === 2) {
+    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+    //         } else if (invalidFieldName.length === 3) {
+    //             //TODO: Add zero to field names in HTML so if statement can be removed
+
+    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+
+
+    //             // if (invalidFieldName[2] === 0) {
+    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+    //             // } else {
+    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+    //             // }
+    //         }
+            
+    //         console.log(invalidFieldName, 'invalid field')
+    //         let validationWarning = document.createElement('div')
+    //         validationWarning.textContent = errorDetails.message
+    //         validationWarning.setAttribute('class', 'field-requirements field-invalid')
+    //         document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
+    //         warningDiv.append(validationWarning)
+    //     }
+    //     return
+    // }
+
+    clearWarning()  //clears any previous warnings
+
+    // validates all entries on the form to match Joi schema on the backend and generates error messages.  Saves true/false to variable on whether there was an error or not.
+    const adminNote = adminNoteCheck()
+    const formFail = formValidation(formProperties.formData, formProperties.schema)
+
+    const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
-    if (!duplicateResult) {
+
+    if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.
-        unloadCheck = true
-        return form.submit()
+        suppressLeavePrompt()
+        return formProperties.formData.submit()
     }
-    event.submitter.disabled = false //re-enables the submit functionality in the even that a duplicate result was found.
-    warningDiv.append(duplicateResult)
+    event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
 })
 
 

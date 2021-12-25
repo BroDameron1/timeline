@@ -11,7 +11,7 @@
 <main>
     <div class="form">
         <h1>Submit Update</h1>
-        <form action="/sources/<%= data.slug %>/edit" method="POST" id="updatePublicSource" class="sourceForm" enctype="multipart/form-data">
+        <form action="/sources/<%= data.slug %>/edit" method="POST" id="updatePublicSource" class="sourceForm" data-formtype="updatePublicSubmission" enctype="multipart/form-data">
 
 
         <%- include('../partials/sourceforms.ejs') %>
