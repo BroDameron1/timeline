@@ -10108,6 +10108,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "gatherFormInfo": () => (/* binding */ gatherFormInfo)
 /* harmony export */ });
 /* harmony import */ var _rejectPublish__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./rejectPublish */ "./public/js/rejectPublish.js");
+/* harmony import */ var _schemas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../schemas */ "./schemas.js");
+
 
 
 
@@ -10116,7 +10118,7 @@ const populateFormInfo = (formProperties) => {
     
     switch (formProperties.formClass) {
         case 'sourceForm':
-            formProperties.schema = 'sourceSchema'
+            formProperties.schema = _schemas__WEBPACK_IMPORTED_MODULE_1__.sourceSchema
             switch (formProperties.formId) {
                 case 'newSource':
                     formProperties.existingSource = false
@@ -10129,7 +10131,7 @@ const populateFormInfo = (formProperties) => {
                 case 'publishSource':
                     formProperties.duplicateCheck = 'publishRecord'
                     formProperties.lockLocation = 'ReviewSource'
-                    ;(0,_rejectPublish__WEBPACK_IMPORTED_MODULE_0__.rejectPublish)(formProperties.lockLocation, formProperties.formId)
+                    ;(0,_rejectPublish__WEBPACK_IMPORTED_MODULE_0__.rejectPublish)(formProperties)
                 break;
                 case 'updatePublicSource':
                     formProperties.duplicateCheck = 'editPublic'
@@ -10311,16 +10313,13 @@ const adminNoteCheck = () => {
     return false
 }
 
-const rejectPublish = (reviewCollection, formId) => {
+const rejectPublish = (formProperties) => {
     document.querySelector('.reject-record').addEventListener('click', async event => {
         try {
             ;(0,_warning_js__WEBPACK_IMPORTED_MODULE_0__.clearWarning)()
-            const formData = document.querySelector(`#${formId}`)
-            const formFail = (0,_submissionFormValidation__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formData, 'sourceSchema')
-
+            const formFail = (0,_submissionFormValidation__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
 
             if (!formFail && !adminNoteCheck()) {
-                const adminNotes = document.querySelector('#adminNotes').value
                 const response = await fetch('/sources/data', {
                     method: 'PUT',
                     headers: {
@@ -10328,12 +10327,11 @@ const rejectPublish = (reviewCollection, formId) => {
                     },
                     body: JSON.stringify({
                         sourceId,
-                        adminNotes,
+                        adminNotes: formProperties.formData.adminNotes.value,
                         state: 'rejected',
-                        collection: reviewCollection
+                        collection: formProperties.lockLocation
                     })
                 })
-                console.log(response)
                 ;(0,_leavePrompt__WEBPACK_IMPORTED_MODULE_2__.suppressLeavePrompt)()
                 location.href = "/dashboard"
                 return response
@@ -10369,9 +10367,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
 const formValidation = (formData, schema) => {
+
     const serializedData = form_serialize_improved__WEBPACK_IMPORTED_MODULE_0___default()(formData, {hash: true })
-    const { error } = _schemas__WEBPACK_IMPORTED_MODULE_1__.sourceSchema.validate(serializedData, { abortEarly: false })
+    const { error } = schema.validate(serializedData, { abortEarly: false })
+    //const { error } = sourceSchema.validate(serializedData, { abortEarly: false })
     if (error) {
         for (let errorDetails of error.details) {
             let invalidFieldName = errorDetails.path
@@ -10425,7 +10427,6 @@ class Duplicate {
             mediaType: this.mediaType,
             sourceId: this.sourceId,
             type: this.type
-            //collection
         }))
         return response.json()
     }
@@ -11145,19 +11146,16 @@ var __webpack_exports__ = {};
   !*** ./public/js/editSource.js ***!
   \*********************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "autocompleteListener": () => (/* binding */ autocompleteListener)
-/* harmony export */ });
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.js */ "./public/js/utils.js");
-/* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! autocompleter */ "./node_modules/autocompleter/autocomplete.js");
-/* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(autocompleter__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./submissionFormValidation.js */ "./public/js/submissionFormValidation.js");
-/* harmony import */ var _rejectPublish_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./rejectPublish.js */ "./public/js/rejectPublish.js");
-/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
-/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
-/* harmony import */ var _formIdentifier__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./formIdentifier */ "./public/js/formIdentifier.js");
-/* harmony import */ var _calendarSet_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./calendarSet.js */ "./public/js/calendarSet.js");
-/* harmony import */ var _imageTools_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./imageTools.js */ "./public/js/imageTools.js");
+/* harmony import */ var _submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./submissionFormValidation.js */ "./public/js/submissionFormValidation.js");
+/* harmony import */ var _rejectPublish_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./rejectPublish.js */ "./public/js/rejectPublish.js");
+/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
+/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
+/* harmony import */ var _formIdentifier__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./formIdentifier */ "./public/js/formIdentifier.js");
+/* harmony import */ var _calendarSet_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./calendarSet.js */ "./public/js/calendarSet.js");
+/* harmony import */ var _imageTools_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./imageTools.js */ "./public/js/imageTools.js");
+/* harmony import */ var _autocomplete_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./autocomplete.js */ "./public/js/autocomplete.js");
+
 
 
 
@@ -11184,16 +11182,19 @@ const comicFields = document.querySelector('#comic-fields')
 
 
 //gets all the properties and data from the form to be used for various other functions
-const formProperties = (0,_formIdentifier__WEBPACK_IMPORTED_MODULE_6__.gatherFormInfo)()
+const formProperties = (0,_formIdentifier__WEBPACK_IMPORTED_MODULE_5__.gatherFormInfo)()
 
 //turns on a prompt that pops up when the window closes.  Can be disabled with suppressLeavePrompt function where necessary
-;(0,_leavePrompt__WEBPACK_IMPORTED_MODULE_5__.leavePrompt)()
+;(0,_leavePrompt__WEBPACK_IMPORTED_MODULE_4__.leavePrompt)()
 
 //determines the current day and sets the release date calendar to have a max date of today. Also properly formats the date.
-;(0,_calendarSet_js__WEBPACK_IMPORTED_MODULE_7__.maxDateSelector)()
+;(0,_calendarSet_js__WEBPACK_IMPORTED_MODULE_6__.maxDateSelector)()
 
 //creates an image preview whenever the image is changed
-;(0,_imageTools_js__WEBPACK_IMPORTED_MODULE_8__.imagePreview)()
+;(0,_imageTools_js__WEBPACK_IMPORTED_MODULE_7__.imagePreview)()
+
+//turns on autocomplete functionality for any associated fields with the autocomplete class
+;(0,_autocomplete_js__WEBPACK_IMPORTED_MODULE_8__.autocompleteListener)()
 
 if (formProperties.existingSource) {
     
@@ -11279,9 +11280,6 @@ if (formProperties.existingSource) {
         } else {
             gameFields.classList.add('hide-sources')
         }
-
-        // let selects = document.getElementsByTagName('select');
-        // console.log(selects.length)
     })
 }
 
@@ -11291,61 +11289,18 @@ formProperties.formData.addEventListener('submit', async event => {
     event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
 
-    //sets the warningDiv to blank so errors don't pile up
-    //this may need to be refactored if there are multiple warnings
-    // warningDiv.innerHTML = ''
-    
-    //clears all red borders around all input types
-    // document.querySelectorAll('input, select, textarea').forEach((element) => {
-    //     element.style.border = ''
-    // })
-
-
-
-
-    // const data = serialize(form, { hash: true })
-    // console.log(data, 'test1')
-    // const { error } = sourceSchema.validate(data, { abortEarly: false })
-    // if (error) {
-    //     for (let errorDetails of error.details) {
-    //         let invalidFieldName = errorDetails.path
-    //         if (invalidFieldName.length === 2) {
-    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-    //         } else if (invalidFieldName.length === 3) {
-    //             //TODO: Add zero to field names in HTML so if statement can be removed
-
-    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-
-
-    //             // if (invalidFieldName[2] === 0) {
-    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-    //             // } else {
-    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-    //             // }
-    //         }
-            
-    //         console.log(invalidFieldName, 'invalid field')
-    //         let validationWarning = document.createElement('div')
-    //         validationWarning.textContent = errorDetails.message
-    //         validationWarning.setAttribute('class', 'field-requirements field-invalid')
-    //         document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
-    //         warningDiv.append(validationWarning)
-    //     }
-    //     return
-    // }
-
-    ;(0,_warning__WEBPACK_IMPORTED_MODULE_4__.clearWarning)()  //clears any previous warnings
+    ;(0,_warning__WEBPACK_IMPORTED_MODULE_3__.clearWarning)()  //clears any previous warnings
 
     // validates all entries on the form to match Joi schema on the backend and generates error messages.  Saves true/false to variable on whether there was an error or not.
-    const adminNote = (0,_rejectPublish_js__WEBPACK_IMPORTED_MODULE_3__.adminNoteCheck)()
-    const formFail = (0,_submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_2__.formValidation)(formProperties.formData, formProperties.schema)
+    const adminNote = (0,_rejectPublish_js__WEBPACK_IMPORTED_MODULE_2__.adminNoteCheck)()
+    const formFail = (0,_submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
 
     const submittedRecord = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.
-        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_5__.suppressLeavePrompt)()
+        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_4__.suppressLeavePrompt)()
         return formProperties.formData.submit()
     }
     event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
@@ -11422,44 +11377,6 @@ bookFields.addEventListener('click', event => {
 })
 
 
-//autocomplete bundle test
-
-const autocompleteListener = () => {
-    const autocompleteFields = document.querySelectorAll('.autocomplete')
-    autocompleteFields.forEach((autocompleteField) => {
-        autocompleteField.addEventListener('focus', event => {
-            autocompleter__WEBPACK_IMPORTED_MODULE_1___default()({
-                input: autocompleteField,
-                emtpyMsg: 'No Results',
-                debounceWaitMs: 200,
-                preventSubmit: true,
-                disableAutoSelect: true,
-                fetch: async function(text, update) {
-                    let field = autocompleteField.name
-                    field = field.replace('[]', '')
-                    field = field.replace('[', '.')
-                    field = field.replace(']', '')
-            
-                    const response = await fetch('/sources/data?' + new URLSearchParams({
-                        field,
-                        fieldValue: autocompleteField.value
-                    }))
-                    const autofillOptions = await response.json()
-                    console.log(autofillOptions)
-                    let suggestions = autofillOptions.map(option => {
-                        return { 'label': option, 'value:': option}
-                    })
-                    update(suggestions)
-                },
-                onSelect: function(item) {
-                    autocompleteField.value = item.label
-                } 
-            })
-        })
-    })
-}
-
-autocompleteListener()
 
 
 })();

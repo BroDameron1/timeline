@@ -2,7 +2,7 @@
 //requires DB collection where the submitted record resides
 
 import { clearWarning, generateWarning } from "./warning.js"
-import { formValidation } from './submissionFormValidation'
+import { formValidation } from './formValidation'
 import { suppressLeavePrompt } from './leavePrompt'
 
 export const adminNoteCheck = () => {
@@ -18,16 +18,13 @@ export const adminNoteCheck = () => {
     return false
 }
 
-export const rejectPublish = (reviewCollection, formId) => {
+export const rejectPublish = (formProperties) => {
     document.querySelector('.reject-record').addEventListener('click', async event => {
         try {
             clearWarning()
-            const formData = document.querySelector(`#${formId}`)
-            const formFail = formValidation(formData, 'sourceSchema')
-
+            const formFail = formValidation(formProperties.formData, formProperties.schema)
 
             if (!formFail && !adminNoteCheck()) {
-                const adminNotes = document.querySelector('#adminNotes').value
                 const response = await fetch('/sources/data', {
                     method: 'PUT',
                     headers: {
@@ -35,12 +32,11 @@ export const rejectPublish = (reviewCollection, formId) => {
                     },
                     body: JSON.stringify({
                         sourceId,
-                        adminNotes,
+                        adminNotes: formProperties.formData.adminNotes.value,
                         state: 'rejected',
-                        collection: reviewCollection
+                        collection: formProperties.lockLocation
                     })
                 })
-                console.log(response)
                 suppressLeavePrompt()
                 location.href = "/dashboard"
                 return response

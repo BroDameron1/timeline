@@ -1,12 +1,13 @@
 import { userActivityThrottler, Duplicate, StateManager, FieldManager } from "./utils.js"
 
-import { formValidation } from './submissionFormValidation.js'
+import { formValidation } from './formValidation.js'
 import { adminNoteCheck } from "./rejectPublish.js"
 import { clearWarning } from './warning'
 import { suppressLeavePrompt, leavePrompt } from './leavePrompt'
 import { gatherFormInfo } from './formIdentifier'
 import { maxDateSelector } from "./calendarSet.js";
 import { imagePreview } from "./imageTools.js";
+import { autocompleteListener } from "./autocomplete.js"
 //TODO: fix the TLDS problem
 //import tlds from '/node_modules/@sideway/address/lib/tlds.js'
 
@@ -122,9 +123,6 @@ if (formProperties.existingSource) {
         } else {
             gameFields.classList.add('hide-sources')
         }
-
-        // let selects = document.getElementsByTagName('select');
-        // console.log(selects.length)
     })
 }
 
@@ -133,49 +131,6 @@ formProperties.formData.addEventListener('submit', async event => {
 
     event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
-
-    //sets the warningDiv to blank so errors don't pile up
-    //this may need to be refactored if there are multiple warnings
-    // warningDiv.innerHTML = ''
-    
-    //clears all red borders around all input types
-    // document.querySelectorAll('input, select, textarea').forEach((element) => {
-    //     element.style.border = ''
-    // })
-
-
-
-
-    // const data = serialize(form, { hash: true })
-    // console.log(data, 'test1')
-    // const { error } = sourceSchema.validate(data, { abortEarly: false })
-    // if (error) {
-    //     for (let errorDetails of error.details) {
-    //         let invalidFieldName = errorDetails.path
-    //         if (invalidFieldName.length === 2) {
-    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-    //         } else if (invalidFieldName.length === 3) {
-    //             //TODO: Add zero to field names in HTML so if statement can be removed
-
-    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-
-
-    //             // if (invalidFieldName[2] === 0) {
-    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-    //             // } else {
-    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-    //             // }
-    //         }
-            
-    //         console.log(invalidFieldName, 'invalid field')
-    //         let validationWarning = document.createElement('div')
-    //         validationWarning.textContent = errorDetails.message
-    //         validationWarning.setAttribute('class', 'field-requirements field-invalid')
-    //         document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
-    //         warningDiv.append(validationWarning)
-    //     }
-    //     return
-    // }
 
     clearWarning()  //clears any previous warnings
 
@@ -263,44 +218,6 @@ bookFields.addEventListener('click', event => {
         fieldUpdate.deleteField(event.target.parentElement)
     }
 })
-
-
-//autocomplete bundle test
-
-// export const autocompleteListener = () => {
-//     const autocompleteFields = document.querySelectorAll('.autocomplete')
-//     autocompleteFields.forEach((autocompleteField) => {
-//         autocompleteField.addEventListener('focus', event => {
-//             autocomplete({
-//                 input: autocompleteField,
-//                 emtpyMsg: 'No Results',
-//                 debounceWaitMs: 200,
-//                 preventSubmit: true,
-//                 disableAutoSelect: true,
-//                 fetch: async function(text, update) {
-//                     let field = autocompleteField.name
-//                     field = field.replace('[]', '')
-//                     field = field.replace('[', '.')
-//                     field = field.replace(']', '')
-            
-//                     const response = await fetch('/sources/data?' + new URLSearchParams({
-//                         field,
-//                         fieldValue: autocompleteField.value
-//                     }))
-//                     const autofillOptions = await response.json()
-//                     console.log(autofillOptions)
-//                     let suggestions = autofillOptions.map(option => {
-//                         return { 'label': option, 'value:': option}
-//                     })
-//                     update(suggestions)
-//                 },
-//                 onSelect: function(item) {
-//                     autocompleteField.value = item.label
-//                 } 
-//             })
-//         })
-//     })
-// }
 
 
 

@@ -1,4 +1,5 @@
 import { rejectPublish } from "./rejectPublish";
+import { sourceSchema } from '../../schemas'
 
 
 
@@ -6,7 +7,7 @@ const populateFormInfo = (formProperties) => {
     
     switch (formProperties.formClass) {
         case 'sourceForm':
-            formProperties.schema = 'sourceSchema'
+            formProperties.schema = sourceSchema
             switch (formProperties.formId) {
                 case 'newSource':
                     formProperties.existingSource = false
@@ -19,7 +20,7 @@ const populateFormInfo = (formProperties) => {
                 case 'publishSource':
                     formProperties.duplicateCheck = 'publishRecord'
                     formProperties.lockLocation = 'ReviewSource'
-                    rejectPublish(formProperties.lockLocation, formProperties.formId)
+                    rejectPublish(formProperties)
                 break;
                 case 'updatePublicSource':
                     formProperties.duplicateCheck = 'editPublic'

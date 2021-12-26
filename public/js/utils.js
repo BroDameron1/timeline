@@ -16,7 +16,6 @@ export class Duplicate {
             mediaType: this.mediaType,
             sourceId: this.sourceId,
             type: this.type
-            //collection
         }))
         return response.json()
     }
