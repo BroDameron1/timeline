@@ -1,4 +1,4 @@
-import { autocompleteListener } from "./editSource.js"
+import { autocompleteListener } from "./autocomplete"
 import { generateWarning } from './warning'
 import { suppressLeavePrompt } from './leavePrompt'
 

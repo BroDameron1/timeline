@@ -10005,6 +10005,61 @@ module.exports = string => {
 
 /***/ }),
 
+/***/ "./public/js/autocomplete.js":
+/*!***********************************!*\
+  !*** ./public/js/autocomplete.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "autocompleteListener": () => (/* binding */ autocompleteListener)
+/* harmony export */ });
+/* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! autocompleter */ "./node_modules/autocompleter/autocomplete.js");
+/* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(autocompleter__WEBPACK_IMPORTED_MODULE_0__);
+
+
+
+//creates autocomplete functionality for any field that contains the autocomplete class.
+
+const autocompleteListener = () => {
+    const autocompleteFields = document.querySelectorAll('.autocomplete')
+    autocompleteFields.forEach((autocompleteField) => {
+        autocompleteField.addEventListener('focus', event => {
+            autocompleter__WEBPACK_IMPORTED_MODULE_0___default()({
+                input: autocompleteField,
+                emtpyMsg: 'No Results',
+                debounceWaitMs: 200,
+                preventSubmit: true,
+                disableAutoSelect: true,
+                fetch: async function(text, update) {
+                    let field = autocompleteField.name
+                    field = field.replace('[]', '')
+                    field = field.replace('[', '.')
+                    field = field.replace(']', '')
+            
+                    const response = await fetch('/sources/data?' + new URLSearchParams({
+                        field,
+                        fieldValue: autocompleteField.value
+                    }))
+                    const autofillOptions = await response.json()
+                    console.log(autofillOptions)
+                    let suggestions = autofillOptions.map(option => {
+                        return { 'label': option, 'value:': option}
+                    })
+                    update(suggestions)
+                },
+                onSelect: function(item) {
+                    autocompleteField.value = item.label
+                } 
+            })
+        })
+    })
+}
+
+/***/ }),
+
 /***/ "./public/js/calendarSet.js":
 /*!**********************************!*\
   !*** ./public/js/calendarSet.js ***!
@@ -10038,346 +10093,6 @@ const maxDateSelector = () => {
         date.setAttribute("max", today)
     })
 }
-
-/***/ }),
-
-/***/ "./public/js/editSource.js":
-/*!*********************************!*\
-  !*** ./public/js/editSource.js ***!
-  \*********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "autocompleteListener": () => (/* binding */ autocompleteListener)
-/* harmony export */ });
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.js */ "./public/js/utils.js");
-/* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! autocompleter */ "./node_modules/autocompleter/autocomplete.js");
-/* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(autocompleter__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./submissionFormValidation.js */ "./public/js/submissionFormValidation.js");
-/* harmony import */ var _rejectPublish_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./rejectPublish.js */ "./public/js/rejectPublish.js");
-/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
-/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
-/* harmony import */ var _formIdentifier__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./formIdentifier */ "./public/js/formIdentifier.js");
-/* harmony import */ var _calendarSet_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./calendarSet.js */ "./public/js/calendarSet.js");
-
-
-
-
-
-
-
-
-//TODO: fix the TLDS problem
-//import tlds from '/node_modules/@sideway/address/lib/tlds.js'
-
-
-
-const title = document.querySelector('#title')
-const mediaType = document.querySelector('#mediaType')
-const bookFields = document.querySelector('#book-fields')
-const movieFields = document.querySelector('#movie-fields')
-const tvFields = document.querySelector('#tv-fields')
-const gameFields = document.querySelector('#game-fields')
-const comicFields = document.querySelector('#comic-fields')
-
-
-
-
-//gets all the properties and data from the form to be used for various other functions
-const formProperties = (0,_formIdentifier__WEBPACK_IMPORTED_MODULE_6__.gatherFormInfo)()
-
-//turns on a prompt that pops up when the window closes.  Can be disabled with suppressLeavePrompt function where necessary
-;(0,_leavePrompt__WEBPACK_IMPORTED_MODULE_5__.leavePrompt)()
-
-//determines the current day and sets the release date calendar to have a max date of today. Also properly formats the date.
-;(0,_calendarSet_js__WEBPACK_IMPORTED_MODULE_7__.maxDateSelector)()
-
-if (formProperties.existingSource) {
-    
-    window.addEventListener('load', async event => {
-        const state = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.StateManager(true, sourceId, formProperties.lockLocation)
-        await state.updateState()
-
-        
-        ;(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.userActivityThrottler)()
-
-    })
-
-    window.addEventListener('beforeunload', async event => {
-        event.preventDefault()  
-        
-        const state = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.StateManager(false, sourceId, formProperties.lockLocation)
-        await state.updateState()
-
-    })
-
-    //determines which parts of the form to load based on the mediaType
-    //also ensures the additionally added fields load with the "remove" option
-    window.addEventListener('load', event => {
-        
-        if (mediaType.value === 'Book') {
-            const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(bookAuthorDetails))
-            fieldUpdate.loadField()
-            bookFields.classList.remove('hide-sources')
-        } else {
-            bookFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Movie') {
-            const directorUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieDirectorDetails))
-            const writerUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieWriterDetails))
-            directorUpdate.loadField()
-            writerUpdate.loadField()
-            movieFields.classList.remove('hide-sources')
-        } else {
-            movieFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'TV Show') {
-            tvFields.classList.remove('hide-sources')
-        } else {
-            tvFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Comic') {
-            const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(comicArtistDetails))
-            fieldUpdate.loadField()
-            comicFields.classList.remove('hide-sources')
-        } else {
-            comicFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Video Game') {
-            gameFields.classList.remove('hide-sources')
-        } else {
-            gameFields.classList.add('hide-sources')
-        }
-    })
-} else {
-    //on new records, loads the proper fields for the chosen mediaType
-    mediaType.addEventListener('input', event => {
-        //event.preventDefault()
-        if (mediaType.value === 'Book') {
-            bookFields.classList.remove('hide-sources')
-        } else {
-            bookFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Movie') {
-            movieFields.classList.remove('hide-sources')
-        } else {
-            movieFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'TV Show') {
-            tvFields.classList.remove('hide-sources')
-        } else {
-            tvFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Comic') {
-            comicFields.classList.remove('hide-sources')
-        } else {
-            comicFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Video Game') {
-            gameFields.classList.remove('hide-sources')
-        } else {
-            gameFields.classList.add('hide-sources')
-        }
-
-        // let selects = document.getElementsByTagName('select');
-        // console.log(selects.length)
-    })
-}
-
-formProperties.formData.addEventListener('submit', async event => {
-    event.preventDefault()
-
-    event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
-
-
-    //sets the warningDiv to blank so errors don't pile up
-    //this may need to be refactored if there are multiple warnings
-    // warningDiv.innerHTML = ''
-    
-    //clears all red borders around all input types
-    // document.querySelectorAll('input, select, textarea').forEach((element) => {
-    //     element.style.border = ''
-    // })
-
-
-
-
-    // const data = serialize(form, { hash: true })
-    // console.log(data, 'test1')
-    // const { error } = sourceSchema.validate(data, { abortEarly: false })
-    // if (error) {
-    //     for (let errorDetails of error.details) {
-    //         let invalidFieldName = errorDetails.path
-    //         if (invalidFieldName.length === 2) {
-    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-    //         } else if (invalidFieldName.length === 3) {
-    //             //TODO: Add zero to field names in HTML so if statement can be removed
-
-    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-
-
-    //             // if (invalidFieldName[2] === 0) {
-    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-    //             // } else {
-    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-    //             // }
-    //         }
-            
-    //         console.log(invalidFieldName, 'invalid field')
-    //         let validationWarning = document.createElement('div')
-    //         validationWarning.textContent = errorDetails.message
-    //         validationWarning.setAttribute('class', 'field-requirements field-invalid')
-    //         document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
-    //         warningDiv.append(validationWarning)
-    //     }
-    //     return
-    // }
-
-    ;(0,_warning__WEBPACK_IMPORTED_MODULE_4__.clearWarning)()  //clears any previous warnings
-
-    // validates all entries on the form to match Joi schema on the backend and generates error messages.  Saves true/false to variable on whether there was an error or not.
-    const adminNote = (0,_rejectPublish_js__WEBPACK_IMPORTED_MODULE_3__.adminNoteCheck)()
-    const formFail = (0,_submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_2__.formValidation)(formProperties.formData, formProperties.schema)
-
-    const submittedRecord = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
-    const duplicateResult = await submittedRecord.validateDuplicates()
-
-    if (!duplicateResult && !formFail && !adminNote) {
-        //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.
-        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_5__.suppressLeavePrompt)()
-        return formProperties.formData.submit()
-    }
-    event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
-})
-
-
-
-//sets properties for properties that can have addable fields.
-const comicArtistDetails = {
-    media: 'comic',
-    job: 'artist',
-    addableFields: 3
-}
-
-const movieDirectorDetails = {
-    media: 'movie',
-    job: 'director',
-    addableFields: 1
-}
-
-const movieWriterDetails = {
-    media: 'movie',
-    job: 'writer',
-    addableFields: 3
-}
-
-const bookAuthorDetails = {
-    media: 'book',
-    job: 'author',
-    addableFields: 3
-}
-
-//creates an image preview if a new image is uploaded.
-sourceImage.addEventListener('change', event => {
-    const imgPreview = document.querySelector('.image-preview')
-    const file = document.querySelector('input[type=file]').files[0]
-    const reader = new FileReader()
-
-    reader.addEventListener('load', function () {
-        imgPreview.src = reader.result
-    }, false)
-
-    if (file) {
-        reader.readAsDataURL(file)
-    }
-    document.querySelector('.file-name').textContent = file.name
-})
-
-//allows adding additional fields for movie directors and writers
-movieFields.addEventListener('click', event => {
-    const directorUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieDirectorDetails))
-    const writerUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieWriterDetails))
-    if (event.target && event.target.matches("a#add-director")) {
-        directorUpdate.addField()
-    }
-    if (event.target && event.target.matches("a.remove-director")) {
-        directorUpdate.deleteField(event.target.parentElement)
-    }
-    
-    if (event.target && event.target.matches("a#add-writer")) {
-        writerUpdate.addField()
-    }
-    if (event.target && event.target.matches("a.remove-writer")) {
-        writerUpdate.deleteField(event.target.parentElement)
-    }
-})
-
-//allows adding additional fields for comic artists
-comicFields.addEventListener('click', event => {
-    const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(comicArtistDetails))
-    if (event.target && event.target.matches("a#add-artist")) {
-        fieldUpdate.addField('remove-artist')
-    }
-    if (event.target && event.target.matches("a.remove-artist")) {
-        fieldUpdate.deleteField(event.target.parentElement)
-        }
-})
-
-//allows adding additional fields for book authors
-bookFields.addEventListener('click', event => {
-    const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(bookAuthorDetails))
-    //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
-    if (event.target && event.target.matches("a#add-author")) {
-        fieldUpdate.addField('remove-author')
-    }
-    if (event.target && event.target.matches("a.remove-author")) {
-        fieldUpdate.deleteField(event.target.parentElement)
-    }
-})
-
-
-//autocomplete bundle test
-
-const autocompleteListener = () => {
-    const autocompleteFields = document.querySelectorAll('.autocomplete')
-    autocompleteFields.forEach((autocompleteField) => {
-        autocompleteField.addEventListener('focus', event => {
-            autocompleter__WEBPACK_IMPORTED_MODULE_1___default()({
-                input: autocompleteField,
-                emtpyMsg: 'No Results',
-                debounceWaitMs: 200,
-                preventSubmit: true,
-                disableAutoSelect: true,
-                fetch: async function(text, update) {
-                    let field = autocompleteField.name
-                    field = field.replace('[]', '')
-                    field = field.replace('[', '.')
-                    field = field.replace(']', '')
-            
-                    const response = await fetch('/sources/data?' + new URLSearchParams({
-                        field,
-                        fieldValue: autocompleteField.value
-                    }))
-                    const autofillOptions = await response.json()
-                    console.log(autofillOptions)
-                    let suggestions = autofillOptions.map(option => {
-                        return { 'label': option, 'value:': option}
-                    })
-                    update(suggestions)
-                },
-                onSelect: function(item) {
-                    autocompleteField.value = item.label
-                } 
-            })
-        })
-    })
-}
-
-autocompleteListener()
-
-
 
 /***/ }),
 
@@ -10495,6 +10210,40 @@ const gatherFormInfo = () => {
 // }
 
 
+
+/***/ }),
+
+/***/ "./public/js/imageTools.js":
+/*!*********************************!*\
+  !*** ./public/js/imageTools.js ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "imagePreview": () => (/* binding */ imagePreview)
+/* harmony export */ });
+
+//creates an image preview if a new image is uploaded.
+
+const imagePreview = () => {
+    const sourceImage = document.querySelector('#sourceImage')
+    sourceImage.addEventListener('change', event => {
+        const imgPreview = document.querySelector('.image-preview')
+        const file = document.querySelector('input[type=file]').files[0]
+        const reader = new FileReader()
+
+        reader.addEventListener('load', function () {
+            imgPreview.src = reader.result
+        }, false)
+
+        if (file) {
+            reader.readAsDataURL(file)
+        }
+        document.querySelector('.file-name').textContent = file.name
+    })
+}
 
 /***/ }),
 
@@ -10655,7 +10404,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "userActivityThrottler": () => (/* binding */ userActivityThrottler),
 /* harmony export */   "FieldManager": () => (/* binding */ FieldManager)
 /* harmony export */ });
-/* harmony import */ var _editSource_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./editSource.js */ "./public/js/editSource.js");
+/* harmony import */ var _autocomplete__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autocomplete */ "./public/js/autocomplete.js");
 /* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
 /* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
 
@@ -10878,7 +10627,7 @@ class FieldManager {
             newDiv.append(this.createRemoveLink(this.job))
 
             //fires the autocompleteListener function again so autocomplete works on the new field
-            ;(0,_editSource_js__WEBPACK_IMPORTED_MODULE_0__.autocompleteListener)()
+            ;(0,_autocomplete__WEBPACK_IMPORTED_MODULE_0__.autocompleteListener)()
         }
         //Check if we have the max number of inputs and then remove the add link if true
         if (totalFieldList.length === this.additionalFields) {
@@ -11388,12 +11137,333 @@ module.exports = JSON.parse('{"amp":"&","apos":"\'","gt":">","lt":"<","quot":"\\
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./public/js/editSource.js");
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+/*!*********************************!*\
+  !*** ./public/js/editSource.js ***!
+  \*********************************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "autocompleteListener": () => (/* binding */ autocompleteListener)
+/* harmony export */ });
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.js */ "./public/js/utils.js");
+/* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! autocompleter */ "./node_modules/autocompleter/autocomplete.js");
+/* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(autocompleter__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./submissionFormValidation.js */ "./public/js/submissionFormValidation.js");
+/* harmony import */ var _rejectPublish_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./rejectPublish.js */ "./public/js/rejectPublish.js");
+/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
+/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
+/* harmony import */ var _formIdentifier__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./formIdentifier */ "./public/js/formIdentifier.js");
+/* harmony import */ var _calendarSet_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./calendarSet.js */ "./public/js/calendarSet.js");
+/* harmony import */ var _imageTools_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./imageTools.js */ "./public/js/imageTools.js");
+
+
+
+
+
+
+
+
+
+//TODO: fix the TLDS problem
+//import tlds from '/node_modules/@sideway/address/lib/tlds.js'
+
+
+
+const title = document.querySelector('#title')
+const mediaType = document.querySelector('#mediaType')
+const bookFields = document.querySelector('#book-fields')
+const movieFields = document.querySelector('#movie-fields')
+const tvFields = document.querySelector('#tv-fields')
+const gameFields = document.querySelector('#game-fields')
+const comicFields = document.querySelector('#comic-fields')
+
+
+
+
+//gets all the properties and data from the form to be used for various other functions
+const formProperties = (0,_formIdentifier__WEBPACK_IMPORTED_MODULE_6__.gatherFormInfo)()
+
+//turns on a prompt that pops up when the window closes.  Can be disabled with suppressLeavePrompt function where necessary
+;(0,_leavePrompt__WEBPACK_IMPORTED_MODULE_5__.leavePrompt)()
+
+//determines the current day and sets the release date calendar to have a max date of today. Also properly formats the date.
+;(0,_calendarSet_js__WEBPACK_IMPORTED_MODULE_7__.maxDateSelector)()
+
+//creates an image preview whenever the image is changed
+;(0,_imageTools_js__WEBPACK_IMPORTED_MODULE_8__.imagePreview)()
+
+if (formProperties.existingSource) {
+    
+    window.addEventListener('load', async event => {
+        const state = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.StateManager(true, sourceId, formProperties.lockLocation)
+        await state.updateState()
+    })
+
+    ;(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.userActivityThrottler)()
+
+    window.addEventListener('beforeunload', async event => {
+        event.preventDefault()  
+        
+        const state = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.StateManager(false, sourceId, formProperties.lockLocation)
+        await state.updateState()
+
+    })
+
+    //determines which parts of the form to load based on the mediaType
+    //also ensures the additionally added fields load with the "remove" option
+    window.addEventListener('load', event => {
+        
+        if (mediaType.value === 'Book') {
+            const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(bookAuthorDetails))
+            fieldUpdate.loadField()
+            bookFields.classList.remove('hide-sources')
+        } else {
+            bookFields.classList.add('hide-sources')
+        }
+        if (mediaType.value === 'Movie') {
+            const directorUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieDirectorDetails))
+            const writerUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieWriterDetails))
+            directorUpdate.loadField()
+            writerUpdate.loadField()
+            movieFields.classList.remove('hide-sources')
+        } else {
+            movieFields.classList.add('hide-sources')
+        }
+        if (mediaType.value === 'TV Show') {
+            tvFields.classList.remove('hide-sources')
+        } else {
+            tvFields.classList.add('hide-sources')
+        }
+        if (mediaType.value === 'Comic') {
+            const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(comicArtistDetails))
+            fieldUpdate.loadField()
+            comicFields.classList.remove('hide-sources')
+        } else {
+            comicFields.classList.add('hide-sources')
+        }
+        if (mediaType.value === 'Video Game') {
+            gameFields.classList.remove('hide-sources')
+        } else {
+            gameFields.classList.add('hide-sources')
+        }
+    })
+} else {
+    //on new records, loads the proper fields for the chosen mediaType
+    mediaType.addEventListener('input', event => {
+        //event.preventDefault()
+        if (mediaType.value === 'Book') {
+            bookFields.classList.remove('hide-sources')
+        } else {
+            bookFields.classList.add('hide-sources')
+        }
+        if (mediaType.value === 'Movie') {
+            movieFields.classList.remove('hide-sources')
+        } else {
+            movieFields.classList.add('hide-sources')
+        }
+        if (mediaType.value === 'TV Show') {
+            tvFields.classList.remove('hide-sources')
+        } else {
+            tvFields.classList.add('hide-sources')
+        }
+        if (mediaType.value === 'Comic') {
+            comicFields.classList.remove('hide-sources')
+        } else {
+            comicFields.classList.add('hide-sources')
+        }
+        if (mediaType.value === 'Video Game') {
+            gameFields.classList.remove('hide-sources')
+        } else {
+            gameFields.classList.add('hide-sources')
+        }
+
+        // let selects = document.getElementsByTagName('select');
+        // console.log(selects.length)
+    })
+}
+
+formProperties.formData.addEventListener('submit', async event => {
+    event.preventDefault()
+
+    event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
+
+
+    //sets the warningDiv to blank so errors don't pile up
+    //this may need to be refactored if there are multiple warnings
+    // warningDiv.innerHTML = ''
+    
+    //clears all red borders around all input types
+    // document.querySelectorAll('input, select, textarea').forEach((element) => {
+    //     element.style.border = ''
+    // })
+
+
+
+
+    // const data = serialize(form, { hash: true })
+    // console.log(data, 'test1')
+    // const { error } = sourceSchema.validate(data, { abortEarly: false })
+    // if (error) {
+    //     for (let errorDetails of error.details) {
+    //         let invalidFieldName = errorDetails.path
+    //         if (invalidFieldName.length === 2) {
+    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+    //         } else if (invalidFieldName.length === 3) {
+    //             //TODO: Add zero to field names in HTML so if statement can be removed
+
+    //             invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+
+
+    //             // if (invalidFieldName[2] === 0) {
+    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+    //             // } else {
+    //             //     invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+    //             // }
+    //         }
+            
+    //         console.log(invalidFieldName, 'invalid field')
+    //         let validationWarning = document.createElement('div')
+    //         validationWarning.textContent = errorDetails.message
+    //         validationWarning.setAttribute('class', 'field-requirements field-invalid')
+    //         document.querySelector(`#${invalidFieldName}`).style.border = 'rgb(196, 63, 63) solid 2px'
+    //         warningDiv.append(validationWarning)
+    //     }
+    //     return
+    // }
+
+    ;(0,_warning__WEBPACK_IMPORTED_MODULE_4__.clearWarning)()  //clears any previous warnings
+
+    // validates all entries on the form to match Joi schema on the backend and generates error messages.  Saves true/false to variable on whether there was an error or not.
+    const adminNote = (0,_rejectPublish_js__WEBPACK_IMPORTED_MODULE_3__.adminNoteCheck)()
+    const formFail = (0,_submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_2__.formValidation)(formProperties.formData, formProperties.schema)
+
+    const submittedRecord = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
+    const duplicateResult = await submittedRecord.validateDuplicates()
+
+    if (!duplicateResult && !formFail && !adminNote) {
+        //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.
+        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_5__.suppressLeavePrompt)()
+        return formProperties.formData.submit()
+    }
+    event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
+})
+
+
+
+//sets properties for properties that can have addable fields.
+const comicArtistDetails = {
+    media: 'comic',
+    job: 'artist',
+    addableFields: 3
+}
+
+const movieDirectorDetails = {
+    media: 'movie',
+    job: 'director',
+    addableFields: 1
+}
+
+const movieWriterDetails = {
+    media: 'movie',
+    job: 'writer',
+    addableFields: 3
+}
+
+const bookAuthorDetails = {
+    media: 'book',
+    job: 'author',
+    addableFields: 3
+}
+
+
+//allows adding additional fields for movie directors and writers
+movieFields.addEventListener('click', event => {
+    const directorUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieDirectorDetails))
+    const writerUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieWriterDetails))
+    if (event.target && event.target.matches("a#add-director")) {
+        directorUpdate.addField()
+    }
+    if (event.target && event.target.matches("a.remove-director")) {
+        directorUpdate.deleteField(event.target.parentElement)
+    }
+    
+    if (event.target && event.target.matches("a#add-writer")) {
+        writerUpdate.addField()
+    }
+    if (event.target && event.target.matches("a.remove-writer")) {
+        writerUpdate.deleteField(event.target.parentElement)
+    }
+})
+
+//allows adding additional fields for comic artists
+comicFields.addEventListener('click', event => {
+    const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(comicArtistDetails))
+    if (event.target && event.target.matches("a#add-artist")) {
+        fieldUpdate.addField('remove-artist')
+    }
+    if (event.target && event.target.matches("a.remove-artist")) {
+        fieldUpdate.deleteField(event.target.parentElement)
+        }
+})
+
+//allows adding additional fields for book authors
+bookFields.addEventListener('click', event => {
+    const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(bookAuthorDetails))
+    //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
+    if (event.target && event.target.matches("a#add-author")) {
+        fieldUpdate.addField('remove-author')
+    }
+    if (event.target && event.target.matches("a.remove-author")) {
+        fieldUpdate.deleteField(event.target.parentElement)
+    }
+})
+
+
+//autocomplete bundle test
+
+const autocompleteListener = () => {
+    const autocompleteFields = document.querySelectorAll('.autocomplete')
+    autocompleteFields.forEach((autocompleteField) => {
+        autocompleteField.addEventListener('focus', event => {
+            autocompleter__WEBPACK_IMPORTED_MODULE_1___default()({
+                input: autocompleteField,
+                emtpyMsg: 'No Results',
+                debounceWaitMs: 200,
+                preventSubmit: true,
+                disableAutoSelect: true,
+                fetch: async function(text, update) {
+                    let field = autocompleteField.name
+                    field = field.replace('[]', '')
+                    field = field.replace('[', '.')
+                    field = field.replace(']', '')
+            
+                    const response = await fetch('/sources/data?' + new URLSearchParams({
+                        field,
+                        fieldValue: autocompleteField.value
+                    }))
+                    const autofillOptions = await response.json()
+                    console.log(autofillOptions)
+                    let suggestions = autofillOptions.map(option => {
+                        return { 'label': option, 'value:': option}
+                    })
+                    update(suggestions)
+                },
+                onSelect: function(item) {
+                    autocompleteField.value = item.label
+                } 
+            })
+        })
+    })
+}
+
+autocompleteListener()
+
+
+})();
+
 /******/ })()
 ;
 //# sourceMappingURL=main.bundle.js.map

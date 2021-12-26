@@ -1,11 +1,12 @@
 import { userActivityThrottler, Duplicate, StateManager, FieldManager } from "./utils.js"
-import autocomplete from 'autocompleter';
+
 import { formValidation } from './submissionFormValidation.js'
-import { adminNoteCheck, rejectPublish } from "./rejectPublish.js"
+import { adminNoteCheck } from "./rejectPublish.js"
 import { clearWarning } from './warning'
 import { suppressLeavePrompt, leavePrompt } from './leavePrompt'
 import { gatherFormInfo } from './formIdentifier'
 import { maxDateSelector } from "./calendarSet.js";
+import { imagePreview } from "./imageTools.js";
 //TODO: fix the TLDS problem
 //import tlds from '/node_modules/@sideway/address/lib/tlds.js'
 
@@ -31,16 +32,20 @@ leavePrompt()
 //determines the current day and sets the release date calendar to have a max date of today. Also properly formats the date.
 maxDateSelector()
 
+//creates an image preview whenever the image is changed
+imagePreview()
+
+//turns on autocomplete functionality for any associated fields with the autocomplete class
+autocompleteListener()
+
 if (formProperties.existingSource) {
     
     window.addEventListener('load', async event => {
         const state = new StateManager(true, sourceId, formProperties.lockLocation)
         await state.updateState()
-
-        
-        userActivityThrottler()
-
     })
+
+    userActivityThrottler()
 
     window.addEventListener('beforeunload', async event => {
         event.preventDefault()  
@@ -216,21 +221,6 @@ const bookAuthorDetails = {
     addableFields: 3
 }
 
-//creates an image preview if a new image is uploaded.
-sourceImage.addEventListener('change', event => {
-    const imgPreview = document.querySelector('.image-preview')
-    const file = document.querySelector('input[type=file]').files[0]
-    const reader = new FileReader()
-
-    reader.addEventListener('load', function () {
-        imgPreview.src = reader.result
-    }, false)
-
-    if (file) {
-        reader.readAsDataURL(file)
-    }
-    document.querySelector('.file-name').textContent = file.name
-})
 
 //allows adding additional fields for movie directors and writers
 movieFields.addEventListener('click', event => {
@@ -277,40 +267,40 @@ bookFields.addEventListener('click', event => {
 
 //autocomplete bundle test
 
-export const autocompleteListener = () => {
-    const autocompleteFields = document.querySelectorAll('.autocomplete')
-    autocompleteFields.forEach((autocompleteField) => {
-        autocompleteField.addEventListener('focus', event => {
-            autocomplete({
-                input: autocompleteField,
-                emtpyMsg: 'No Results',
-                debounceWaitMs: 200,
-                preventSubmit: true,
-                disableAutoSelect: true,
-                fetch: async function(text, update) {
-                    let field = autocompleteField.name
-                    field = field.replace('[]', '')
-                    field = field.replace('[', '.')
-                    field = field.replace(']', '')
+// export const autocompleteListener = () => {
+//     const autocompleteFields = document.querySelectorAll('.autocomplete')
+//     autocompleteFields.forEach((autocompleteField) => {
+//         autocompleteField.addEventListener('focus', event => {
+//             autocomplete({
+//                 input: autocompleteField,
+//                 emtpyMsg: 'No Results',
+//                 debounceWaitMs: 200,
+//                 preventSubmit: true,
+//                 disableAutoSelect: true,
+//                 fetch: async function(text, update) {
+//                     let field = autocompleteField.name
+//                     field = field.replace('[]', '')
+//                     field = field.replace('[', '.')
+//                     field = field.replace(']', '')
             
-                    const response = await fetch('/sources/data?' + new URLSearchParams({
-                        field,
-                        fieldValue: autocompleteField.value
-                    }))
-                    const autofillOptions = await response.json()
-                    console.log(autofillOptions)
-                    let suggestions = autofillOptions.map(option => {
-                        return { 'label': option, 'value:': option}
-                    })
-                    update(suggestions)
-                },
-                onSelect: function(item) {
-                    autocompleteField.value = item.label
-                } 
-            })
-        })
-    })
-}
+//                     const response = await fetch('/sources/data?' + new URLSearchParams({
+//                         field,
+//                         fieldValue: autocompleteField.value
+//                     }))
+//                     const autofillOptions = await response.json()
+//                     console.log(autofillOptions)
+//                     let suggestions = autofillOptions.map(option => {
+//                         return { 'label': option, 'value:': option}
+//                     })
+//                     update(suggestions)
+//                 },
+//                 onSelect: function(item) {
+//                     autocompleteField.value = item.label
+//                 } 
+//             })
+//         })
+//     })
+// }
 
-autocompleteListener()
+
 
