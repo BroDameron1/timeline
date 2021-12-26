@@ -23,6 +23,82 @@ const comicFields = document.querySelector('#comic-fields')
 
 
 
+//sets properties for properties that can have addable fields.
+const comicArtistDetails = {
+    media: 'comic',
+    job: 'artist',
+    addableFields: 3
+}
+
+const movieDirectorDetails = {
+    media: 'movie',
+    job: 'director',
+    addableFields: 1
+}
+
+const movieWriterDetails = {
+    media: 'movie',
+    job: 'writer',
+    addableFields: 3
+}
+
+const bookAuthorDetails = {
+    media: 'book',
+    job: 'author',
+    addableFields: 3
+}
+
+const mediaDetails = [
+    {
+        type: 'Book',
+        field: 'book-fields',
+        expandableFields: [
+            {
+                media: 'book',
+                job: 'author',
+                maxFields: 2
+            }
+        ]
+    },
+    {
+        type: 'Movie',
+        field: 'movie-fields',
+        expandableFields: [
+            {
+                media: 'movie',
+                job: 'director',
+                maxFields: 1
+            },
+            {
+                media: 'movie',
+                job: 'writer',
+                maxFields: 3
+            }
+        ]
+    },
+    {
+        type: 'TV Show',
+        field: 'tv-fields',
+        expandableFields: []
+    },
+    {
+        type: 'Comic',
+        field: 'comic-fields',
+        expandableFields: [
+            {
+                media: 'comic',
+                job: 'artist',
+                maxFields: 3
+            }
+        ]
+    },
+    {
+        type: 'Video Game',
+        field: 'game-fields',
+        expandableFields: []
+    },
+]
+
 
 //gets all the properties and data from the form to be used for various other functions
 const formProperties = gatherFormInfo()
@@ -59,70 +135,91 @@ if (formProperties.existingSource) {
     //determines which parts of the form to load based on the mediaType
     //also ensures the additionally added fields load with the "remove" option
     window.addEventListener('load', event => {
+
+        for (let media of mediaDetails) {
+            if (media.type === mediaType.value) {
+                document.querySelector(`#${media.field}`).classList.remove('hide-sources')
+                for (let field of media.expandableFields) {
+                    console.log(...Object.values(field))
+                    const fieldUpdate = new FieldManager(...Object.values(field))
+                    fieldUpdate.loadField()
+                }
+            } else {
+                document.querySelector(`#${media.field}`).classList.add('hide-sources')
+            }
+        }
         
-        if (mediaType.value === 'Book') {
-            const fieldUpdate = new FieldManager(...Object.values(bookAuthorDetails))
-            fieldUpdate.loadField()
-            bookFields.classList.remove('hide-sources')
-        } else {
-            bookFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Movie') {
-            const directorUpdate = new FieldManager(...Object.values(movieDirectorDetails))
-            const writerUpdate = new FieldManager(...Object.values(movieWriterDetails))
-            directorUpdate.loadField()
-            writerUpdate.loadField()
-            movieFields.classList.remove('hide-sources')
-        } else {
-            movieFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'TV Show') {
-            tvFields.classList.remove('hide-sources')
-        } else {
-            tvFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Comic') {
-            const fieldUpdate = new FieldManager(...Object.values(comicArtistDetails))
-            fieldUpdate.loadField()
-            comicFields.classList.remove('hide-sources')
-        } else {
-            comicFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Video Game') {
-            gameFields.classList.remove('hide-sources')
-        } else {
-            gameFields.classList.add('hide-sources')
-        }
+        // if (mediaType.value === 'Book') {
+        //     const fieldUpdate = new FieldManager(...Object.values(bookAuthorDetails))
+        //     fieldUpdate.loadField()
+        //     bookFields.classList.remove('hide-sources')
+        // } else {
+        //     bookFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Movie') {
+        //     const directorUpdate = new FieldManager(...Object.values(movieDirectorDetails))
+        //     const writerUpdate = new FieldManager(...Object.values(movieWriterDetails))
+        //     directorUpdate.loadField()
+        //     writerUpdate.loadField()
+        //     movieFields.classList.remove('hide-sources')
+        // } else {
+        //     movieFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'TV Show') {
+        //     tvFields.classList.remove('hide-sources')
+        // } else {
+        //     tvFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Comic') {
+        //     const fieldUpdate = new FieldManager(...Object.values(comicArtistDetails))
+        //     fieldUpdate.loadField()
+        //     comicFields.classList.remove('hide-sources')
+        // } else {
+        //     comicFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Video Game') {
+        //     gameFields.classList.remove('hide-sources')
+        // } else {
+        //     gameFields.classList.add('hide-sources')
+        // }
     })
 } else {
     //on new records, loads the proper fields for the chosen mediaType
     mediaType.addEventListener('input', event => {
-        //event.preventDefault()
-        if (mediaType.value === 'Book') {
-            bookFields.classList.remove('hide-sources')
-        } else {
-            bookFields.classList.add('hide-sources')
+
+        for (let media of mediaDetails) {
+            if (media.type === mediaType.value) {
+                document.querySelector(`#${media.field}`).classList.remove('hide-sources')
+            } else {
+                document.querySelector(`#${media.field}`).classList.add('hide-sources')
+            }
         }
-        if (mediaType.value === 'Movie') {
-            movieFields.classList.remove('hide-sources')
-        } else {
-            movieFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'TV Show') {
-            tvFields.classList.remove('hide-sources')
-        } else {
-            tvFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Comic') {
-            comicFields.classList.remove('hide-sources')
-        } else {
-            comicFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Video Game') {
-            gameFields.classList.remove('hide-sources')
-        } else {
-            gameFields.classList.add('hide-sources')
-        }
+
+        // if (mediaType.value === 'Book') {
+        //     bookFields.classList.remove('hide-sources')
+        // } else {
+        //     bookFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Movie') {
+        //     movieFields.classList.remove('hide-sources')
+        // } else {
+        //     movieFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'TV Show') {
+        //     tvFields.classList.remove('hide-sources')
+        // } else {
+        //     tvFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Comic') {
+        //     comicFields.classList.remove('hide-sources')
+        // } else {
+        //     comicFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Video Game') {
+        //     gameFields.classList.remove('hide-sources')
+        // } else {
+        //     gameFields.classList.add('hide-sources')
+        // }
     })
 }
 
@@ -151,30 +248,7 @@ formProperties.formData.addEventListener('submit', async event => {
 
 
 
-//sets properties for properties that can have addable fields.
-const comicArtistDetails = {
-    media: 'comic',
-    job: 'artist',
-    addableFields: 3
-}
 
-const movieDirectorDetails = {
-    media: 'movie',
-    job: 'director',
-    addableFields: 1
-}
-
-const movieWriterDetails = {
-    media: 'movie',
-    job: 'writer',
-    addableFields: 3
-}
-
-const bookAuthorDetails = {
-    media: 'book',
-    job: 'author',
-    addableFields: 3
-}
 
 
 //allows adding additional fields for movie directors and writers

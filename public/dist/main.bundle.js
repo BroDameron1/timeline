@@ -10215,6 +10215,48 @@ const gatherFormInfo = () => {
 
 /***/ }),
 
+/***/ "./public/js/formValidation.js":
+/*!*************************************!*\
+  !*** ./public/js/formValidation.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "formValidation": () => (/* binding */ formValidation)
+/* harmony export */ });
+/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! form-serialize-improved */ "./node_modules/form-serialize-improved/index.js");
+/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(form_serialize_improved__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
+//validates the form entry for record submission against the same backend Joi validations
+
+
+
+
+
+
+const formValidation = (formData, schema) => {
+    const serializedData = form_serialize_improved__WEBPACK_IMPORTED_MODULE_0___default()(formData, {hash: true })
+    const { error } = schema.validate(serializedData, { abortEarly: false })
+    if (error) {
+        for (let errorDetails of error.details) {
+            let invalidFieldName = errorDetails.path
+            if (invalidFieldName.length === 2) {
+                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
+            } else if (invalidFieldName.length === 3) {
+                //TODO: Add zero to field names in HTML so if statement can be removed
+                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
+            }
+            (0,_warning__WEBPACK_IMPORTED_MODULE_1__.generateWarning)(errorDetails.message, invalidFieldName)
+        }
+        return true
+    }
+    return false
+}
+
+/***/ }),
+
 /***/ "./public/js/imageTools.js":
 /*!*********************************!*\
   !*** ./public/js/imageTools.js ***!
@@ -10291,7 +10333,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "rejectPublish": () => (/* binding */ rejectPublish)
 /* harmony export */ });
 /* harmony import */ var _warning_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./warning.js */ "./public/js/warning.js");
-/* harmony import */ var _submissionFormValidation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./submissionFormValidation */ "./public/js/submissionFormValidation.js");
+/* harmony import */ var _formValidation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./formValidation */ "./public/js/formValidation.js");
 /* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
 //script for rejecting user submitted updates.
 //requires DB collection where the submitted record resides
@@ -10317,7 +10359,7 @@ const rejectPublish = (formProperties) => {
     document.querySelector('.reject-record').addEventListener('click', async event => {
         try {
             ;(0,_warning_js__WEBPACK_IMPORTED_MODULE_0__.clearWarning)()
-            const formFail = (0,_submissionFormValidation__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
+            const formFail = (0,_formValidation__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
 
             if (!formFail && !adminNoteCheck()) {
                 const response = await fetch('/sources/data', {
@@ -10343,52 +10385,6 @@ const rejectPublish = (formProperties) => {
 }
 
 
-
-/***/ }),
-
-/***/ "./public/js/submissionFormValidation.js":
-/*!***********************************************!*\
-  !*** ./public/js/submissionFormValidation.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "formValidation": () => (/* binding */ formValidation)
-/* harmony export */ });
-/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! form-serialize-improved */ "./node_modules/form-serialize-improved/index.js");
-/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(form_serialize_improved__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _schemas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../schemas */ "./schemas.js");
-/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
-//validates the form entry for record submission against the same backend Joi validations
-
-
-
-
-
-
-
-const formValidation = (formData, schema) => {
-
-    const serializedData = form_serialize_improved__WEBPACK_IMPORTED_MODULE_0___default()(formData, {hash: true })
-    const { error } = schema.validate(serializedData, { abortEarly: false })
-    //const { error } = sourceSchema.validate(serializedData, { abortEarly: false })
-    if (error) {
-        for (let errorDetails of error.details) {
-            let invalidFieldName = errorDetails.path
-            if (invalidFieldName.length === 2) {
-                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
-            } else if (invalidFieldName.length === 3) {
-                //TODO: Add zero to field names in HTML so if statement can be removed
-                invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}${invalidFieldName[2]}`
-            }
-            (0,_warning__WEBPACK_IMPORTED_MODULE_2__.generateWarning)(errorDetails.message, invalidFieldName)
-        }
-        return true
-    }
-    return false
-}
 
 /***/ }),
 
@@ -10794,7 +10790,8 @@ const customStringErrors = {
     'string.pattern.base': '{{#label}} contains one or more illegal characters.',
     'string.min': '{{#label}} must be at least {{#limit}} characters.',
     'string.max': '{{#label}} must be less than {{#limit}} charaters.',
-    'any.required': '{{#label}} is a required field.'
+    'any.required': '{{#label}} is a required field.',
+    'array.unique': '{{#label}} is a duplicate entry.'
 }
 
 //TODO:  Remove fields not in form and test if this still works
@@ -11147,7 +11144,7 @@ var __webpack_exports__ = {};
   \*********************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.js */ "./public/js/utils.js");
-/* harmony import */ var _submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./submissionFormValidation.js */ "./public/js/submissionFormValidation.js");
+/* harmony import */ var _formValidation_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./formValidation.js */ "./public/js/formValidation.js");
 /* harmony import */ var _rejectPublish_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./rejectPublish.js */ "./public/js/rejectPublish.js");
 /* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
 /* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
@@ -11179,6 +11176,82 @@ const gameFields = document.querySelector('#game-fields')
 const comicFields = document.querySelector('#comic-fields')
 
 
+
+//sets properties for properties that can have addable fields.
+const comicArtistDetails = {
+    media: 'comic',
+    job: 'artist',
+    addableFields: 3
+}
+
+const movieDirectorDetails = {
+    media: 'movie',
+    job: 'director',
+    addableFields: 1
+}
+
+const movieWriterDetails = {
+    media: 'movie',
+    job: 'writer',
+    addableFields: 3
+}
+
+const bookAuthorDetails = {
+    media: 'book',
+    job: 'author',
+    addableFields: 3
+}
+
+const mediaDetails = [
+    {
+        type: 'Book',
+        field: 'book-fields',
+        expandableFields: [
+            {
+                media: 'book',
+                job: 'author',
+                maxFields: 2
+            }
+        ]
+    },
+    {
+        type: 'Movie',
+        field: 'movie-fields',
+        expandableFields: [
+            {
+                media: 'movie',
+                job: 'director',
+                maxFields: 1
+            },
+            {
+                media: 'movie',
+                job: 'writer',
+                maxFields: 3
+            }
+        ]
+    },
+    {
+        type: 'TV Show',
+        field: 'tv-fields',
+        expandableFields: []
+    },
+    {
+        type: 'Comic',
+        field: 'comic-fields',
+        expandableFields: [
+            {
+                media: 'comic',
+                job: 'artist',
+                maxFields: 3
+            }
+        ]
+    },
+    {
+        type: 'Video Game',
+        field: 'game-fields',
+        expandableFields: []
+    },
+]
 
 
 //gets all the properties and data from the form to be used for various other functions
@@ -11216,70 +11289,91 @@ if (formProperties.existingSource) {
     //determines which parts of the form to load based on the mediaType
     //also ensures the additionally added fields load with the "remove" option
     window.addEventListener('load', event => {
+
+        for (let media of mediaDetails) {
+            if (media.type === mediaType.value) {
+                document.querySelector(`#${media.field}`).classList.remove('hide-sources')
+                for (let field of media.expandableFields) {
+                    console.log(...Object.values(field))
+                    const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(field))
+                    fieldUpdate.loadField()
+                }
+            } else {
+                document.querySelector(`#${media.field}`).classList.add('hide-sources')
+            }
+        }
         
-        if (mediaType.value === 'Book') {
-            const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(bookAuthorDetails))
-            fieldUpdate.loadField()
-            bookFields.classList.remove('hide-sources')
-        } else {
-            bookFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Movie') {
-            const directorUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieDirectorDetails))
-            const writerUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieWriterDetails))
-            directorUpdate.loadField()
-            writerUpdate.loadField()
-            movieFields.classList.remove('hide-sources')
-        } else {
-            movieFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'TV Show') {
-            tvFields.classList.remove('hide-sources')
-        } else {
-            tvFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Comic') {
-            const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(comicArtistDetails))
-            fieldUpdate.loadField()
-            comicFields.classList.remove('hide-sources')
-        } else {
-            comicFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Video Game') {
-            gameFields.classList.remove('hide-sources')
-        } else {
-            gameFields.classList.add('hide-sources')
-        }
+        // if (mediaType.value === 'Book') {
+        //     const fieldUpdate = new FieldManager(...Object.values(bookAuthorDetails))
+        //     fieldUpdate.loadField()
+        //     bookFields.classList.remove('hide-sources')
+        // } else {
+        //     bookFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Movie') {
+        //     const directorUpdate = new FieldManager(...Object.values(movieDirectorDetails))
+        //     const writerUpdate = new FieldManager(...Object.values(movieWriterDetails))
+        //     directorUpdate.loadField()
+        //     writerUpdate.loadField()
+        //     movieFields.classList.remove('hide-sources')
+        // } else {
+        //     movieFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'TV Show') {
+        //     tvFields.classList.remove('hide-sources')
+        // } else {
+        //     tvFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Comic') {
+        //     const fieldUpdate = new FieldManager(...Object.values(comicArtistDetails))
+        //     fieldUpdate.loadField()
+        //     comicFields.classList.remove('hide-sources')
+        // } else {
+        //     comicFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Video Game') {
+        //     gameFields.classList.remove('hide-sources')
+        // } else {
+        //     gameFields.classList.add('hide-sources')
+        // }
     })
 } else {
     //on new records, loads the proper fields for the chosen mediaType
     mediaType.addEventListener('input', event => {
-        //event.preventDefault()
-        if (mediaType.value === 'Book') {
-            bookFields.classList.remove('hide-sources')
-        } else {
-            bookFields.classList.add('hide-sources')
+
+        for (let media of mediaDetails) {
+            if (media.type === mediaType.value) {
+                document.querySelector(`#${media.field}`).classList.remove('hide-sources')
+            } else {
+                document.querySelector(`#${media.field}`).classList.add('hide-sources')
+            }
         }
-        if (mediaType.value === 'Movie') {
-            movieFields.classList.remove('hide-sources')
-        } else {
-            movieFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'TV Show') {
-            tvFields.classList.remove('hide-sources')
-        } else {
-            tvFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Comic') {
-            comicFields.classList.remove('hide-sources')
-        } else {
-            comicFields.classList.add('hide-sources')
-        }
-        if (mediaType.value === 'Video Game') {
-            gameFields.classList.remove('hide-sources')
-        } else {
-            gameFields.classList.add('hide-sources')
-        }
+
+        // if (mediaType.value === 'Book') {
+        //     bookFields.classList.remove('hide-sources')
+        // } else {
+        //     bookFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Movie') {
+        //     movieFields.classList.remove('hide-sources')
+        // } else {
+        //     movieFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'TV Show') {
+        //     tvFields.classList.remove('hide-sources')
+        // } else {
+        //     tvFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Comic') {
+        //     comicFields.classList.remove('hide-sources')
+        // } else {
+        //     comicFields.classList.add('hide-sources')
+        // }
+        // if (mediaType.value === 'Video Game') {
+        //     gameFields.classList.remove('hide-sources')
+        // } else {
+        //     gameFields.classList.add('hide-sources')
+        // }
     })
 }
 
@@ -11293,7 +11387,7 @@ formProperties.formData.addEventListener('submit', async event => {
 
     // validates all entries on the form to match Joi schema on the backend and generates error messages.  Saves true/false to variable on whether there was an error or not.
     const adminNote = (0,_rejectPublish_js__WEBPACK_IMPORTED_MODULE_2__.adminNoteCheck)()
-    const formFail = (0,_submissionFormValidation_js__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
+    const formFail = (0,_formValidation_js__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
 
     const submittedRecord = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
@@ -11308,30 +11402,7 @@ formProperties.formData.addEventListener('submit', async event => {
 
 
 
-//sets properties for properties that can have addable fields.
-const comicArtistDetails = {
-    media: 'comic',
-    job: 'artist',
-    addableFields: 3
-}
 
-const movieDirectorDetails = {
-    media: 'movie',
-    job: 'director',
-    addableFields: 1
-}
-
-const movieWriterDetails = {
-    media: 'movie',
-    job: 'writer',
-    addableFields: 3
-}
-
-const bookAuthorDetails = {
-    media: 'book',
-    job: 'author',
-    addableFields: 3
-}
 
 
 //allows adding additional fields for movie directors and writers

@@ -6,10 +6,8 @@ import { generateWarning } from './warning'
 
 
 export const formValidation = (formData, schema) => {
-
     const serializedData = serialize(formData, {hash: true })
     const { error } = schema.validate(serializedData, { abortEarly: false })
-    //const { error } = sourceSchema.validate(serializedData, { abortEarly: false })
     if (error) {
         for (let errorDetails of error.details) {
             let invalidFieldName = errorDetails.path

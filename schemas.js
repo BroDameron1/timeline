@@ -60,7 +60,8 @@ const customStringErrors = {
     'string.pattern.base': '{{#label}} contains one or more illegal characters.',
     'string.min': '{{#label}} must be at least {{#limit}} characters.',
     'string.max': '{{#label}} must be less than {{#limit}} charaters.',
-    'any.required': '{{#label}} is a required field.'
+    'any.required': '{{#label}} is a required field.',
+    'array.unique': '{{#label}} is a duplicate entry.'
 }
 
 //TODO:  Remove fields not in form and test if this still works
