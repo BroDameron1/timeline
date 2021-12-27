@@ -99,7 +99,9 @@ module.exports.sourceSchema = Joi.object({
                 .messages(customStringErrors)
             )
             .max(4)
-            .unique(),
+            .unique()
+            .label('Author')
+            .messages(customStringErrors),
         publisher: stringRulesMax
             .label('Publisher')
             .messages(customStringErrors),
@@ -122,7 +124,9 @@ module.exports.sourceSchema = Joi.object({
                 .messages(customStringErrors)
             )
             .max(2)
-            .unique(),
+            .unique()
+            .label('Director')
+            .messages(customStringErrors),
         writer: Joi.array()
             .items(
                 stringRulesMax
@@ -130,7 +134,9 @@ module.exports.sourceSchema = Joi.object({
                 .messages(customStringErrors)
             )
             .max(4)
-            .unique(),
+            .unique()
+            .label('Writer')
+            .messages(customStringErrors),
         releaseDate: Joi.date()
             .less('now')
             .iso(),
@@ -146,7 +152,9 @@ module.exports.sourceSchema = Joi.object({
                 .messages(customStringErrors)
             )
             .max(4)
-            .unique(),
+            .unique()
+            .label('Writer')
+            .messages(customStringErrors),
         series: stringRulesMax
             .label('Comic Series')
             .messages(customStringErrors),

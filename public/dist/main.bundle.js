@@ -10829,7 +10829,9 @@ module.exports.sourceSchema = Joi.object({
                 .messages(customStringErrors)
             )
             .max(4)
-            .unique(),
+            .unique()
+            .label('Author')
+            .messages(customStringErrors),
         publisher: stringRulesMax
             .label('Publisher')
             .messages(customStringErrors),
@@ -10852,7 +10854,9 @@ module.exports.sourceSchema = Joi.object({
                 .messages(customStringErrors)
             )
             .max(2)
-            .unique(),
+            .unique()
+            .label('Director')
+            .messages(customStringErrors),
         writer: Joi.array()
             .items(
                 stringRulesMax
@@ -10860,7 +10864,9 @@ module.exports.sourceSchema = Joi.object({
                 .messages(customStringErrors)
             )
             .max(4)
-            .unique(),
+            .unique()
+            .label('Writer')
+            .messages(customStringErrors),
         releaseDate: Joi.date()
             .less('now')
             .iso(),
@@ -10876,7 +10882,9 @@ module.exports.sourceSchema = Joi.object({
                 .messages(customStringErrors)
             )
             .max(4)
-            .unique(),
+            .unique()
+            .label('Writer')
+            .messages(customStringErrors),
         series: stringRulesMax
             .label('Comic Series')
             .messages(customStringErrors),
@@ -11253,6 +11261,9 @@ const mediaDetails = [
     },
 ]
 
+//allows adding additional fields for book authors
+
+
 
 //gets all the properties and data from the form to be used for various other functions
 const formProperties = (0,_formIdentifier__WEBPACK_IMPORTED_MODULE_5__.gatherFormInfo)()
@@ -11268,6 +11279,47 @@ const formProperties = (0,_formIdentifier__WEBPACK_IMPORTED_MODULE_5__.gatherFor
 
 //turns on autocomplete functionality for any associated fields with the autocomplete class
 ;(0,_autocomplete_js__WEBPACK_IMPORTED_MODULE_8__.autocompleteListener)()
+
+// const enableFieldAdd = (currentField, field) => {
+//     currentField.addEventListener('click', event => {
+//         const fieldChange = new FieldManager(...Object.values(field))
+//         console.log(field.job, 'here')
+//         if (event.target && event.target.matches(`a#add-${field.job}`)) {
+//             fieldChange.addField(`remove-${field.job}`)
+//         }
+//         if (event.target && event.target.matches(`a.remove-${field.job}`)) {
+//             fieldChange.deleteField(event.target.parentElement)
+//         }
+//     })
+// }
+
+const multiFieldManager = () => {
+    for (let media of mediaDetails) {
+        const currentField = document.querySelector(`#${media.field}`)
+        if (media.type === mediaType.value) {
+            currentField.classList.remove('hide-sources')
+            for (let expandFieldSettings of media.expandableFields) {
+                if (formProperties.existingSource) {
+                    const loadExistingFields = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))  //TODO: change how we pass through the parameters so we can remove "media" from the object.
+                    loadExistingFields.loadField()
+                }
+                // enableFieldAdd(currentField, expandFieldSettings)
+                currentField.addEventListener('click', event => {
+                    const fieldChange = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))
+                    if (event.target && event.target.matches(`a#add-${expandFieldSettings.job}`)) {
+                        fieldChange.addField(`remove-${expandFieldSettings.job}`)
+                    }
+                    if (event.target && event.target.matches(`a.remove-${expandFieldSettings.job}`)) {
+                        fieldChange.deleteField(event.target.parentElement)
+                    }
+                })
+            }
+        } else {
+            currentField.classList.add('hide-sources')
+        }
+    }
+}
+
 
 if (formProperties.existingSource) {
     
@@ -11286,94 +11338,68 @@ if (formProperties.existingSource) {
 
     })
 
+
+
     //determines which parts of the form to load based on the mediaType
     //also ensures the additionally added fields load with the "remove" option
     window.addEventListener('load', event => {
-
-        for (let media of mediaDetails) {
-            if (media.type === mediaType.value) {
-                document.querySelector(`#${media.field}`).classList.remove('hide-sources')
-                for (let field of media.expandableFields) {
-                    console.log(...Object.values(field))
-                    const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(field))
-                    fieldUpdate.loadField()
-                }
-            } else {
-                document.querySelector(`#${media.field}`).classList.add('hide-sources')
-            }
-        }
-        
-        // if (mediaType.value === 'Book') {
-        //     const fieldUpdate = new FieldManager(...Object.values(bookAuthorDetails))
-        //     fieldUpdate.loadField()
-        //     bookFields.classList.remove('hide-sources')
-        // } else {
-        //     bookFields.classList.add('hide-sources')
-        // }
-        // if (mediaType.value === 'Movie') {
-        //     const directorUpdate = new FieldManager(...Object.values(movieDirectorDetails))
-        //     const writerUpdate = new FieldManager(...Object.values(movieWriterDetails))
-        //     directorUpdate.loadField()
-        //     writerUpdate.loadField()
-        //     movieFields.classList.remove('hide-sources')
-        // } else {
-        //     movieFields.classList.add('hide-sources')
-        // }
-        // if (mediaType.value === 'TV Show') {
-        //     tvFields.classList.remove('hide-sources')
-        // } else {
-        //     tvFields.classList.add('hide-sources')
-        // }
-        // if (mediaType.value === 'Comic') {
-        //     const fieldUpdate = new FieldManager(...Object.values(comicArtistDetails))
-        //     fieldUpdate.loadField()
-        //     comicFields.classList.remove('hide-sources')
-        // } else {
-        //     comicFields.classList.add('hide-sources')
-        // }
-        // if (mediaType.value === 'Video Game') {
-        //     gameFields.classList.remove('hide-sources')
-        // } else {
-        //     gameFields.classList.add('hide-sources')
+        multiFieldManager()
+        // for (let media of mediaDetails) {
+        //     const currentField = document.querySelector(`#${media.field}`)
+        //     if (media.type === mediaType.value) {
+        //         currentField.classList.remove('hide-sources')
+        //         for (let expandFieldSettings of media.expandableFields) {
+        //             const loadExistingFields = new FieldManager(...Object.values(expandFieldSettings))  //TODO: change how we pass through the parameters so we can remove "media" from the object.
+        //             loadExistingFields.loadField()
+        //             enableFieldAdd(currentField, expandFieldSettings)
+        //         }
+        //     } else {
+        //         currentField.classList.add('hide-sources')
+        //     }
         // }
     })
 } else {
     //on new records, loads the proper fields for the chosen mediaType
     mediaType.addEventListener('input', event => {
 
-        for (let media of mediaDetails) {
-            if (media.type === mediaType.value) {
-                document.querySelector(`#${media.field}`).classList.remove('hide-sources')
-            } else {
-                document.querySelector(`#${media.field}`).classList.add('hide-sources')
-            }
-        }
+        multiFieldManager()
+    //     for (let media of mediaDetails) {
+    //         const currentField = document.querySelector(`#${media.field}`)
+    //         if (media.type === mediaType.value) {
+    //             currentField.classList.remove('hide-sources')
+    //             for (let expandFieldSettings of media.expandableFields) {
+    //                 enableFieldAdd(currentField, expandFieldSettings)
+    //             }
+    //         } else {
+    //             currentField.classList.add('hide-sources')
+    //         }
+    //     }
 
-        // if (mediaType.value === 'Book') {
-        //     bookFields.classList.remove('hide-sources')
-        // } else {
-        //     bookFields.classList.add('hide-sources')
-        // }
-        // if (mediaType.value === 'Movie') {
-        //     movieFields.classList.remove('hide-sources')
-        // } else {
-        //     movieFields.classList.add('hide-sources')
-        // }
-        // if (mediaType.value === 'TV Show') {
-        //     tvFields.classList.remove('hide-sources')
-        // } else {
-        //     tvFields.classList.add('hide-sources')
-        // }
-        // if (mediaType.value === 'Comic') {
-        //     comicFields.classList.remove('hide-sources')
-        // } else {
-        //     comicFields.classList.add('hide-sources')
-        // }
-        // if (mediaType.value === 'Video Game') {
-        //     gameFields.classList.remove('hide-sources')
-        // } else {
-        //     gameFields.classList.add('hide-sources')
-        // }
+    //     // if (mediaType.value === 'Book') {
+    //     //     bookFields.classList.remove('hide-sources')
+    //     // } else {
+    //     //     bookFields.classList.add('hide-sources')
+    //     // }
+    //     // if (mediaType.value === 'Movie') {
+    //     //     movieFields.classList.remove('hide-sources')
+    //     // } else {
+    //     //     movieFields.classList.add('hide-sources')
+    //     // }
+    //     // if (mediaType.value === 'TV Show') {
+    //     //     tvFields.classList.remove('hide-sources')
+    //     // } else {
+    //     //     tvFields.classList.add('hide-sources')
+    //     // }
+    //     // if (mediaType.value === 'Comic') {
+    //     //     comicFields.classList.remove('hide-sources')
+    //     // } else {
+    //     //     comicFields.classList.add('hide-sources')
+    //     // }
+    //     // if (mediaType.value === 'Video Game') {
+    //     //     gameFields.classList.remove('hide-sources')
+    //     // } else {
+    //     //     gameFields.classList.add('hide-sources')
+    //     // }
     })
 }
 
@@ -11406,48 +11432,47 @@ formProperties.formData.addEventListener('submit', async event => {
 
 
 //allows adding additional fields for movie directors and writers
-movieFields.addEventListener('click', event => {
-    const directorUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieDirectorDetails))
-    const writerUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(movieWriterDetails))
-    if (event.target && event.target.matches("a#add-director")) {
-        directorUpdate.addField()
-    }
-    if (event.target && event.target.matches("a.remove-director")) {
-        directorUpdate.deleteField(event.target.parentElement)
-    }
+// movieFields.addEventListener('click', event => {
+//     const directorUpdate = new FieldManager(...Object.values(movieDirectorDetails))
+//     const writerUpdate = new FieldManager(...Object.values(movieWriterDetails))
+//     if (event.target && event.target.matches("a#add-director")) {
+//         directorUpdate.addField()
+//     }
+//     if (event.target && event.target.matches("a.remove-director")) {
+//         directorUpdate.deleteField(event.target.parentElement)
+//     }
     
-    if (event.target && event.target.matches("a#add-writer")) {
-        writerUpdate.addField()
-    }
-    if (event.target && event.target.matches("a.remove-writer")) {
-        writerUpdate.deleteField(event.target.parentElement)
-    }
-})
+//     if (event.target && event.target.matches("a#add-writer")) {
+//         writerUpdate.addField()
+//     }
+//     if (event.target && event.target.matches("a.remove-writer")) {
+//         writerUpdate.deleteField(event.target.parentElement)
+//     }
+// })
 
-//allows adding additional fields for comic artists
-comicFields.addEventListener('click', event => {
-    const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(comicArtistDetails))
-    if (event.target && event.target.matches("a#add-artist")) {
-        fieldUpdate.addField('remove-artist')
-    }
-    if (event.target && event.target.matches("a.remove-artist")) {
-        fieldUpdate.deleteField(event.target.parentElement)
-        }
-})
-
-//allows adding additional fields for book authors
-bookFields.addEventListener('click', event => {
-    const fieldUpdate = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(bookAuthorDetails))
-    //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
-    if (event.target && event.target.matches("a#add-author")) {
-        fieldUpdate.addField('remove-author')
-    }
-    if (event.target && event.target.matches("a.remove-author")) {
-        fieldUpdate.deleteField(event.target.parentElement)
-    }
-})
+// //allows adding additional fields for comic artists
+// comicFields.addEventListener('click', event => {
+//     const fieldUpdate = new FieldManager(...Object.values(comicArtistDetails))
+//     if (event.target && event.target.matches("a#add-artist")) {
+//         fieldUpdate.addField('remove-artist')
+//     }
+//     if (event.target && event.target.matches("a.remove-artist")) {
+//         fieldUpdate.deleteField(event.target.parentElement)
+//         }
+// })
 
 
+
+// bookFields.addEventListener('click', event => {
+//     const fieldUpdate = new FieldManager(...Object.values(bookAuthorDetails))
+//     //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
+//     if (event.target && event.target.matches("a#add-author")) {
+//         fieldUpdate.addField('remove-author')
+//     }
+//     if (event.target && event.target.matches("a.remove-author")) {
+//         fieldUpdate.deleteField(event.target.parentElement)
+//     }
+// })
 
 
 })();
