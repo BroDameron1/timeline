@@ -1,69 +1,69 @@
 import { autocompleteListener } from "./autocomplete"
-import { generateWarning } from './warning'
+// import { generateWarning } from './warning'
 import { suppressLeavePrompt } from './leavePrompt'
 
-//TODO: Can it be expanded to work with any record?
-export class Duplicate {
-    constructor (title, mediaType, sourceId, type) {
-        this.title = title
-        this.mediaType = mediaType || null
-        this.sourceId = sourceId || null
-        this.type = type
-    }
-    async checkDuplicates () {
-        const response = await fetch('/sources/data?' + new URLSearchParams({
-            title: this.title,
-            mediaType: this.mediaType,
-            sourceId: this.sourceId,
-            type: this.type
-        }))
-        return response.json()
-    }
+// //TODO: Can it be expanded to work with any record?
+// export class Duplicate {
+//     constructor (title, mediaType, sourceId, type) {
+//         this.title = title
+//         this.mediaType = mediaType || null
+//         this.sourceId = sourceId || null
+//         this.type = type
+//     }
+//     async checkDuplicates () {
+//         const response = await fetch('/sources/data?' + new URLSearchParams({
+//             title: this.title,
+//             mediaType: this.mediaType,
+//             sourceId: this.sourceId,
+//             type: this.type
+//         }))
+//         return response.json()
+//     }
 
-    async validateDuplicates () {
-        const duplicateResponse = await this.checkDuplicates()
-        if (!duplicateResponse) return false
-        if (duplicateResponse.title) {
-            //create the link
-            let duplicateLink = document.createElement('a')
-            duplicateLink.textContent = duplicateResponse.title
-            duplicateLink.href = `/sources/${duplicateResponse.slug}`
-            duplicateLink.setAttribute('target', '_blank')
-            //create a span to put the link in.
-            let warningSpan = document.createElement('div')
-            warningSpan.textContent = 'There is already a record with this title: '
-            warningSpan.setAttribute('class', 'field-requirements field-invalid')
-            warningSpan.append(duplicateLink)
-            generateWarning(warningSpan, 'title')
-            return true //return the span with think link included.
-        } else {
-            generateWarning('A record with that title is already under review.', 'title')
-            return true
-        }
-    }
-}
+//     async validateDuplicates () {
+//         const duplicateResponse = await this.checkDuplicates()
+//         if (!duplicateResponse) return false
+//         if (duplicateResponse.title) {
+//             //create the link
+//             let duplicateLink = document.createElement('a')
+//             duplicateLink.textContent = duplicateResponse.title
+//             duplicateLink.href = `/sources/${duplicateResponse.slug}`
+//             duplicateLink.setAttribute('target', '_blank')
+//             //create a span to put the link in.
+//             let warningSpan = document.createElement('div')
+//             warningSpan.textContent = 'There is already a record with this title: '
+//             warningSpan.setAttribute('class', 'field-requirements field-invalid')
+//             warningSpan.append(duplicateLink)
+//             generateWarning(warningSpan, 'title')
+//             return true //return the span with think link included.
+//         } else {
+//             generateWarning('A record with that title is already under review.', 'title')
+//             return true
+//         }
+//     }
+// }
 
-//Class for managing record state from the front end
-export class StateManager {
-    constructor(checkedOut, sourceId, targetCollection) {
-        this.checkedOut = checkedOut
-        this.sourceId = sourceId
-        this.targetCollection = targetCollection
-    }
+// //Class for managing record state from the front end
+// export class StateManager {
+//     constructor(checkedOut, sourceId, targetCollection) {
+//         this.checkedOut = checkedOut
+//         this.sourceId = sourceId
+//         this.targetCollection = targetCollection
+//     }
 
-    async updateState () {
-        const checkedOutRequest = JSON.stringify({
-            checkedOut: this.checkedOut,
-            sourceId: this.sourceId,
-            collection: this.targetCollection
-        })
+//     async updateState () {
+//         const checkedOutRequest = JSON.stringify({
+//             checkedOut: this.checkedOut,
+//             sourceId: this.sourceId,
+//             collection: this.targetCollection
+//         })
 
-        const beacon = await navigator.sendBeacon('/sources/data', checkedOutRequest)
-        if (!beacon) {
-            console.log('Something went wrong.',  err)
-        }
-    }
-}
+//         const beacon = await navigator.sendBeacon('/sources/data', checkedOutRequest)
+//         if (!beacon) {
+//             console.log('Something went wrong.',  err)
+//         }
+//     }
+// }
 
 //variables and function for idling out a user while they are editing a record.
 const warningPopup = document.querySelector('.warning-popup')
@@ -79,39 +79,39 @@ let time = startingMinutes * 60 //timer for use in idleLogout function, should n
 let intervalStart = null
 
 //function to remove all event listeners
-const userActivityEventRemover = () => {
-    window.removeEventListener('load', userActivityThrottler)
-    window.removeEventListener('mousemove', userActivityThrottler)
-    window.removeEventListener('mousedown', userActivityThrottler) // catches touchscreen presses as well
-    window.removeEventListener('touchstart', userActivityThrottler) // catches touchscreen swipes as well
-    window.removeEventListener('click', userActivityThrottler) // catches touchpad clicks as well
-    window.removeEventListener('keydown', userActivityThrottler)
-    window.removeEventListener('scroll', userActivityThrottler, true);
+const formTimeoutEventRemover = () => {
+    window.removeEventListener('load', formTimeout)
+    window.removeEventListener('mousemove', formTimeout)
+    window.removeEventListener('mousedown', formTimeout) // catches touchscreen presses as well
+    window.removeEventListener('touchstart', formTimeout) // catches touchscreen swipes as well
+    window.removeEventListener('click', formTimeout) // catches touchpad clicks as well
+    window.removeEventListener('keydown', formTimeout)
+    window.removeEventListener('scroll', formTimeout, true);
 }
 
 //starts the countdown after 2 minutes.  If a previously countdown had been started, resets the timer, removes the eventlisteners and stops the countdown and then starts it back up again after 2 minutes.
-//this ensures that the countdown only needs to pick up one event every two minutes in order to reset the timer instead of picking up every event all the time.
-export const userActivityThrottler = () => {
+//this ensures that the countdown only needs to pick uformTimeout minutes in order to reset the timer instead of picking up every event all the time.
+export const formTimeout = () => {
     if (intervalStart) {
         // if (time > warningTime) { //resets the timer to full as long as the warning window isn't up.
         //     time = startingMinutes * 60
         // }
         time = startingMinutes * 60 //resets the time back to default
-        userActivityEventRemover() //removes all event listeners
+        formTimeoutEventRemover() //removes all event listeners
         clearInterval(intervalStart) //stops the idleLogout function from running every 1 second.
     }
     //all listeners are removed and the idleLogout function is stopped until the below function starts
     //function will run after the amount of time specified at the end.
     setTimeout(() => {
         intervalStart = setInterval(idleLogout, 1000)  //runs the idleLogout function every second after starting
-        //create all the event listeners that will rerun the userActivityThrottler function from the start.
-        window.addEventListener('load', userActivityThrottler)
-        window.addEventListener('mousemove', userActivityThrottler)
-        window.addEventListener('mousedown', userActivityThrottler) 
-        window.addEventListener('touchstart', userActivityThrottler) 
-        window.addEventListener('click', userActivityThrottler) 
-        window.addEventListener('keydown', userActivityThrottler)
-        window.addEventListener('scroll', userActivityThrottler, true);
+        //create all the event listeners that will rerun the formTimeout function from the start.
+        window.addEventListener('load', formTimeout)
+        window.addEventListener('mousemove', formTimeout)
+        window.addEventListener('mousedown', formTimeout) 
+        window.addEventListener('touchstart', formTimeout) 
+        window.addEventListener('click', formTimeout) 
+        window.addEventListener('keydown', formTimeout)
+        window.addEventListener('scroll', formTimeout, true);
     }, 1000 * 60 * 1)
 }
 
@@ -123,7 +123,7 @@ const idleLogout = () => { //function for kicking user out of the page if they d
         blurBackground.style.display = 'none' //closes the warning popup
         // time = startingMinutes * 60 //resets the time back to default
         timerButton.removeEventListener('click', closePopup) //removes the timerbutton eventlistener associated with the popup
-        userActivityThrottler() //runs the function to eventually restart the timer again.
+        formTimeout() //runs the function to eventually restart the timer again.
     }
     
     const openPopup = () => { //creates the popup
@@ -138,7 +138,7 @@ const idleLogout = () => { //function for kicking user out of the page if they d
 
     if (time === warningTime) {
         openPopup() //opens the pop up ONCE
-        userActivityEventRemover() //removes all other eventlisteners
+        formTimeoutEventRemover() //removes all other eventlisteners
         timerButton.addEventListener('click', closePopup) //creates a SINGLE event listener for the close button which runs the closePopup function.
     }
 

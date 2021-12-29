@@ -1,5 +1,5 @@
 import { rejectPublish } from "./rejectPublish";
-import { sourceSchema } from '../../schemas'
+import { sourceSchema } from '../../../schemas'
 
 
 
@@ -52,51 +52,3 @@ export const gatherFormInfo = () => {
     formProperties = populateFormInfo(formProperties)
     return formProperties
 }
-
-
-
-
-
-
-
-// export const identifyForm = () => {
-//     // const formType = document.querySelector('[data-formtype]')
-//     // const formId = formType.id
-//     let formProperties = gatherFormInfo()
-
-
-//     switch (formProperties.formType) {
-//         case 'newSubmission':
-//             formProperties.existingSource = false
-//         break;
-//         case 'publishSubmission':
-
-//         break;
-//         case 'updatePublicSubmission':
-//         break;
-//         case 'updateReviewSubmission':
-//         break;
-//     }
-
-//     // switch (formStuff.dataset.formtype) {
-//     //     case 'newSubmission':
-//     //         formStuff.existingSource = false
-//     //         console.log('test1')
-//     //     break;
-//     //     case 'publishSubmission':
-//     //         formStuff.existingSource = true
-//     //         console.log('test2')
-//     //         rejectPublish('ReviewSource', formId)
-//     //     break;
-//     //     case 'updatePublicSubmission':
-//     //         formStuff.existingSource = true
-//     //         console.log('test3')
-//     //     break;
-//     //     case 'updateReviewSubmission':
-//     //         formStuff.existingSource = true
-//     //         console.log('test4')
-//     //     break;
-//     // }
-
-// }
-

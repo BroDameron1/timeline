@@ -10005,10 +10005,10 @@ module.exports = string => {
 
 /***/ }),
 
-/***/ "./public/js/autocomplete.js":
-/*!***********************************!*\
-  !*** ./public/js/autocomplete.js ***!
-  \***********************************/
+/***/ "./public/js/utils/autocomplete.js":
+/*!*****************************************!*\
+  !*** ./public/js/utils/autocomplete.js ***!
+  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10060,10 +10060,10 @@ const autocompleteListener = () => {
 
 /***/ }),
 
-/***/ "./public/js/calendarSet.js":
-/*!**********************************!*\
-  !*** ./public/js/calendarSet.js ***!
-  \**********************************/
+/***/ "./public/js/utils/calendarSet.js":
+/*!****************************************!*\
+  !*** ./public/js/utils/calendarSet.js ***!
+  \****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10096,10 +10096,66 @@ const maxDateSelector = () => {
 
 /***/ }),
 
-/***/ "./public/js/formIdentifier.js":
-/*!*************************************!*\
-  !*** ./public/js/formIdentifier.js ***!
-  \*************************************/
+/***/ "./public/js/utils/duplicateChecker.js":
+/*!*********************************************!*\
+  !*** ./public/js/utils/duplicateChecker.js ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Duplicate": () => (/* binding */ Duplicate)
+/* harmony export */ });
+/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./warning */ "./public/js/utils/warning.js");
+
+
+class Duplicate {
+    constructor (title, mediaType, sourceId, type) {
+        this.title = title
+        this.mediaType = mediaType || null
+        this.sourceId = sourceId || null
+        this.type = type
+    }
+    async checkDuplicates () {
+        const response = await fetch('/sources/data?' + new URLSearchParams({
+            title: this.title,
+            mediaType: this.mediaType,
+            sourceId: this.sourceId,
+            type: this.type
+        }))
+        return response.json()
+    }
+
+    async validateDuplicates () {
+        const duplicateResponse = await this.checkDuplicates()
+        if (!duplicateResponse) return false
+        if (duplicateResponse.title) {
+            //create the link
+            let duplicateLink = document.createElement('a')
+            duplicateLink.textContent = duplicateResponse.title
+            duplicateLink.href = `/sources/${duplicateResponse.slug}`
+            duplicateLink.setAttribute('target', '_blank')
+            //create a span to put the link in.
+            let warningSpan = document.createElement('div')
+            warningSpan.textContent = 'There is already a record with this title: '
+            warningSpan.setAttribute('class', 'field-requirements field-invalid')
+            warningSpan.append(duplicateLink)
+            ;(0,_warning__WEBPACK_IMPORTED_MODULE_0__.generateWarning)(warningSpan, 'title')
+            return true //return the span with think link included.
+        } else {
+            (0,_warning__WEBPACK_IMPORTED_MODULE_0__.generateWarning)('A record with that title is already under review.', 'title')
+            return true
+        }
+    }
+}
+
+/***/ }),
+
+/***/ "./public/js/utils/formIdentifier.js":
+/*!*******************************************!*\
+  !*** ./public/js/utils/formIdentifier.js ***!
+  \*******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10107,8 +10163,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "gatherFormInfo": () => (/* binding */ gatherFormInfo)
 /* harmony export */ });
-/* harmony import */ var _rejectPublish__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./rejectPublish */ "./public/js/rejectPublish.js");
-/* harmony import */ var _schemas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../schemas */ "./schemas.js");
+/* harmony import */ var _rejectPublish__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./rejectPublish */ "./public/js/utils/rejectPublish.js");
+/* harmony import */ var _schemas__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../schemas */ "./schemas.js");
 
 
 
@@ -10165,60 +10221,12 @@ const gatherFormInfo = () => {
 }
 
 
-
-
-
-
-
-// export const identifyForm = () => {
-//     // const formType = document.querySelector('[data-formtype]')
-//     // const formId = formType.id
-//     let formProperties = gatherFormInfo()
-
-
-//     switch (formProperties.formType) {
-//         case 'newSubmission':
-//             formProperties.existingSource = false
-//         break;
-//         case 'publishSubmission':
-
-//         break;
-//         case 'updatePublicSubmission':
-//         break;
-//         case 'updateReviewSubmission':
-//         break;
-//     }
-
-//     // switch (formStuff.dataset.formtype) {
-//     //     case 'newSubmission':
-//     //         formStuff.existingSource = false
-//     //         console.log('test1')
-//     //     break;
-//     //     case 'publishSubmission':
-//     //         formStuff.existingSource = true
-//     //         console.log('test2')
-//     //         rejectPublish('ReviewSource', formId)
-//     //     break;
-//     //     case 'updatePublicSubmission':
-//     //         formStuff.existingSource = true
-//     //         console.log('test3')
-//     //     break;
-//     //     case 'updateReviewSubmission':
-//     //         formStuff.existingSource = true
-//     //         console.log('test4')
-//     //     break;
-//     // }
-
-// }
-
-
-
 /***/ }),
 
-/***/ "./public/js/formValidation.js":
-/*!*************************************!*\
-  !*** ./public/js/formValidation.js ***!
-  \*************************************/
+/***/ "./public/js/utils/formValidation.js":
+/*!*******************************************!*\
+  !*** ./public/js/utils/formValidation.js ***!
+  \*******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10228,7 +10236,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! form-serialize-improved */ "./node_modules/form-serialize-improved/index.js");
 /* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(form_serialize_improved__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
+/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./warning */ "./public/js/utils/warning.js");
 //validates the form entry for record submission against the same backend Joi validations
 
 
@@ -10257,10 +10265,10 @@ const formValidation = (formData, schema) => {
 
 /***/ }),
 
-/***/ "./public/js/imageTools.js":
-/*!*********************************!*\
-  !*** ./public/js/imageTools.js ***!
-  \*********************************/
+/***/ "./public/js/utils/imageTools.js":
+/*!***************************************!*\
+  !*** ./public/js/utils/imageTools.js ***!
+  \***************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10291,10 +10299,10 @@ const imagePreview = () => {
 
 /***/ }),
 
-/***/ "./public/js/leavePrompt.js":
-/*!**********************************!*\
-  !*** ./public/js/leavePrompt.js ***!
-  \**********************************/
+/***/ "./public/js/utils/leavePrompt.js":
+/*!****************************************!*\
+  !*** ./public/js/utils/leavePrompt.js ***!
+  \****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10320,10 +10328,10 @@ const leavePrompt = () => {
 
 /***/ }),
 
-/***/ "./public/js/rejectPublish.js":
-/*!************************************!*\
-  !*** ./public/js/rejectPublish.js ***!
-  \************************************/
+/***/ "./public/js/utils/rejectPublish.js":
+/*!******************************************!*\
+  !*** ./public/js/utils/rejectPublish.js ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10332,9 +10340,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "adminNoteCheck": () => (/* binding */ adminNoteCheck),
 /* harmony export */   "rejectPublish": () => (/* binding */ rejectPublish)
 /* harmony export */ });
-/* harmony import */ var _warning_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./warning.js */ "./public/js/warning.js");
-/* harmony import */ var _formValidation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./formValidation */ "./public/js/formValidation.js");
-/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
+/* harmony import */ var _warning_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./warning.js */ "./public/js/utils/warning.js");
+/* harmony import */ var _formValidation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./formValidation */ "./public/js/utils/formValidation.js");
+/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/utils/leavePrompt.js");
 //script for rejecting user submitted updates.
 //requires DB collection where the submitted record resides
 
@@ -10388,67 +10396,18 @@ const rejectPublish = (formProperties) => {
 
 /***/ }),
 
-/***/ "./public/js/utils.js":
-/*!****************************!*\
-  !*** ./public/js/utils.js ***!
-  \****************************/
+/***/ "./public/js/utils/stateManager.js":
+/*!*****************************************!*\
+  !*** ./public/js/utils/stateManager.js ***!
+  \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Duplicate": () => (/* binding */ Duplicate),
-/* harmony export */   "StateManager": () => (/* binding */ StateManager),
-/* harmony export */   "userActivityThrottler": () => (/* binding */ userActivityThrottler),
-/* harmony export */   "FieldManager": () => (/* binding */ FieldManager)
+/* harmony export */   "StateManager": () => (/* binding */ StateManager)
 /* harmony export */ });
-/* harmony import */ var _autocomplete__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autocomplete */ "./public/js/autocomplete.js");
-/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
-/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
 
-
-
-
-//TODO: Can it be expanded to work with any record?
-class Duplicate {
-    constructor (title, mediaType, sourceId, type) {
-        this.title = title
-        this.mediaType = mediaType || null
-        this.sourceId = sourceId || null
-        this.type = type
-    }
-    async checkDuplicates () {
-        const response = await fetch('/sources/data?' + new URLSearchParams({
-            title: this.title,
-            mediaType: this.mediaType,
-            sourceId: this.sourceId,
-            type: this.type
-        }))
-        return response.json()
-    }
-
-    async validateDuplicates () {
-        const duplicateResponse = await this.checkDuplicates()
-        if (!duplicateResponse) return false
-        if (duplicateResponse.title) {
-            //create the link
-            let duplicateLink = document.createElement('a')
-            duplicateLink.textContent = duplicateResponse.title
-            duplicateLink.href = `/sources/${duplicateResponse.slug}`
-            duplicateLink.setAttribute('target', '_blank')
-            //create a span to put the link in.
-            let warningSpan = document.createElement('div')
-            warningSpan.textContent = 'There is already a record with this title: '
-            warningSpan.setAttribute('class', 'field-requirements field-invalid')
-            warningSpan.append(duplicateLink)
-            ;(0,_warning__WEBPACK_IMPORTED_MODULE_1__.generateWarning)(warningSpan, 'title')
-            return true //return the span with think link included.
-        } else {
-            (0,_warning__WEBPACK_IMPORTED_MODULE_1__.generateWarning)('A record with that title is already under review.', 'title')
-            return true
-        }
-    }
-}
 
 //Class for managing record state from the front end
 class StateManager {
@@ -10472,6 +10431,89 @@ class StateManager {
     }
 }
 
+/***/ }),
+
+/***/ "./public/js/utils/utils.js":
+/*!**********************************!*\
+  !*** ./public/js/utils/utils.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "formTimeout": () => (/* binding */ formTimeout),
+/* harmony export */   "FieldManager": () => (/* binding */ FieldManager)
+/* harmony export */ });
+/* harmony import */ var _autocomplete__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autocomplete */ "./public/js/utils/autocomplete.js");
+/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/utils/leavePrompt.js");
+
+// import { generateWarning } from './warning'
+
+
+// //TODO: Can it be expanded to work with any record?
+// export class Duplicate {
+//     constructor (title, mediaType, sourceId, type) {
+//         this.title = title
+//         this.mediaType = mediaType || null
+//         this.sourceId = sourceId || null
+//         this.type = type
+//     }
+//     async checkDuplicates () {
+//         const response = await fetch('/sources/data?' + new URLSearchParams({
+//             title: this.title,
+//             mediaType: this.mediaType,
+//             sourceId: this.sourceId,
+//             type: this.type
+//         }))
+//         return response.json()
+//     }
+
+//     async validateDuplicates () {
+//         const duplicateResponse = await this.checkDuplicates()
+//         if (!duplicateResponse) return false
+//         if (duplicateResponse.title) {
+//             //create the link
+//             let duplicateLink = document.createElement('a')
+//             duplicateLink.textContent = duplicateResponse.title
+//             duplicateLink.href = `/sources/${duplicateResponse.slug}`
+//             duplicateLink.setAttribute('target', '_blank')
+//             //create a span to put the link in.
+//             let warningSpan = document.createElement('div')
+//             warningSpan.textContent = 'There is already a record with this title: '
+//             warningSpan.setAttribute('class', 'field-requirements field-invalid')
+//             warningSpan.append(duplicateLink)
+//             generateWarning(warningSpan, 'title')
+//             return true //return the span with think link included.
+//         } else {
+//             generateWarning('A record with that title is already under review.', 'title')
+//             return true
+//         }
+//     }
+// }
+
+// //Class for managing record state from the front end
+// export class StateManager {
+//     constructor(checkedOut, sourceId, targetCollection) {
+//         this.checkedOut = checkedOut
+//         this.sourceId = sourceId
+//         this.targetCollection = targetCollection
+//     }
+
+//     async updateState () {
+//         const checkedOutRequest = JSON.stringify({
+//             checkedOut: this.checkedOut,
+//             sourceId: this.sourceId,
+//             collection: this.targetCollection
+//         })
+
+//         const beacon = await navigator.sendBeacon('/sources/data', checkedOutRequest)
+//         if (!beacon) {
+//             console.log('Something went wrong.',  err)
+//         }
+//     }
+// }
+
 //variables and function for idling out a user while they are editing a record.
 const warningPopup = document.querySelector('.warning-popup')
 const countdownTimer = document.querySelector('.countdown-timer')
@@ -10486,39 +10528,39 @@ let time = startingMinutes * 60 //timer for use in idleLogout function, should n
 let intervalStart = null
 
 //function to remove all event listeners
-const userActivityEventRemover = () => {
-    window.removeEventListener('load', userActivityThrottler)
-    window.removeEventListener('mousemove', userActivityThrottler)
-    window.removeEventListener('mousedown', userActivityThrottler) // catches touchscreen presses as well
-    window.removeEventListener('touchstart', userActivityThrottler) // catches touchscreen swipes as well
-    window.removeEventListener('click', userActivityThrottler) // catches touchpad clicks as well
-    window.removeEventListener('keydown', userActivityThrottler)
-    window.removeEventListener('scroll', userActivityThrottler, true);
+const formTimeoutEventRemover = () => {
+    window.removeEventListener('load', formTimeout)
+    window.removeEventListener('mousemove', formTimeout)
+    window.removeEventListener('mousedown', formTimeout) // catches touchscreen presses as well
+    window.removeEventListener('touchstart', formTimeout) // catches touchscreen swipes as well
+    window.removeEventListener('click', formTimeout) // catches touchpad clicks as well
+    window.removeEventListener('keydown', formTimeout)
+    window.removeEventListener('scroll', formTimeout, true);
 }
 
 //starts the countdown after 2 minutes.  If a previously countdown had been started, resets the timer, removes the eventlisteners and stops the countdown and then starts it back up again after 2 minutes.
-//this ensures that the countdown only needs to pick up one event every two minutes in order to reset the timer instead of picking up every event all the time.
-const userActivityThrottler = () => {
+//this ensures that the countdown only needs to pick uformTimeout minutes in order to reset the timer instead of picking up every event all the time.
+const formTimeout = () => {
     if (intervalStart) {
         // if (time > warningTime) { //resets the timer to full as long as the warning window isn't up.
         //     time = startingMinutes * 60
         // }
         time = startingMinutes * 60 //resets the time back to default
-        userActivityEventRemover() //removes all event listeners
+        formTimeoutEventRemover() //removes all event listeners
         clearInterval(intervalStart) //stops the idleLogout function from running every 1 second.
     }
     //all listeners are removed and the idleLogout function is stopped until the below function starts
     //function will run after the amount of time specified at the end.
     setTimeout(() => {
         intervalStart = setInterval(idleLogout, 1000)  //runs the idleLogout function every second after starting
-        //create all the event listeners that will rerun the userActivityThrottler function from the start.
-        window.addEventListener('load', userActivityThrottler)
-        window.addEventListener('mousemove', userActivityThrottler)
-        window.addEventListener('mousedown', userActivityThrottler) 
-        window.addEventListener('touchstart', userActivityThrottler) 
-        window.addEventListener('click', userActivityThrottler) 
-        window.addEventListener('keydown', userActivityThrottler)
-        window.addEventListener('scroll', userActivityThrottler, true);
+        //create all the event listeners that will rerun the formTimeout function from the start.
+        window.addEventListener('load', formTimeout)
+        window.addEventListener('mousemove', formTimeout)
+        window.addEventListener('mousedown', formTimeout) 
+        window.addEventListener('touchstart', formTimeout) 
+        window.addEventListener('click', formTimeout) 
+        window.addEventListener('keydown', formTimeout)
+        window.addEventListener('scroll', formTimeout, true);
     }, 1000 * 60 * 1)
 }
 
@@ -10530,7 +10572,7 @@ const idleLogout = () => { //function for kicking user out of the page if they d
         blurBackground.style.display = 'none' //closes the warning popup
         // time = startingMinutes * 60 //resets the time back to default
         timerButton.removeEventListener('click', closePopup) //removes the timerbutton eventlistener associated with the popup
-        userActivityThrottler() //runs the function to eventually restart the timer again.
+        formTimeout() //runs the function to eventually restart the timer again.
     }
     
     const openPopup = () => { //creates the popup
@@ -10545,7 +10587,7 @@ const idleLogout = () => { //function for kicking user out of the page if they d
 
     if (time === warningTime) {
         openPopup() //opens the pop up ONCE
-        userActivityEventRemover() //removes all other eventlisteners
+        formTimeoutEventRemover() //removes all other eventlisteners
         timerButton.addEventListener('click', closePopup) //creates a SINGLE event listener for the close button which runs the closePopup function.
     }
 
@@ -10554,7 +10596,7 @@ const idleLogout = () => { //function for kicking user out of the page if they d
     }
 
     if (time <= 0) {  //when the timer reaches zero, boots them out.
-        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_2__.suppressLeavePrompt)() //don't want a dialog box, set flag to false.
+        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_1__.suppressLeavePrompt)() //don't want a dialog box, set flag to false.
         location.href = '/dashboard' //redirects to the dashboard
     }
 
@@ -10678,10 +10720,10 @@ class FieldManager {
 
 /***/ }),
 
-/***/ "./public/js/warning.js":
-/*!******************************!*\
-  !*** ./public/js/warning.js ***!
-  \******************************/
+/***/ "./public/js/utils/warning.js":
+/*!************************************!*\
+  !*** ./public/js/utils/warning.js ***!
+  \************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -11147,19 +11189,23 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-/*!*********************************!*\
-  !*** ./public/js/editSource.js ***!
-  \*********************************/
+/*!************************************!*\
+  !*** ./public/js/manageSources.js ***!
+  \************************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils.js */ "./public/js/utils.js");
-/* harmony import */ var _formValidation_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./formValidation.js */ "./public/js/formValidation.js");
-/* harmony import */ var _rejectPublish_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./rejectPublish.js */ "./public/js/rejectPublish.js");
-/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./warning */ "./public/js/warning.js");
-/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/leavePrompt.js");
-/* harmony import */ var _formIdentifier__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./formIdentifier */ "./public/js/formIdentifier.js");
-/* harmony import */ var _calendarSet_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./calendarSet.js */ "./public/js/calendarSet.js");
-/* harmony import */ var _imageTools_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./imageTools.js */ "./public/js/imageTools.js");
-/* harmony import */ var _autocomplete_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./autocomplete.js */ "./public/js/autocomplete.js");
+/* harmony import */ var _utils_utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/utils.js */ "./public/js/utils/utils.js");
+/* harmony import */ var _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/duplicateChecker */ "./public/js/utils/duplicateChecker.js");
+/* harmony import */ var _utils_stateManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/stateManager */ "./public/js/utils/stateManager.js");
+/* harmony import */ var _utils_formValidation_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils/formValidation.js */ "./public/js/utils/formValidation.js");
+/* harmony import */ var _utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils/rejectPublish.js */ "./public/js/utils/rejectPublish.js");
+/* harmony import */ var _utils_warning__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils/warning */ "./public/js/utils/warning.js");
+/* harmony import */ var _utils_leavePrompt__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/leavePrompt */ "./public/js/utils/leavePrompt.js");
+/* harmony import */ var _utils_formIdentifier__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils/formIdentifier */ "./public/js/utils/formIdentifier.js");
+/* harmony import */ var _utils_calendarSet_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/calendarSet.js */ "./public/js/utils/calendarSet.js");
+/* harmony import */ var _utils_imageTools_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./utils/imageTools.js */ "./public/js/utils/imageTools.js");
+/* harmony import */ var _utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./utils/autocomplete.js */ "./public/js/utils/autocomplete.js");
+
+
 
 
 
@@ -11177,38 +11223,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
-const bookFields = document.querySelector('#book-fields')
-const movieFields = document.querySelector('#movie-fields')
-const tvFields = document.querySelector('#tv-fields')
-const gameFields = document.querySelector('#game-fields')
-const comicFields = document.querySelector('#comic-fields')
 
-
-
-//sets properties for properties that can have addable fields.
-const comicArtistDetails = {
-    media: 'comic',
-    job: 'artist',
-    addableFields: 3
-}
-
-const movieDirectorDetails = {
-    media: 'movie',
-    job: 'director',
-    addableFields: 1
-}
-
-const movieWriterDetails = {
-    media: 'movie',
-    job: 'writer',
-    addableFields: 3
-}
-
-const bookAuthorDetails = {
-    media: 'book',
-    job: 'author',
-    addableFields: 3
-}
 
 const mediaDetails = [
     {
@@ -11266,46 +11281,35 @@ const mediaDetails = [
 
 
 //gets all the properties and data from the form to be used for various other functions
-const formProperties = (0,_formIdentifier__WEBPACK_IMPORTED_MODULE_5__.gatherFormInfo)()
+const formProperties = (0,_utils_formIdentifier__WEBPACK_IMPORTED_MODULE_7__.gatherFormInfo)()
 
 //turns on a prompt that pops up when the window closes.  Can be disabled with suppressLeavePrompt function where necessary
-;(0,_leavePrompt__WEBPACK_IMPORTED_MODULE_4__.leavePrompt)()
+;(0,_utils_leavePrompt__WEBPACK_IMPORTED_MODULE_6__.leavePrompt)()
 
 //determines the current day and sets the release date calendar to have a max date of today. Also properly formats the date.
-;(0,_calendarSet_js__WEBPACK_IMPORTED_MODULE_6__.maxDateSelector)()
+;(0,_utils_calendarSet_js__WEBPACK_IMPORTED_MODULE_8__.maxDateSelector)()
 
 //creates an image preview whenever the image is changed
-;(0,_imageTools_js__WEBPACK_IMPORTED_MODULE_7__.imagePreview)()
+;(0,_utils_imageTools_js__WEBPACK_IMPORTED_MODULE_9__.imagePreview)()
 
 //turns on autocomplete functionality for any associated fields with the autocomplete class
-;(0,_autocomplete_js__WEBPACK_IMPORTED_MODULE_8__.autocompleteListener)()
+;(0,_utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_10__.autocompleteListener)()
 
-// const enableFieldAdd = (currentField, field) => {
-//     currentField.addEventListener('click', event => {
-//         const fieldChange = new FieldManager(...Object.values(field))
-//         console.log(field.job, 'here')
-//         if (event.target && event.target.matches(`a#add-${field.job}`)) {
-//             fieldChange.addField(`remove-${field.job}`)
-//         }
-//         if (event.target && event.target.matches(`a.remove-${field.job}`)) {
-//             fieldChange.deleteField(event.target.parentElement)
-//         }
-//     })
-// }
-
+//this function does multiple things.  For new records it hides or reveals the fields associated with the chosen media type.  In new and existing records it allows for the addition and removal of variable number fields as defined in the mediaDetails object.  In existing records it ensures that dynamically loaded fields saved previously load correctly.
+//TODO: rebuilt this function to allow any record to use it to add/remove fields
 const multiFieldManager = () => {
-    for (let media of mediaDetails) {
-        const currentField = document.querySelector(`#${media.field}`)
-        if (media.type === mediaType.value) {
-            currentField.classList.remove('hide-sources')
-            for (let expandFieldSettings of media.expandableFields) {
-                if (formProperties.existingSource) {
-                    const loadExistingFields = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))  //TODO: change how we pass through the parameters so we can remove "media" from the object.
+    for (let media of mediaDetails) { //loops through each media object in the mediaType array
+        const mediaDiv = document.querySelector(`#${media.field}`) //selects the div holding all the fields for that particular media type
+        if (media.type === mediaType.value) { //checks if the current media being looped through matches the current value of the form.
+            mediaDiv.classList.remove('hide-sources') //displays all fields of the chosen media type
+            for (let expandFieldSettings of media.expandableFields) { //loops through each field that can be expanded as defined in the mediaType array.
+                if (formProperties.existingSource) { //if an existing source, runs the loadField method so the dynamic fields are properly added
+                    const loadExistingFields = new _utils_utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))  //TODO: change how we pass through the parameters so we can remove "media" from the object.
                     loadExistingFields.loadField()
                 }
-                // enableFieldAdd(currentField, expandFieldSettings)
-                currentField.addEventListener('click', event => {
-                    const fieldChange = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))
+                //creates the eventlisteners for the add/remove field methods and then executes those methods when clicked.
+                mediaDiv.addEventListener('click', event => {
+                    const fieldChange = new _utils_utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))
                     if (event.target && event.target.matches(`a#add-${expandFieldSettings.job}`)) {
                         fieldChange.addField(`remove-${expandFieldSettings.job}`)
                     }
@@ -11315,91 +11319,46 @@ const multiFieldManager = () => {
                 })
             }
         } else {
-            currentField.classList.add('hide-sources')
+            mediaDiv.classList.add('hide-sources') //hides divs for non-chosen media types.
+            const allFields = mediaDiv.querySelectorAll(":scope > div > input"); //selects all inputs under non-chosen media types.
+            for (let singleField of allFields) { //loops through all previously chosen inputs and sets them to their default value.  For example, this stops book records being submitted with movie data by scrubbing that data when the media type is changed.
+                singleField.value = singleField.defaultValue
+            }
         }
     }
 }
 
 
-if (formProperties.existingSource) {
+if (formProperties.existingSource) { //for non-new records only.
     
+    //updates the record to being locked on load.  sourceId is pulled from the HTML.
     window.addEventListener('load', async event => {
-        const state = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.StateManager(true, sourceId, formProperties.lockLocation)
+        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_2__.StateManager(true, sourceId, formProperties.lockLocation)
         await state.updateState()
     })
 
-    ;(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.userActivityThrottler)()
+    //starts the inactivity timer.
+    ;(0,_utils_utils_js__WEBPACK_IMPORTED_MODULE_0__.formTimeout)()
 
+    //unlocks the record if a user leaves the edit page or the page times out.
     window.addEventListener('beforeunload', async event => {
         event.preventDefault()  
         
-        const state = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.StateManager(false, sourceId, formProperties.lockLocation)
+        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_2__.StateManager(false, sourceId, formProperties.lockLocation)
         await state.updateState()
-
     })
-
-
 
     //determines which parts of the form to load based on the mediaType
     //also ensures the additionally added fields load with the "remove" option
     window.addEventListener('load', event => {
         multiFieldManager()
-        // for (let media of mediaDetails) {
-        //     const currentField = document.querySelector(`#${media.field}`)
-        //     if (media.type === mediaType.value) {
-        //         currentField.classList.remove('hide-sources')
-        //         for (let expandFieldSettings of media.expandableFields) {
-        //             const loadExistingFields = new FieldManager(...Object.values(expandFieldSettings))  //TODO: change how we pass through the parameters so we can remove "media" from the object.
-        //             loadExistingFields.loadField()
-        //             enableFieldAdd(currentField, expandFieldSettings)
-        //         }
-        //     } else {
-        //         currentField.classList.add('hide-sources')
-        //     }
-        // }
     })
+
 } else {
+
     //on new records, loads the proper fields for the chosen mediaType
     mediaType.addEventListener('input', event => {
-
         multiFieldManager()
-    //     for (let media of mediaDetails) {
-    //         const currentField = document.querySelector(`#${media.field}`)
-    //         if (media.type === mediaType.value) {
-    //             currentField.classList.remove('hide-sources')
-    //             for (let expandFieldSettings of media.expandableFields) {
-    //                 enableFieldAdd(currentField, expandFieldSettings)
-    //             }
-    //         } else {
-    //             currentField.classList.add('hide-sources')
-    //         }
-    //     }
-
-    //     // if (mediaType.value === 'Book') {
-    //     //     bookFields.classList.remove('hide-sources')
-    //     // } else {
-    //     //     bookFields.classList.add('hide-sources')
-    //     // }
-    //     // if (mediaType.value === 'Movie') {
-    //     //     movieFields.classList.remove('hide-sources')
-    //     // } else {
-    //     //     movieFields.classList.add('hide-sources')
-    //     // }
-    //     // if (mediaType.value === 'TV Show') {
-    //     //     tvFields.classList.remove('hide-sources')
-    //     // } else {
-    //     //     tvFields.classList.add('hide-sources')
-    //     // }
-    //     // if (mediaType.value === 'Comic') {
-    //     //     comicFields.classList.remove('hide-sources')
-    //     // } else {
-    //     //     comicFields.classList.add('hide-sources')
-    //     // }
-    //     // if (mediaType.value === 'Video Game') {
-    //     //     gameFields.classList.remove('hide-sources')
-    //     // } else {
-    //     //     gameFields.classList.add('hide-sources')
-    //     // }
     })
 }
 
@@ -11409,18 +11368,18 @@ formProperties.formData.addEventListener('submit', async event => {
     event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
 
-    ;(0,_warning__WEBPACK_IMPORTED_MODULE_3__.clearWarning)()  //clears any previous warnings
+    ;(0,_utils_warning__WEBPACK_IMPORTED_MODULE_5__.clearWarning)()  //clears any previous warnings
 
     // validates all entries on the form to match Joi schema on the backend and generates error messages.  Saves true/false to variable on whether there was an error or not.
-    const adminNote = (0,_rejectPublish_js__WEBPACK_IMPORTED_MODULE_2__.adminNoteCheck)()
-    const formFail = (0,_formValidation_js__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
+    const adminNote = (0,_utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_4__.adminNoteCheck)()
+    const formFail = (0,_utils_formValidation_js__WEBPACK_IMPORTED_MODULE_3__.formValidation)(formProperties.formData, formProperties.schema)
 
-    const submittedRecord = new _utils_js__WEBPACK_IMPORTED_MODULE_0__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
+    const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_1__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.
-        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_4__.suppressLeavePrompt)()
+        (0,_utils_leavePrompt__WEBPACK_IMPORTED_MODULE_6__.suppressLeavePrompt)()
         return formProperties.formData.submit()
     }
     event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
@@ -11429,50 +11388,6 @@ formProperties.formData.addEventListener('submit', async event => {
 
 
 
-
-
-//allows adding additional fields for movie directors and writers
-// movieFields.addEventListener('click', event => {
-//     const directorUpdate = new FieldManager(...Object.values(movieDirectorDetails))
-//     const writerUpdate = new FieldManager(...Object.values(movieWriterDetails))
-//     if (event.target && event.target.matches("a#add-director")) {
-//         directorUpdate.addField()
-//     }
-//     if (event.target && event.target.matches("a.remove-director")) {
-//         directorUpdate.deleteField(event.target.parentElement)
-//     }
-    
-//     if (event.target && event.target.matches("a#add-writer")) {
-//         writerUpdate.addField()
-//     }
-//     if (event.target && event.target.matches("a.remove-writer")) {
-//         writerUpdate.deleteField(event.target.parentElement)
-//     }
-// })
-
-// //allows adding additional fields for comic artists
-// comicFields.addEventListener('click', event => {
-//     const fieldUpdate = new FieldManager(...Object.values(comicArtistDetails))
-//     if (event.target && event.target.matches("a#add-artist")) {
-//         fieldUpdate.addField('remove-artist')
-//     }
-//     if (event.target && event.target.matches("a.remove-artist")) {
-//         fieldUpdate.deleteField(event.target.parentElement)
-//         }
-// })
-
-
-
-// bookFields.addEventListener('click', event => {
-//     const fieldUpdate = new FieldManager(...Object.values(bookAuthorDetails))
-//     //const fieldUpdate = new FieldManager('add-author', 'book-author', 'book[author][]', 3)
-//     if (event.target && event.target.matches("a#add-author")) {
-//         fieldUpdate.addField('remove-author')
-//     }
-//     if (event.target && event.target.matches("a.remove-author")) {
-//         fieldUpdate.deleteField(event.target.parentElement)
-//     }
-// })
 
 
 })();
