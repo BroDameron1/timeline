@@ -1,5 +1,5 @@
-import { formTimeout, FieldManager } from "./utils/utils.js"
-
+import { FieldManager } from "./utils/fieldManager.js"
+import { formTimeout } from "./utils/timeout.js"
 import { Duplicate } from './utils/duplicateChecker'
 import { StateManager } from './utils/stateManager'
 import { formValidation } from './utils/formValidation.js'

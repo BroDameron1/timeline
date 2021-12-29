@@ -10110,6 +10110,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./warning */ "./public/js/utils/warning.js");
 
 
+//TODO: Can it be expanded to work with any record?
 class Duplicate {
     constructor (title, mediaType, sourceId, type) {
         this.title = title
@@ -10148,6 +10149,136 @@ class Duplicate {
             return true
         }
     }
+}
+
+/***/ }),
+
+/***/ "./public/js/utils/fieldManager.js":
+/*!*****************************************!*\
+  !*** ./public/js/utils/fieldManager.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "FieldManager": () => (/* binding */ FieldManager)
+/* harmony export */ });
+/* harmony import */ var _autocomplete__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autocomplete */ "./public/js/utils/autocomplete.js");
+
+
+
+class FieldManager {
+    constructor (media, job, additionalFields) {
+        this.media = media,
+        this.job = job,
+        this.additionalFields = additionalFields
+    }
+
+    //creates a remove link, needed for the addField method and loadField method
+    createRemoveLink(job) {
+        //create link to remove the associated input
+        let removeButton = document.createElement('a')
+        //set link text to Remove
+        removeButton.textContent = 'Remove'
+        //don't let the link go anywhere.
+        removeButton.href = "#"
+        //set class so the event listener can find it
+        removeButton.setAttribute('class', `remove-${job}`)
+        return removeButton
+    }
+
+    //add a new input function
+    addField () {
+        //find the link so new elements can be placed in reference to it
+        const addFieldLink = document.querySelector(`#add-${this.job}`)
+        //create a node list of current input fields.
+        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
+
+        //check if the number of input fields is less than or equal to the number of specified fields.
+        if (totalFieldList.length <= this.additionalFields) {
+            //create div and add before link
+            let newDiv = document.createElement('div')
+            //set new div to have a class of form-field (styling only)
+            newDiv.setAttribute('class', 'form-field')
+            //set the new div to have a unique id specific to this field
+            newDiv.setAttribute('id', `${this.media}-${this.job}-${totalFieldList.length}`)
+            //place the new div before the add field link
+            addFieldLink.parentNode.insertBefore(newDiv, addFieldLink)
+
+            //create input field
+            let newInput = document.createElement('input')
+            //set to text input
+            newInput.type = 'text'
+            //set to same class that totalFieldList looks for.  ALso adds autocomplete class to allow that functionality.
+            newInput.setAttribute('class', `${this.media}-${this.job} autocomplete`)
+
+            //set id to allow the box to be highlighted for validation errors
+            //this must be different than the div id for proper selection and highlighting
+            newInput.setAttribute('id', `${this.media}-${this.job}${totalFieldList.length}`)
+
+            //set name to allow it to be passed in the request body.  This name is the same on each input.
+            newInput.setAttribute('name', `${this.media}[${this.job}][]`)
+            //sets the max length of the new field
+            newInput.setAttribute('maxlength', '80')
+            //adds new input field into the previously created div
+            newDiv.append(newInput)
+
+
+            //Create a link with the method and add it inside the new div
+            newDiv.append(this.createRemoveLink(this.job))
+
+            //fires the autocompleteListener function again so autocomplete works on the new field
+            ;(0,_autocomplete__WEBPACK_IMPORTED_MODULE_0__.autocompleteListener)()
+        }
+        //Check if we have the max number of inputs and then remove the add link if true
+        if (totalFieldList.length === this.additionalFields) {
+            addFieldLink.classList.add('hide-sources')
+        }
+    }
+
+    //delete an existing input function (except the first one)
+    deleteField (elementToDelete) {
+        //remove parent element of link
+        elementToDelete.remove()
+        //identify the Add input link.
+        const addFieldLink = document.querySelector(`#add-${this.job}`)
+        //indetify the total number of current inputs.
+        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
+
+        //readd the add input link if there are less than the max fields.
+        if (totalFieldList.length <= this.additionalFields) {
+            addFieldLink.classList.remove('hide-sources')
+        }
+    }
+
+    //when the page loads, all the input fields are dynamically added by a loop in the
+    //EJS file.  The EJS file can't add the dynamic ids of the fields, this method does that on load of the page
+    //so that the fields have the remove capability.
+    loadField () {
+        //find the link so new elements can be placed in reference to it
+        const addFieldLink = document.querySelector(`#add-${this.job}`)
+        //identify all input fields
+        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
+        //if there is more than one entry, start the loop
+        if (totalFieldList.length > 1) {
+            //loop over each field starting at position one (skipping the first one)
+            for (let i = 1; i < totalFieldList.length; i++) {
+                //set input to the current field in the nodelist
+                let input = totalFieldList[i]
+                //add the dynamic id to the div housing the input.
+                input.parentElement.setAttribute("id", `${this.media}-${this.job}-${i}`)
+
+                //create remove link with method and insert it after the input.
+                input.parentNode.insertBefore(this.createRemoveLink(this.job), input.nextSibling)
+            }
+        }
+
+        //Check if we have the max number of inputs and then remove the add link if true
+        if (totalFieldList.length > this.additionalFields) {
+            addFieldLink.classList.add('hide-sources')
+        }
+    }    
 }
 
 /***/ }),
@@ -10433,86 +10564,20 @@ class StateManager {
 
 /***/ }),
 
-/***/ "./public/js/utils/utils.js":
-/*!**********************************!*\
-  !*** ./public/js/utils/utils.js ***!
-  \**********************************/
+/***/ "./public/js/utils/timeout.js":
+/*!************************************!*\
+  !*** ./public/js/utils/timeout.js ***!
+  \************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "formTimeout": () => (/* binding */ formTimeout),
-/* harmony export */   "FieldManager": () => (/* binding */ FieldManager)
+/* harmony export */   "formTimeout": () => (/* binding */ formTimeout)
 /* harmony export */ });
-/* harmony import */ var _autocomplete__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autocomplete */ "./public/js/utils/autocomplete.js");
-/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/utils/leavePrompt.js");
-
-// import { generateWarning } from './warning'
+/* harmony import */ var _leavePrompt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./leavePrompt */ "./public/js/utils/leavePrompt.js");
 
 
-// //TODO: Can it be expanded to work with any record?
-// export class Duplicate {
-//     constructor (title, mediaType, sourceId, type) {
-//         this.title = title
-//         this.mediaType = mediaType || null
-//         this.sourceId = sourceId || null
-//         this.type = type
-//     }
-//     async checkDuplicates () {
-//         const response = await fetch('/sources/data?' + new URLSearchParams({
-//             title: this.title,
-//             mediaType: this.mediaType,
-//             sourceId: this.sourceId,
-//             type: this.type
-//         }))
-//         return response.json()
-//     }
-
-//     async validateDuplicates () {
-//         const duplicateResponse = await this.checkDuplicates()
-//         if (!duplicateResponse) return false
-//         if (duplicateResponse.title) {
-//             //create the link
-//             let duplicateLink = document.createElement('a')
-//             duplicateLink.textContent = duplicateResponse.title
-//             duplicateLink.href = `/sources/${duplicateResponse.slug}`
-//             duplicateLink.setAttribute('target', '_blank')
-//             //create a span to put the link in.
-//             let warningSpan = document.createElement('div')
-//             warningSpan.textContent = 'There is already a record with this title: '
-//             warningSpan.setAttribute('class', 'field-requirements field-invalid')
-//             warningSpan.append(duplicateLink)
-//             generateWarning(warningSpan, 'title')
-//             return true //return the span with think link included.
-//         } else {
-//             generateWarning('A record with that title is already under review.', 'title')
-//             return true
-//         }
-//     }
-// }
-
-// //Class for managing record state from the front end
-// export class StateManager {
-//     constructor(checkedOut, sourceId, targetCollection) {
-//         this.checkedOut = checkedOut
-//         this.sourceId = sourceId
-//         this.targetCollection = targetCollection
-//     }
-
-//     async updateState () {
-//         const checkedOutRequest = JSON.stringify({
-//             checkedOut: this.checkedOut,
-//             sourceId: this.sourceId,
-//             collection: this.targetCollection
-//         })
-
-//         const beacon = await navigator.sendBeacon('/sources/data', checkedOutRequest)
-//         if (!beacon) {
-//             console.log('Something went wrong.',  err)
-//         }
-//     }
-// }
 
 //variables and function for idling out a user while they are editing a record.
 const warningPopup = document.querySelector('.warning-popup')
@@ -10596,7 +10661,7 @@ const idleLogout = () => { //function for kicking user out of the page if they d
     }
 
     if (time <= 0) {  //when the timer reaches zero, boots them out.
-        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_1__.suppressLeavePrompt)() //don't want a dialog box, set flag to false.
+        (0,_leavePrompt__WEBPACK_IMPORTED_MODULE_0__.suppressLeavePrompt)() //don't want a dialog box, set flag to false.
         location.href = '/dashboard' //redirects to the dashboard
     }
 
@@ -10604,119 +10669,6 @@ const idleLogout = () => { //function for kicking user out of the page if they d
     time-- //subtracts one second from the time
 }
 
-
-class FieldManager {
-    constructor (media, job, additionalFields) {
-        this.media = media,
-        this.job = job,
-        this.additionalFields = additionalFields
-    }
-
-    //creates a remove link, needed for the addField method and loadField method
-    createRemoveLink(job) {
-        //create link to remove the associated input
-        let removeButton = document.createElement('a')
-        //set link text to Remove
-        removeButton.textContent = 'Remove'
-        //don't let the link go anywhere.
-        removeButton.href = "#"
-        //set class so the event listener can find it
-        removeButton.setAttribute('class', `remove-${job}`)
-        return removeButton
-    }
-
-    //add a new input function
-    addField () {
-        //find the link so new elements can be placed in reference to it
-        const addFieldLink = document.querySelector(`#add-${this.job}`)
-        //create a node list of current input fields.
-        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
-
-        //check if the number of input fields is less than or equal to the number of specified fields.
-        if (totalFieldList.length <= this.additionalFields) {
-            //create div and add before link
-            let newDiv = document.createElement('div')
-            //set new div to have a class of form-field (styling only)
-            newDiv.setAttribute('class', 'form-field')
-            //set the new div to have a unique id specific to this field
-            newDiv.setAttribute('id', `${this.media}-${this.job}-${totalFieldList.length}`)
-            //place the new div before the add field link
-            addFieldLink.parentNode.insertBefore(newDiv, addFieldLink)
-
-            //create input field
-            let newInput = document.createElement('input')
-            //set to text input
-            newInput.type = 'text'
-            //set to same class that totalFieldList looks for.  ALso adds autocomplete class to allow that functionality.
-            newInput.setAttribute('class', `${this.media}-${this.job} autocomplete`)
-
-            //set id to allow the box to be highlighted for validation errors
-            //this must be different than the div id for proper selection and highlighting
-            newInput.setAttribute('id', `${this.media}-${this.job}${totalFieldList.length}`)
-
-            //set name to allow it to be passed in the request body.  This name is the same on each input.
-            newInput.setAttribute('name', `${this.media}[${this.job}][]`)
-            //sets the max length of the new field
-            newInput.setAttribute('maxlength', '80')
-            //adds new input field into the previously created div
-            newDiv.append(newInput)
-
-
-            //Create a link with the method and add it inside the new div
-            newDiv.append(this.createRemoveLink(this.job))
-
-            //fires the autocompleteListener function again so autocomplete works on the new field
-            ;(0,_autocomplete__WEBPACK_IMPORTED_MODULE_0__.autocompleteListener)()
-        }
-        //Check if we have the max number of inputs and then remove the add link if true
-        if (totalFieldList.length === this.additionalFields) {
-            addFieldLink.classList.add('hide-sources')
-        }
-    }
-
-    //delete an existing input function (except the first one)
-    deleteField (elementToDelete) {
-        //remove parent element of link
-        elementToDelete.remove()
-        //identify the Add input link.
-        const addFieldLink = document.querySelector(`#add-${this.job}`)
-        //indetify the total number of current inputs.
-        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
-
-        //readd the add input link if there are less than the max fields.
-        if (totalFieldList.length <= this.additionalFields) {
-            addFieldLink.classList.remove('hide-sources')
-        }
-    }
-
-    //when the page loads, all the input fields are dynamically added by a loop in the
-    //EJS file.  The EJS file can't add the dynamic ids of the fields, this method does that on load of the page
-    //so that the fields have the remove capability.
-    loadField () {
-        //find the link so new elements can be placed in reference to it
-        const addFieldLink = document.querySelector(`#add-${this.job}`)
-        //identify all input fields
-        const totalFieldList = document.querySelectorAll(`.${this.media}-${this.job}`)
-        //if there is more than one entry, start the loop
-        if (totalFieldList.length > 1) {
-            //loop over each field starting at position one (skipping the first one)
-            for (let i = 1; i < totalFieldList.length; i++) {
-                //set input to the current field in the nodelist
-                let input = totalFieldList[i]
-                //add the dynamic id to the div housing the input.
-                input.parentElement.setAttribute("id", `${this.media}-${this.job}-${i}`)
-
-                //create remove link with method and insert it after the input.
-                input.parentNode.insertBefore(this.createRemoveLink(this.job), input.nextSibling)
-            }
-        }
-
-        //Check if we have the max number of inputs and then remove the add link if true
-        if (totalFieldList.length > this.additionalFields) {
-            addFieldLink.classList.add('hide-sources')
-        }
-    }    
-}
 
 /***/ }),
 
@@ -11193,17 +11145,18 @@ var __webpack_exports__ = {};
   !*** ./public/js/manageSources.js ***!
   \************************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/utils.js */ "./public/js/utils/utils.js");
-/* harmony import */ var _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/duplicateChecker */ "./public/js/utils/duplicateChecker.js");
-/* harmony import */ var _utils_stateManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/stateManager */ "./public/js/utils/stateManager.js");
-/* harmony import */ var _utils_formValidation_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils/formValidation.js */ "./public/js/utils/formValidation.js");
-/* harmony import */ var _utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils/rejectPublish.js */ "./public/js/utils/rejectPublish.js");
-/* harmony import */ var _utils_warning__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils/warning */ "./public/js/utils/warning.js");
-/* harmony import */ var _utils_leavePrompt__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/leavePrompt */ "./public/js/utils/leavePrompt.js");
-/* harmony import */ var _utils_formIdentifier__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils/formIdentifier */ "./public/js/utils/formIdentifier.js");
-/* harmony import */ var _utils_calendarSet_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/calendarSet.js */ "./public/js/utils/calendarSet.js");
-/* harmony import */ var _utils_imageTools_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./utils/imageTools.js */ "./public/js/utils/imageTools.js");
-/* harmony import */ var _utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./utils/autocomplete.js */ "./public/js/utils/autocomplete.js");
+/* harmony import */ var _utils_fieldManager_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/fieldManager.js */ "./public/js/utils/fieldManager.js");
+/* harmony import */ var _utils_timeout_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/timeout.js */ "./public/js/utils/timeout.js");
+/* harmony import */ var _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils/duplicateChecker */ "./public/js/utils/duplicateChecker.js");
+/* harmony import */ var _utils_stateManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils/stateManager */ "./public/js/utils/stateManager.js");
+/* harmony import */ var _utils_formValidation_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils/formValidation.js */ "./public/js/utils/formValidation.js");
+/* harmony import */ var _utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils/rejectPublish.js */ "./public/js/utils/rejectPublish.js");
+/* harmony import */ var _utils_warning__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/warning */ "./public/js/utils/warning.js");
+/* harmony import */ var _utils_leavePrompt__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils/leavePrompt */ "./public/js/utils/leavePrompt.js");
+/* harmony import */ var _utils_formIdentifier__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/formIdentifier */ "./public/js/utils/formIdentifier.js");
+/* harmony import */ var _utils_calendarSet_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./utils/calendarSet.js */ "./public/js/utils/calendarSet.js");
+/* harmony import */ var _utils_imageTools_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./utils/imageTools.js */ "./public/js/utils/imageTools.js");
+/* harmony import */ var _utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./utils/autocomplete.js */ "./public/js/utils/autocomplete.js");
 
 
 
@@ -11281,19 +11234,19 @@ const mediaDetails = [
 
 
 //gets all the properties and data from the form to be used for various other functions
-const formProperties = (0,_utils_formIdentifier__WEBPACK_IMPORTED_MODULE_7__.gatherFormInfo)()
+const formProperties = (0,_utils_formIdentifier__WEBPACK_IMPORTED_MODULE_8__.gatherFormInfo)()
 
 //turns on a prompt that pops up when the window closes.  Can be disabled with suppressLeavePrompt function where necessary
-;(0,_utils_leavePrompt__WEBPACK_IMPORTED_MODULE_6__.leavePrompt)()
+;(0,_utils_leavePrompt__WEBPACK_IMPORTED_MODULE_7__.leavePrompt)()
 
 //determines the current day and sets the release date calendar to have a max date of today. Also properly formats the date.
-;(0,_utils_calendarSet_js__WEBPACK_IMPORTED_MODULE_8__.maxDateSelector)()
+;(0,_utils_calendarSet_js__WEBPACK_IMPORTED_MODULE_9__.maxDateSelector)()
 
 //creates an image preview whenever the image is changed
-;(0,_utils_imageTools_js__WEBPACK_IMPORTED_MODULE_9__.imagePreview)()
+;(0,_utils_imageTools_js__WEBPACK_IMPORTED_MODULE_10__.imagePreview)()
 
 //turns on autocomplete functionality for any associated fields with the autocomplete class
-;(0,_utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_10__.autocompleteListener)()
+;(0,_utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_11__.autocompleteListener)()
 
 //this function does multiple things.  For new records it hides or reveals the fields associated with the chosen media type.  In new and existing records it allows for the addition and removal of variable number fields as defined in the mediaDetails object.  In existing records it ensures that dynamically loaded fields saved previously load correctly.
 //TODO: rebuilt this function to allow any record to use it to add/remove fields
@@ -11304,12 +11257,12 @@ const multiFieldManager = () => {
             mediaDiv.classList.remove('hide-sources') //displays all fields of the chosen media type
             for (let expandFieldSettings of media.expandableFields) { //loops through each field that can be expanded as defined in the mediaType array.
                 if (formProperties.existingSource) { //if an existing source, runs the loadField method so the dynamic fields are properly added
-                    const loadExistingFields = new _utils_utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))  //TODO: change how we pass through the parameters so we can remove "media" from the object.
+                    const loadExistingFields = new _utils_fieldManager_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))  //TODO: change how we pass through the parameters so we can remove "media" from the object.
                     loadExistingFields.loadField()
                 }
                 //creates the eventlisteners for the add/remove field methods and then executes those methods when clicked.
                 mediaDiv.addEventListener('click', event => {
-                    const fieldChange = new _utils_utils_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))
+                    const fieldChange = new _utils_fieldManager_js__WEBPACK_IMPORTED_MODULE_0__.FieldManager(...Object.values(expandFieldSettings))
                     if (event.target && event.target.matches(`a#add-${expandFieldSettings.job}`)) {
                         fieldChange.addField(`remove-${expandFieldSettings.job}`)
                     }
@@ -11333,18 +11286,18 @@ if (formProperties.existingSource) { //for non-new records only.
     
     //updates the record to being locked on load.  sourceId is pulled from the HTML.
     window.addEventListener('load', async event => {
-        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_2__.StateManager(true, sourceId, formProperties.lockLocation)
+        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_3__.StateManager(true, sourceId, formProperties.lockLocation)
         await state.updateState()
     })
 
     //starts the inactivity timer.
-    ;(0,_utils_utils_js__WEBPACK_IMPORTED_MODULE_0__.formTimeout)()
+    ;(0,_utils_timeout_js__WEBPACK_IMPORTED_MODULE_1__.formTimeout)()
 
     //unlocks the record if a user leaves the edit page or the page times out.
     window.addEventListener('beforeunload', async event => {
         event.preventDefault()  
         
-        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_2__.StateManager(false, sourceId, formProperties.lockLocation)
+        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_3__.StateManager(false, sourceId, formProperties.lockLocation)
         await state.updateState()
     })
 
@@ -11368,18 +11321,18 @@ formProperties.formData.addEventListener('submit', async event => {
     event.submitter.disabled = true //disables the submit functionality so the form can't be submitted twice.
 
 
-    ;(0,_utils_warning__WEBPACK_IMPORTED_MODULE_5__.clearWarning)()  //clears any previous warnings
+    ;(0,_utils_warning__WEBPACK_IMPORTED_MODULE_6__.clearWarning)()  //clears any previous warnings
 
     // validates all entries on the form to match Joi schema on the backend and generates error messages.  Saves true/false to variable on whether there was an error or not.
-    const adminNote = (0,_utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_4__.adminNoteCheck)()
-    const formFail = (0,_utils_formValidation_js__WEBPACK_IMPORTED_MODULE_3__.formValidation)(formProperties.formData, formProperties.schema)
+    const adminNote = (0,_utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_5__.adminNoteCheck)()
+    const formFail = (0,_utils_formValidation_js__WEBPACK_IMPORTED_MODULE_4__.formValidation)(formProperties.formData, formProperties.schema)
 
-    const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_1__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
+    const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.
-        (0,_utils_leavePrompt__WEBPACK_IMPORTED_MODULE_6__.suppressLeavePrompt)()
+        (0,_utils_leavePrompt__WEBPACK_IMPORTED_MODULE_7__.suppressLeavePrompt)()
         return formProperties.formData.submit()
     }
     event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
