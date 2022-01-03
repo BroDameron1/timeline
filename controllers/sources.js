@@ -4,18 +4,25 @@ const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
 const { ImageHandler } = require('../utils/cloudinary')
 const ObjectID = require('mongoose').Types.ObjectId;
+const { RecordHandler } = require('./record-handler-service');
+
 
 //controller for get route for rendering any existing source.
 module.exports.renderSource = async (req, res) => {
-    const { slug } = req.params
-    const publicSourceData = await Source.publicSource.findOne({slug})
-        .populate('author', 'username')
-        .populate('lastApprover', 'username')
-    if (!publicSourceData) {
-        req.flash('error', 'This record does not exist.')
-        return res.redirect('/dashboard')
-    }
-    res.render('sources/source', { data: publicSourceData })
+    // const { slug } = req.params
+    // const publicSourceData = await Source.publicSource.findOne({slug})
+    //     .populate('author', 'username')
+    //     .populate('lastApprover', 'username')
+    // if (!publicSourceData) {
+    //     req.flash('error', 'This record does not exist.')
+    //     return res.redirect('/dashboard')
+    // }
+    // res.render('sources/source', { data: publicSourceData })
+    const recordHandler = new RecordHandler(req, res, Source.publicSource)
+    // await recordHandler.renderSource()
+    const data = await recordHandler.publicDataLookup()
+    // console.log('test')
+    res.render('sources/source', { data })
 }
 
 //controller for rendering a review record AFTER it has been reviewed.
@@ -38,7 +45,9 @@ module.exports.renderPostReviewSource = async (req, res) => {
 //controller for get route for rendering the New Source submission form.
 module.exports.renderNewSource = async (req, res) => {
     const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/newSource', { mediaTypes })
+    const sourceData = new Source.reviewSource()
+    console.log(sourceData)
+    res.render('sources/newSource', { mediaTypes, data: sourceData })
 }
 
 //controller for the post route for submitting a New Source to be approved.
