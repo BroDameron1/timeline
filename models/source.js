@@ -134,6 +134,7 @@ SourceSchema.virtual('displayImage').get(function() {
 
 //adds new author to the front of the array of authors, removes any duplicates and stores the last 
 //five total authors
+//TODO: Don't use this at all.  Replaced by the record handler service.
 SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
     this.author = previousAuthors.filter(previousAuthor => !previousAuthor.equals(newAuthor))
     this.author.unshift(newAuthor)
