@@ -6,6 +6,13 @@ const { ImageHandler } = require('../utils/cloudinary')
 const ObjectID = require('mongoose').Types.ObjectId;
 const { RecordHandler } = require('./record-handler-service');
 
+const recordDb = {
+    review: Source.reviewSource,
+    public: Source.publicSource
+}
+
+const staticFields = ['mediaType']
+
 //controller for get route for rendering any existing source.
 module.exports.renderSource = async (req, res) => {
     // const { slug } = req.params
@@ -18,9 +25,8 @@ module.exports.renderSource = async (req, res) => {
     // }
     // res.render('sources/source', { data: publicSourceData })
 
-    const recordHandler = new RecordHandler(req, res, 'sources/source.ejs')
-    const publicData = await recordHandler.dataLookup(Source.publicSource)
-    recordHandler.checkData(publicData)
+    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/source.ejs')
+    const publicData = await recordHandler.dataLookup('public')
     recordHandler.renderData(publicData)
 }
 
@@ -39,9 +45,8 @@ module.exports.renderPostReviewSource = async (req, res) => {
     //     return res.redirect('/dashboard')
     // }
     // res.render('sources/source', { data: reviewSourceData })
-    const recordHandler = new RecordHandler(req, res, 'sources/source.ejs')
-    const reviewData = await recordHandler.dataLookup(Source.reviewSource)
-    recordHandler.checkData(reviewData)
+    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/source.ejs')
+    const reviewData = await recordHandler.dataLookup('review')
     recordHandler.renderData(reviewData)
 
 }
@@ -49,12 +54,20 @@ module.exports.renderPostReviewSource = async (req, res) => {
 //controller for get route for rendering the New Source submission form.
 //TODO: Get in record-handler-service some how
 module.exports.renderNewSource = async (req, res) => {
-    const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    const sourceData = new Source.reviewSource()  //not sure i should be doing this
-    res.render('sources/newSource', { mediaTypes, data: sourceData })
-    // const recordHandler = new RecordHandler(req, res, 'sources/newSource.ejs')
-    // const reviewData = new Source.reviewSource()
-    // recordHandler.renderData(mediaTypes, reviewData)
+    //const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
+    const data = new Source.reviewSource()  //not sure i should be doing this
+    
+    // const fieldsToUpdate = new Object()
+    // for (let field of staticFields) {
+    //     fieldsToUpdate[field] = await Source.reviewSource.schema.path(field).enumValues
+    // }
+    // console.log(fieldsToUpdate)
+
+    // res.render('sources/newSource', { mediaTypes, data: sourceData })
+
+    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/newSource.ejs')
+    recordHandler.renderData(data, staticFields)
+    // recordHandler.renderData(mediaTypes, data)
 }
 
 //controller for the post route for submitting a New Source to be approved.
@@ -75,28 +88,33 @@ module.exports.submitNewSource = async (req, res) => {
     // req.flash('info', 'Your new Source has been submitted for approval.')
     // res.redirect('/dashboard');
 
-    const recordHandler = new RecordHandler(req, res)
-    return await recordHandler.newDataPost(Source.reviewSource)
+    const recordHandler = new RecordHandler(req, res, recordDb)
+    return await recordHandler.createNewRecord()
 }
 
 //renders the page for an admin to update and approve any review record
 module.exports.renderReviewSource = async (req, res) => {
     const { sourceId } = req.params
-    if (!ObjectID.isValid(sourceId)) {
-        req.flash('error', 'This record does not exist.')
-        return res.redirect('/dashboard')
-    }
-    const reviewSourceData = await Source.reviewSource.findById(sourceId)
-    if (!reviewSourceData) {
-        req.flash('error', 'This record does not exist')
-        return res.redirect('/dashboard')
-    }
-    if (reviewSourceData.state === 'approved' || reviewSourceData.state === 'rejected') {
-        req.flash('error', 'This article has already been reviewed.')
-        return res.redirect('/dashboard')
-    }
-    const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/publishSource', { mediaTypes, data: reviewSourceData })
+    // if (!ObjectID.isValid(sourceId)) {
+    //     req.flash('error', 'This record does not exist.')
+    //     return res.redirect('/dashboard')
+    // }
+    // const reviewSourceData = await Source.reviewSource.findById(sourceId)
+    // if (!reviewSourceData) {
+    //     req.flash('error', 'This record does not exist')
+    //     return res.redirect('/dashboard')
+    // }
+    // if (reviewSourceData.state === 'approved' || reviewSourceData.state === 'rejected') {
+    //     req.flash('error', 'This article has already been reviewed.')
+    //     return res.redirect('/dashboard')
+    // }
+    // const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
+    // res.render('sources/publishSource', { mediaTypes, data: reviewSourceData })
+
+    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/publishSource.ejs')
+    const reviewData = await recordHandler.dataLookup('review')
+    if (recordHandler.checkApprovalState(reviewData)) return
+    recordHandler.renderData(reviewData, staticFields)
 }
 
 //allows the publishing of any review record (whether a new record or an updated one)w
@@ -139,8 +157,8 @@ module.exports.publishReviewSource = async (req, res) => {
     // await publicSourceData.save()
     // res.redirect(`/sources/${publicSourceData.slug}`)
 
-    const recordHandler = new RecordHandler(req, res, '/sources/')
-    await recordHandler.publishReviewData(Source.reviewSource, Source.publicSource)
+    const recordHandler = new RecordHandler(req, res, recordDb, '/sources/')
+    await recordHandler.publishReviewRecord()
 }
 
 //renders the page for a user to update an already submitted review record
@@ -186,8 +204,8 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
     // req.flash('info', 'Your changes have been saved successfully.')
     // res.redirect('/dashboard')
 
-    const recordHandler = new RecordHandler(req, res)
-    await recordHandler.editReviewData(Source.reviewSource)
+    const recordHandler = new RecordHandler(req, res, recordDb)
+    await recordHandler.editReviewRecord()
 }
 
 //allows a user to delete a pending submitted update
@@ -210,8 +228,8 @@ module.exports.deleteReviewSource = async (req, res) => {
     // req.flash('info', 'Your submission was successfully deleted.')
     // res.redirect('/dashboard')
 
-    const recordHandler = new RecordHandler(req, res)
-    recordHandler.deleteReviewData(Source.reviewSource, Source.publicSource)
+    const recordHandler = new RecordHandler(req, res, recordDb)
+    recordHandler.deleteReviewData()
 }
 
 //renders the page for update to an existing source
@@ -232,40 +250,46 @@ module.exports.renderEditSource = async (req, res) => {
 
 //allows a user to submit an update for an existing source
 module.exports.submitEditSource = async (req, res) => {
-    const { slug } = req.params
-    const publicSourceData = await Source.publicSource.findOne({ slug })
-    const reviewSourceData = new Source.reviewSource(req.body)
-    const duplicateCheck = await duplicateChecker.editPublic(reviewSourceData.title, reviewSourceData.mediaType, publicSourceData._id)
-    if (duplicateCheck) {
-        req.flash('error', 'This record already exists.')
-        return res.redirect(`/sources/${slug}`)
-    }
-    if (req.file) {
-        reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
-    } else {
-        reviewSourceData.images.url = publicSourceData.images.url
-        reviewSourceData.images.filename = publicSourceData.images.filename
-    }
-    reviewSourceData.author.unshift(req.user._id)
-    reviewSourceData.publicId = publicSourceData._id;
-    reviewSourceData.state = 'update';
-    publicSourceData.checkedOut = true;
-    await publicSourceData.save()
-    await reviewSourceData.save()
-    req.flash('info', 'Your update request has been submitted')
-    res.redirect('/dashboard')
+    // const { slug } = req.params
+    // const publicSourceData = await Source.publicSource.findOne({ slug })
+    // const reviewSourceData = new Source.reviewSource(req.body)
+    // const duplicateCheck = await duplicateChecker.editPublic(reviewSourceData.title, reviewSourceData.mediaType, publicSourceData._id)
+    // if (duplicateCheck) {
+    //     req.flash('error', 'This record already exists.')
+    //     return res.redirect(`/sources/${slug}`)
+    // }
+    // if (req.file) {
+    //     reviewSourceData.images = { url: req.file.path, filename: req.file.filename}
+    // } else {
+    //     reviewSourceData.images.url = publicSourceData.images.url
+    //     reviewSourceData.images.filename = publicSourceData.images.filename
+    // }
+    // reviewSourceData.author.unshift(req.user._id)
+    // reviewSourceData.publicId = publicSourceData._id;
+    // reviewSourceData.state = 'update';
+    // publicSourceData.checkedOut = true;
+    // await publicSourceData.save()
+    // await reviewSourceData.save()
+    // req.flash('info', 'Your update request has been submitted')
+    // res.redirect('/dashboard')
+
+    const recordHandler = new RecordHandler(req, res, recordDb, '/sources/')
+    await recordHandler.editPublicRecord()
 }
 
 //controller that allows an admin to delete a published source
 module.exports.deletePublicSource = async (req,res) => {
-    const { slug } = req.params
-    const publicSourceData = await Source.publicSource.findOne({ slug })
-    if (publicSourceData.images.url) {
-        const image = new ImageHandler(publicSourceData.images.url, publicSourceData.images.filename, null, publicSourceData)
-        await image.deletePublicImage()
-    }
-    await publicSourceData.delete()
-    res.redirect('/dashboard')
+    // const { slug } = req.params
+    // const publicSourceData = await Source.publicSource.findOne({ slug })
+    // if (publicSourceData.images.url) {
+    //     const image = new ImageHandler(publicSourceData.images.url, publicSourceData.images.filename, null, publicSourceData)
+    //     await image.deletePublicImage()
+    // }
+    // await publicSourceData.delete()
+    // res.redirect('/dashboard')
+
+    const recordHandler = new RecordHandler(req, res, recordDb)
+    await recordHandler.deletePublicRecord()
 }
 
 //controller to check for duplicate data by passing the title, mediaType, and sometimes review Id through
