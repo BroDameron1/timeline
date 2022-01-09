@@ -27,7 +27,7 @@ module.exports.renderSource = async (req, res) => {
 
     const recordHandler = new RecordHandler(req, res, recordDb, 'sources/source.ejs')
     const publicData = await recordHandler.dataLookup('public')
-    recordHandler.renderData(publicData)
+    recordHandler.renderPage(publicData)
 }
 
 //controller for rendering a review record AFTER it has been reviewed.
@@ -47,7 +47,7 @@ module.exports.renderPostReviewSource = async (req, res) => {
     // res.render('sources/source', { data: reviewSourceData })
     const recordHandler = new RecordHandler(req, res, recordDb, 'sources/source.ejs')
     const reviewData = await recordHandler.dataLookup('review')
-    recordHandler.renderData(reviewData)
+    recordHandler.renderPage(reviewData)
 
 }
 
@@ -66,8 +66,7 @@ module.exports.renderNewSource = async (req, res) => {
     // res.render('sources/newSource', { mediaTypes, data: sourceData })
 
     const recordHandler = new RecordHandler(req, res, recordDb, 'sources/newSource.ejs')
-    recordHandler.renderData(data, staticFields)
-    // recordHandler.renderData(mediaTypes, data)
+    recordHandler.renderPage(data, staticFields)
 }
 
 //controller for the post route for submitting a New Source to be approved.
@@ -111,10 +110,19 @@ module.exports.renderReviewSource = async (req, res) => {
     // const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
     // res.render('sources/publishSource', { mediaTypes, data: reviewSourceData })
 
+
+
     const recordHandler = new RecordHandler(req, res, recordDb, 'sources/publishSource.ejs')
     const reviewData = await recordHandler.dataLookup('review')
+
+    //TODO: Make this a middleware???
+    if (reviewData.author[0].equals(req.user._id)) {
+        req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
+        return res.redirect('/dashboard')
+    }
+
     if (recordHandler.checkApprovalState(reviewData)) return
-    recordHandler.renderData(reviewData, staticFields)
+    recordHandler.renderPage(reviewData, staticFields)
 }
 
 //allows the publishing of any review record (whether a new record or an updated one)w
@@ -163,22 +171,27 @@ module.exports.publishReviewSource = async (req, res) => {
 
 //renders the page for a user to update an already submitted review record
 module.exports.renderUpdateReviewSource = async (req, res) => {
-    const { sourceId } = req.params
-    if (!ObjectID.isValid(sourceId)) {
-        req.flash('error', 'This record does not exist.')
-        return res.redirect('/dashboard')
-    }
-    const reviewSourceData = await Source.reviewSource.findById(sourceId)
-    if (!reviewSourceData) {
-        req.flash('error', 'This record does not exist')
-        return res.redirect('/dashboard')
-    }
-    if (reviewSourceData.state === 'approved' || reviewSourceData.state === 'rejected') {
-        req.flash('error', 'This record has already been reviewed.')
-        return res.redirect('/dashboard')
-    }
-    const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/updateReviewSource', { data: reviewSourceData, mediaTypes})
+    // const { sourceId } = req.params
+    // if (!ObjectID.isValid(sourceId)) {
+    //     req.flash('error', 'This record does not exist.')
+    //     return res.redirect('/dashboard')
+    // }
+    // const reviewSourceData = await Source.reviewSource.findById(sourceId)
+    // if (!reviewSourceData) {
+    //     req.flash('error', 'This record does not exist')
+    //     return res.redirect('/dashboard')
+    // }
+    // if (reviewSourceData.state === 'approved' || reviewSourceData.state === 'rejected') {
+    //     req.flash('error', 'This record has already been reviewed.')
+    //     return res.redirect('/dashboard')
+    // }
+    // const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
+    // res.render('sources/updateReviewSource', { data: reviewSourceData, mediaTypes})
+
+    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/updateReviewSource.ejs')
+    const reviewData = await recordHandler.dataLookup('review')
+    if (recordHandler.checkApprovalState(reviewData)) return
+    recordHandler.renderPage(reviewData, staticFields)
 }
 
 //allows submission of an update to an already submitted review record
@@ -234,18 +247,22 @@ module.exports.deleteReviewSource = async (req, res) => {
 
 //renders the page for update to an existing source
 module.exports.renderEditSource = async (req, res) => {
-    const { slug } = req.params
-    const publicSourceData = await Source.publicSource.findOne({ slug })
-    if (!publicSourceData) {
-        req.flash('error', 'This record does not exist.')
-        return res.redirect('/dashboard')
-    }
-    // if (publicSourceData.checkedOut) {
-    //     req.flash('error', 'This record is currently in use.')
+    // const { slug } = req.params
+    // const publicSourceData = await Source.publicSource.findOne({ slug })
+    // if (!publicSourceData) {
+    //     req.flash('error', 'This record does not exist.')
     //     return res.redirect('/dashboard')
     // }
-    const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
-    res.render('sources/updatePublicSource', { data: publicSourceData, mediaTypes})
+    // // if (publicSourceData.checkedOut) {
+    // //     req.flash('error', 'This record is currently in use.')
+    // //     return res.redirect('/dashboard')
+    // // }
+    // const mediaTypes = await Source.reviewSource.schema.path('mediaType').enumValues
+    // res.render('sources/updatePublicSource', { data: publicSourceData, mediaTypes})
+
+    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/updatePublicSource.ejs')
+    const publicData = await recordHandler.dataLookup('public')
+    recordHandler.renderPage(publicData, staticFields)
 }
 
 //allows a user to submit an update for an existing source

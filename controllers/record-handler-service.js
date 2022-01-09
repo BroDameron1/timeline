@@ -198,7 +198,7 @@ class RecordHandler {
     }
 
 
-    async renderData(data, staticFields) {
+    async renderPage(data, staticFields) {
         if (!data) {
             this.req.flash('error', 'This record does not exist.')
             return this.res.redirect(this.redirectUrl)

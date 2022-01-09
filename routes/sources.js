@@ -14,7 +14,7 @@ router.route('/new')
 
 //routes for publishing a source to public
 router.route('/review/:sourceId')
-    .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderReviewSource))
+    .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderReviewSource))  //TODO: Add isAdmin here.  Right now public users might be able to access.  TEST THIS.
     .put(isLoggedIn, isAdmin, upload.single('sourceImage'), validateSource, catchAsync(sources.publishReviewSource))
     .post(isLoggedIn, isAdmin, upload.single('sourceImage'), validateSource, catchAsync(sources.publishReviewSource))
     .delete(isLoggedIn, isAuthor, catchAsync(sources.deleteReviewSource))
