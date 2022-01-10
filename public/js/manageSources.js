@@ -19,6 +19,7 @@ const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
 
 
+//used to manage adding and removing dynamic fields
 const mediaDetails = [
     {
         type: 'Book',
@@ -69,8 +70,6 @@ const mediaDetails = [
         expandableFields: []
     },
 ]
-
-//allows adding additional fields for book authors
 
 
 

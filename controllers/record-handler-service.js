@@ -12,26 +12,6 @@ class RecordHandler {
         this.redirectUrl = '/dashboard'
     }
 
-    // get renderSourceTest() {
-    //     console.log('test3')
-    //     return this.renderSource()
-    // }
-
-    // async dataLookup(dbCollection) {
-    //     const { slug, sourceId } = this.req.params
-    //     let data
-    //     if (slug) {
-    //         data = await dbCollection.findOne({ slug })
-    //             .populate('author', 'username')
-    //             .populate('lastApprover', 'username')
-    //     } else {
-    //         data = await dbCollection.findById(sourceId)
-    //             .populate('author', 'username')
-    //             .populate('lastApprover', 'username')
-    //     }
-    //     return data
-    // }
-
     async dataLookup(dbToCheck) {
         const { slug, sourceId } = this.req.params
         let dbPlaceholder
@@ -50,15 +30,6 @@ class RecordHandler {
         return data
     }
 
-    //this is being checked in the middleware.  TODO: Have the middleware call this method to reduce code duplication
-    // checkMongoId(sourceId) {
-    //     console.log('failed here')
-    //     if (!ObjectID.isValid(sourceId)) {
-    //         console.log('failed here')
-    //         this.req.flash('error', 'This record does not exist.')
-    //         return this.res.redirect(this.redirectUrl)
-    //     }
-    // }
 
     async publishReviewRecord() {
         const { sourceId } = this.req.params
