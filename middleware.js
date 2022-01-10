@@ -2,7 +2,9 @@ const User = require('./models/user');
 const Source = require('./models/source');
 const ExpressError = require('./utils/expressError')
 const { userSchema, sourceSchema } = require('./schemas');
+const mongoose = require('mongoose');
 const ObjectID = require('mongoose').Types.ObjectId;
+
 
 const isLoggedIn = async (req, res, next) => {
     //checks to see if a user is already logged in.  If so, get their info from the DB so it can be checked
@@ -88,22 +90,25 @@ const isAdmin = async (req, res, next) => {
     next()
 }
 
-const isAuthor = async (req, res, next) => {
-    const { sourceId } = req.params
-    if (!ObjectID.isValid(sourceId)) {
-        req.flash('error', 'This record does not exist.')
-        return res.redirect('/dashboard')
+
+const isAuthor = (dbCollection) => {
+    return async (req, res, next) => {
+        const { sourceId } = req.params
+        if (!ObjectID.isValid(sourceId)) {
+            req.flash('error', 'This record does not exist.')
+            return res.redirect('/dashboard')
+        }
+        const reviewSourceData = await mongoose.model(dbCollection).findById(sourceId)
+        if (!reviewSourceData) {
+            req.flash('error', 'This record does not exist.')
+            return res.redirect('/dashboard')
+        }
+        if (!reviewSourceData.author[0].equals(req.user._id)) {
+            req.flash('error', "You do not have the correct permissions.")
+            return res.redirect('/dashboard')
+        }
+        next()
     }
-    const reviewSourceData = await Source.reviewSource.findById(sourceId)
-    if (!reviewSourceData) {
-        req.flash('error', 'This record does not exist.')
-        return res.redirect('/dashboard')
-    }
-    if (!reviewSourceData.author[0].equals(req.user._id)) {
-        req.flash('error', "You do not have the correct permissions.")
-        return res.redirect('/dashboard')
-    }
-    next()
 }
 
 const isCheckedOut = async (req, res, next) => {

@@ -160,9 +160,9 @@ class RecordHandler {
         this.checkApprovalState(reviewData)
         const image = new ImageHandler(reviewData.images.url, reviewData.images.filename, reviewData)
         await image.deleteReviewImage()
-        await reviewDb.findByIdAndDelete(sourceId)
+        await this.recordDb.review.findByIdAndDelete(sourceId)
         if (reviewData.publicId) {
-            const publicData = await publicDb.findById(reviewData.publicId)
+            const publicData = await this.recordDb.public.findById(reviewData.publicId)
             publicData.checkedOut = false
             publicData.save()
         }
