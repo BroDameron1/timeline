@@ -1,0 +1,138 @@
+<% layout('layouts/boilerplate.ejs') %>
+
+<main>
+    <div class="form">
+        <h1>Submit a Source</h1>
+        <form action='/sources/new' method="POST" id="newSource" class="sourceForm" data-formtype="newSubmission" enctype="multipart/form-data">
+        <div class="form-field">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" maxlength="100" autofocus>
+        </div>
+        <div class="form-field">
+            <label for="media-type">Media Type</label>
+            <select name="mediaType" id="mediaType">
+                <option value="default">----Select a Media----</option>
+                <% for(let mediaType of mediaTypes) { %>
+                    <option value="<%= mediaType %>"><%= mediaType %></option>
+                <% } %> 
+            </select>
+        </div>
+        <div class="form-field">
+            Upload Image
+            <div class="file-name" id="file-name"></div>
+            <input type="file" name="sourceImage" id="sourceImage" class="inputfile">
+            <label for="sourceImage" class="btn-browse">Browse...</label>
+        </div>
+        <div class="imgpreview-wrapper">
+            <img src="" class="image-preview">
+        </div>  
+
+        <div class="hide-sources" id="book-fields">
+            <div class="form-field">
+                <label for="book-author">Author(s)</label>
+                    <input type="text" id="book-author0" class="book-author autocomplete" maxlength="80" name="book[author][]">
+                <a href="#" id="add-author">Add another author</a>
+            </div>
+            <div class="form-field">
+                <label for="book-series">Series</label>
+                <input type="text" id="book-series" maxlength="80" class="autocomplete" name="book[series]">
+            </div>
+            <div class="form-field">
+                <label for="publisher">Publisher</label>
+                <input type="text" id="publisher" maxlength="80" class="autocomplete" name="book[publisher]">
+            </div>
+            <div class="form-field">
+                <label for="bookReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="bookReleaseDate" name="book[releaseDate]" min="1977-05-25">
+            </div>
+            <div class="form-field">
+                <label for="isbn10">ISBN-10</label>
+                <input type="text" id="isbn10" name="book[isbn10]" maxlength="50">
+            </div>
+        </div> 
+        <div class="hide-sources" id="movie-fields">
+            <div class="form-field">
+                <label for="movie-director">Director(s)</label>
+                    <input type="text" id="movie-director0" class="movie-director autocomplete" name="movie[director][]" maxlength="80">
+                <a href="#" id="add-director">Add another director</a>
+            </div>
+            <div class="form-field">
+                <label for="movie-writer">Writer(s)</label>
+                    <input type="text" id="movie-writer0" class="movie-writer autocomplete" name="movie[writer][]" maxlength="80">
+                <a href="#" id="add-writer">Add another writer</a>
+            </div>
+            <div class="form-field">
+                <label for="movieReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="movieReleaseDate" name="movie[releaseDate]" min="1977-05-25">
+            </div>
+        </div> 
+        <div class="hide-sources" id="comic-fields">
+            <div class="form-field">
+                <label for="comic-writer">Writer</label>
+                <input type="text" id="comic-writer" name="comic[writer]" class="comic-writer autocomplete" maxlength="80">
+            </div>
+            <div class="form-field">
+                <label for="comic-artist">Art Contributor(s)</label>
+                    <input type="text" id="comic-artist0" class="comic-artist autocomplete" name="comic[artist][]" maxlength="80">
+                <a href="#" id="add-artist">Add another art contributor</a>
+            </div>
+            <div class="form-field">
+                <label for="comic-series">Series</label>
+                <input type="text" id="comic-series" name="comic[series]" class="autocomplete" maxlength="80">
+            </div>
+            <div class="form-field">
+                <label for="comic-issue">Issue</label>
+                <input type="number" id="comic-issue" name="comic[issueNum]" min="0" max="101">
+            </div>
+            <div class="form-field">
+                <label for="comicReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="comicReleaseDate" name="comic[releaseDate]" min="1977-05-25">
+            </div>
+        </div> 
+        <div class="hide-sources" id="tv-fields">
+            <div class="form-field">
+                <label for="tv-series">Series</label>
+                <input type="text" id="tv-series" name="tv[series]" class="autocomplete" maxlength="80">
+            </div>
+            <div class="form-field">
+                <label for="tv-season">Season</label>
+                <input type="number" id="tv-season" name="tv[season]" min="1" max="20">
+            </div>
+            <div class="form-field">
+                <label for="tv-episode">Episode</label>
+                <input type="number" id="tv-episode" name="tv[episode]" min="1" max="50">
+            </div>
+            <div class="form-field">
+                <label for="tvReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="tvReleaseDate" name="tv[releaseDate]" min="1977-05-25">
+            </div>
+        </div> 
+        <div class="hide-sources" id="game-fields">
+            <div class="form-field">
+                <label for="vg-studio">Production Studio</label>
+                <input type="text" id="vg-studio" name="videoGame[studio]" class="autocomplete" maxlength="80">
+            </div>
+            <div class="form-field">
+                <label for="vg-publisher">Publisher</label>
+                <input type="text" id="vg-publisher" name="videoGame[publisher]" class="autocomplete" maxlength="80">
+            </div>
+            <div class="form-field">
+                <label for="vgReleaseDate">Initial Release Date</label>
+                <input type="date" class="date" id="vgReleaseDate" name="videoGame[releaseDate]" min="1977-05-25">
+            </div>
+        </div> 
+
+        <div>
+            <button class="btn-blue">Submit for Review</button>
+        </div>
+        <div id="warning"></div>
+        </form>
+    </div>
+</main>
+
+<script>
+    const sourceId = null
+</script>
+
+<script type="module" src="/dist/main.bundle.js"></script>
+

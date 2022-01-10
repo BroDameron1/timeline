@@ -2,10 +2,18 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const slugify = require('slugify')
 
+Schema.Types.String.set('trim', true); //sets all strings to trim()
+
 const SourceSchema = new Schema({
     title: {
         type: String,
         required: true
+    },
+    recordType: {
+        type: String,
+        default: 'Source',
+        required: true,
+        immutable: true
     },
     slug: {
         type: String,
@@ -23,7 +31,7 @@ const SourceSchema = new Schema({
     state: {
         type: String,
         required: true,
-        enum: ['new', 'update', 'approved', 'published', 'rejected']
+        enum: ['new', 'update', 'approved', 'published', 'rejected'],
     },
     checkedOut: {
         type: Boolean,
@@ -77,7 +85,7 @@ const SourceSchema = new Schema({
     },
     comic: {
         writer: String,
-        artContributor: {
+        artist: {
             type: [ String ],
             default: undefined
         },
@@ -106,7 +114,9 @@ const SourceSchema = new Schema({
         }
     }
 },
-    { timestamps: true, get: formatDate  });
+    { timestamps: true });
+
+
 
 //virtual to access slugified URLs
 // SourceSchema.virtual('slug')
@@ -124,6 +134,7 @@ SourceSchema.virtual('displayImage').get(function() {
 
 //adds new author to the front of the array of authors, removes any duplicates and stores the last 
 //five total authors
+//TODO: Don't use this at all.  Replaced by the record handler service.
 SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
     this.author = previousAuthors.filter(previousAuthor => !previousAuthor.equals(newAuthor))
     this.author.unshift(newAuthor)
@@ -156,7 +167,11 @@ function formDate (date) {
         return date.toISOString().substring(0, 10)
     } else {
         return null
+    }
 }
+
+function capitalize (stringToCapitalize) {
+    return stringToCapitalize.charAt(0).toUpperCase() + stringToCapitalize.slice(1)
 }
 
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);

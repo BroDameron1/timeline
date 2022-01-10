@@ -11,7 +11,7 @@
 <main>
     <div class="form">
         <h1>Submit Update</h1>
-        <form action="/sources/<%= data.slug %>/edit" method="POST" id="editSource" enctype="multipart/form-data">
+        <form action="/sources/<%= data.slug %>/edit" method="POST" id="updatePublicSource" class="sourceForm" data-formtype="updatePublicSubmission" enctype="multipart/form-data">
 
 
         <%- include('../partials/sourceforms.ejs') %>
@@ -27,4 +27,5 @@
 <script>
     const sourceId = '<%- data._id %>'
 </script>
-<script type="module" src="/js/editPublicSource.js"></script>
+<script type="module" src="/dist/main.bundle.js"></script>
+<!-- <script type="module" src="/dist/main.bundle.js"></script> -->

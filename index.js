@@ -53,6 +53,7 @@ db.once('open', () => {
 //require the user routes
 const userRoutes = require('./routes/users');
 const sourceRoutes = require('./routes/sources');
+const utilRoutes = require('./routes/utils');
 
 //execute EJS and EJS mate
 app.engine('ejs', ejsMate)
@@ -61,8 +62,10 @@ app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'))
 //allows express to parse form data as url encoded data
 app.use(express.urlencoded({ extended: true }))
-//allows parsing json data?
+//allows parsing json data
 app.use(express.json());
+//allows parsing text data
+app.use(express.text())
 //this tells express where static assets are held
 app.use(express.static(path.join(__dirname, 'public')))
 //execute methodoverride functionality
@@ -148,6 +151,8 @@ app.use(function(req, res, next) {
 app.use('/', userRoutes);
 //direct requests to the source routes
 app.use('/sources', sourceRoutes);
+//direct requests to the util routes for various generic data handling requests
+app.use('/utils', utilRoutes);
 
 //route for the home page
 app.get('/', (req, res) => {

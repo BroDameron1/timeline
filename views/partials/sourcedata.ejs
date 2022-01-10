@@ -4,15 +4,19 @@
     </div>
     <div class="data-line">
         Director(s):
-        <% for (let director of data.movie.director) { %>
-            <div><%= director %></div>
-        <% } %> 
+        <% if (data.movie.director) { %> 
+            <% for (let director of data.movie.director) { %>
+                <div><%= director %></div>
+            <% } %>
+        <% } %>
     </div>
     <div class="data-line">
-        Writer(s):
-        <% for (let writer of data.movie.writer) { %>
-            <div><%= writer %></div>
-        <% } %> 
+        <% if (data.movie.writer) { %> 
+            Writer(s):
+            <% for (let writer of data.movie.writer) { %>
+                <div><%= writer %></div>
+            <% } %>
+        <% } %>
     </div>
 <% } %>
 
@@ -40,9 +44,11 @@
     </div>
     <div class="data-line">
         Author(s):
-        <% for (let author of data.book.author) { %>
-            <div><%= author %></div>
-        <% } %> 
+        <% if (data.book.author) { %>
+            <% for (let author of data.book.author) { %>
+                <div><%= author %></div>
+            <% } %>
+        <% } %>
     </div>
     <div class="data-line">
         Series: <%= data.book.series %> 
@@ -65,8 +71,10 @@
     </div>
     <div class="data-line">
         Art Contributors:
-        <% for (let artist of data.comic.artContributor) { %>
-            <div><%= artist %></div>
+        <% if (data.comic.artist) { %> 
+            <% for (let artist of data.comic.artist) { %>
+                <div><%= artist %></div>
+            <% } %>
         <% } %> 
     </div>
     <div class="data-line">

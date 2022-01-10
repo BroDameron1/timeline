@@ -29,7 +29,7 @@
                     <div class="record-date">Last Update: <%= pendingRequest.updateDate %> </div>
                     <div class="record-state">
                         <div class="state-container">
-                            <%= pendingRequest.state %>
+                            <%= pendingRequest.state.charAt(0).toUpperCase() + pendingRequest.state.slice(1) %> <%= pendingRequest.recordType %> 
                         </div>
                     </div>
                     <% if (!pendingRequest.checkedOut) { %> 
@@ -58,7 +58,7 @@
                     <div class="record-date">Last Update: <%= pendingRequest.updateDate %></div>
                     <div class="record-state">
                         <div class="state-container">
-                            <%= pendingRequest.state %>
+                            <%= pendingRequest.state.charAt(0).toUpperCase() + pendingRequest.state.slice(1) %>
                         </div>
                     </div>
                     <div class="record-button"></div>
@@ -81,7 +81,7 @@
                         <div class="record-date">Last Update: <%= pendingRequest.updateDate %></div>
                         <div class="record-state">
                             <div class="state-container">
-                                <%= pendingRequest.state %>
+                                <%= pendingRequest.state.charAt(0).toUpperCase() + pendingRequest.state.slice(1) %> <%= pendingRequest.recordType %> 
                             </div>
                         </div>
                         <div></div>

@@ -1,15 +1,25 @@
 <div class="form-field">
     <label for="title">Title</label>
-    <input type="text" id="title" name="title" value="<%= data.title %>" required autofocus>
+    <input type="text" id="title" name="title" value="<%= data.title %>" maxlength="100">
+
 </div>
 <div class="form-field">
     <label for="mediaType">Media Type</label>
-    <select name="mediaType" id="mediaType" disabled>
-        <% for(let mediaType of mediaTypes) { %>
-            <option value="<%= mediaType %>" <%= data.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
-        <% } %> 
-    </select>
-    <input type="hidden" name="mediaType" value="<%= data.mediaType %>">
+    <% if (!data.mediaType) { %>
+        <select name="mediaType" id="mediaType">
+            <option value="default">----Select a Media----</option>
+            <% for(let mediaType of staticFieldOptions.mediaType) { %>
+                <option value="<%= mediaType %>"><%= mediaType %></option>
+            <% } %> 
+        </select>
+    <% } else { %> 
+        <select name="mediaType" id="mediaType" disabled>
+            <% for(let mediaType of staticFieldOptions.mediaType) { %>
+                <option value="<%= mediaType %>" <%= data.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
+            <% } %>
+        </select>
+        <input type="hidden" name="mediaType" value="<%= data.mediaType %>">
+    <% } %> 
 </div>
 <div class="form-field">
     Upload Image
@@ -27,20 +37,20 @@
         <label for="book-author">Author(s)</label>
         <% if (data.book.author && data.book.author.length > 0) { %> 
             <% for(let author of data.book.author) { %>    
-                <div class="form-field"><input type="text" class="book-author" name="book[author][]" value="<%= author %>"></div>
+                <div class="form-field"><input type="text" id="book-author<%= data.book.author.indexOf(author) %>" class="book-author autocomplete" name="book[author][]" value="<%= author %>" maxlength="80"></div>
             <% } %>
         <% } else { %>
-            <input type="text" class="book-author" name="book[author][]">
+            <input type="text" id="book-author0" class="book-author autocomplete" name="book[author][]" maxlength="80">
         <% } %> 
         <a href="#" id="add-author">Add another author</a>
     </div>
     <div class="form-field">
         <label for="book-series">Series</label>
-        <input type="text" id="book-series" name="book[series]" value="<%= data.book.series %>">
+        <input type="text" id="book-series" name="book[series]" class="autocomplete" value="<%= data.book.series %>" maxlength="80">
     </div>
     <div class="form-field">
         <label for="publisher">Publisher</label>
-        <input type="text" id="publisher" name="book[publisher]" value="<%= data.book.publisher %>">
+        <input type="text" id="publisher" name="book[publisher]" class="autocomplete" value="<%= data.book.publisher %>" maxlength="80">
     </div>
     <div class="form-field">
         <label for="bookReleaseDate">Initial Release Date</label>
@@ -48,7 +58,7 @@
     </div>
     <div class="form-field">
         <label for="isbn10">ISBN-10</label>
-        <input type="text" id="isbn10" name="book[isbn10]" value="<%= data.book.isbn10 %>">
+        <input type="text" id="isbn10" name="book[isbn10]" value="<%= data.book.isbn10 %>" maxlength="50">
     </div>
 </div> 
 
@@ -58,10 +68,10 @@
         <label for="movie-director">Director(s)</label>
         <% if (data.movie.director && data.movie.director.length > 0) { %> 
             <% for(let director of data.movie.director) { %>    
-                <div class="form-field"><input type="text" class="movie-director" name="movie[director][]" value="<%= director %>"></div>
+                <div class="form-field"><input type="text" id="movie-director<%= data.movie.director.indexOf(director) %>"  class="movie-director autocomplete" name="movie[director][]" value="<%= director %>" maxlength="80"></div>
             <% } %>
         <% } else { %>
-            <input type="text" class="movie-director" name="movie[director][]">
+            <input type="text" id="movie-director0" class="movie-director autocomplete" name="movie[director][]" maxlength="80">
         <% } %> 
         <a href="#" id="add-director">Add another director</a>
     </div>
@@ -69,10 +79,10 @@
         <label for="movie-writer">Writer(s)</label>
         <% if (data.movie.writer && data.movie.writer.length > 0) { %> 
             <% for(let writer of data.movie.writer) { %>    
-                <div class="form-field"><input type="text" class="movie-writer" name="movie[writer][]" value="<%= writer %>"></div>
+                <div class="form-field"><input type="text" id="movie-writer<%= data.movie.writer.indexOf(writer) %>"  class="movie-writer autocomplete" name="movie[writer][]" value="<%= writer %>" maxlength="80"></div>
             <% } %>
         <% } else { %>
-            <input type="text" class="movie-writer" name="movie[writer][]">
+            <input type="text" id="movie-writer0" class="movie-writer autocomplete" name="movie[writer][]" maxlength="80">
         <% } %> 
         <a href="#" id="add-writer">Add another writer</a>
     </div>
@@ -85,26 +95,26 @@
 <div class="hide-sources" id="comic-fields">
     <div class="form-field">
         <label for="comic-writer">Writer</label>
-        <input type="text" id="comic-writer" name="comic[writer]" value="<%= data.comic.writer %>">
+        <input type="text" id="comic-writer" name="comic[writer]" class="autocomplete" value="<%= data.comic.writer %>" maxlength="80">
     </div>
     <div class="form-field">
-        <label for="art-contributor">Art Contributor(s)</label>
-        <% if (data.comic.artContributor && data.comic.artContributor.length > 0) { %> 
-            <% for(let artist of data.comic.artContributor) { %>    
-                <div class="form-field"><input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]" value="<%= artist %>"></div>
+        <label for="comic-artist">Art Contributor(s)</label>
+        <% if (data.comic.artist && data.comic.artist.length > 0) { %> 
+            <% for(let artist of data.comic.artist) { %>    
+                <div class="form-field"><input type="text" id="comic-artist<%= data.comic.artist.indexOf(artist) %>"  class="comic-artist autocomplete" name="comic[artist][]" value="<%= artist %>" maxlength="80"></div>
             <% } %>
         <% } else { %>
-            <input type="text" id="art-contributor" class="art-contributor" name="comic[artContributor][]">
+            <input type="text" id="comic-artist0" class="comic-artist autocomplete" name="comic[artist][]" maxlength="80" maxlength="80">
         <% } %> 
         <a href="#" id="add-artist">Add another art contributor</a>
     </div>
     <div class="form-field">
         <label for="comic-series">Series</label>
-        <input type="text" id="comic-series" name="comic[series]" value="<%= data.comic.series %>">
+        <input type="text" id="comic-series" name="comic[series]" class="autocomplete" value="<%= data.comic.series %>" maxlength="80">
     </div>
     <div class="form-field">
         <label for="comic-issue">Issue</label>
-        <input type="number" id="comic-issue" name="comic[issueNum]" value="<%= data.comic.issueNum %>" min="0">
+        <input type="number" id="comic-issue" name="comic[issueNum]" value="<%= data.comic.issueNum %>" min="0" max="101">
     </div>
     <div class="form-field">
         <label for="comicReleaseDate">Initial Release Date</label>
@@ -115,15 +125,15 @@
 <div class="hide-sources" id="tv-fields">
     <div class="form-field">
         <label for="tv-series">Series</label>
-        <input type="text" id="tv-series" name="tv[series]" value="<%= data.tv.series %>">
+        <input type="text" id="tv-series" name="tv[series]" class="autocomplete" value="<%= data.tv.series %>" maxlength="80">
     </div>
     <div class="form-field">
         <label for="tv-season">Season</label>
-        <input type="number" id="tv-season" name="tv[season]" min="1" value="<%= data.tv.season %>">
+        <input type="number" id="tv-season" name="tv[season]" min="1" max="20" value="<%= data.tv.season %>">
     </div>
     <div class="form-field">
         <label for="tv-episode">Episode</label>
-        <input type="number" id="tv-episode" name="tv[episode]" min="1" value="<%= data.tv.episode %>">
+        <input type="number" id="tv-episode" name="tv[episode]" min="1" max="50" value="<%= data.tv.episode %>">
     </div>
     <div class="form-field">
         <label for="tvReleaseDate">Initial Release Date</label>
@@ -134,11 +144,11 @@
 <div class="hide-sources" id="game-fields">
     <div class="form-field">
         <label for="vg-studio">Production Studio</label>
-        <input type="text" id="vg-studio" name="videoGame[studio]" value="<%= data.videoGame.studio %>">
+        <input type="text" id="vg-studio" name="videoGame[studio]" class="autocomplete" value="<%= data.videoGame.studio %>" maxlength="80">
     </div>
     <div class="form-field">
         <label for="vg-publisher">Publisher</label>
-        <input type="text" id="vg-publisher" name="videoGame[publisher]" value="<%= data.videoGame.releaseDate %>">
+        <input type="text" id="vg-publisher" name="videoGame[publisher]" class="autocomplete" value="<%= data.videoGame.publisher %>" maxlength="80">
     </div>
     <div class="form-field">
         <label for="vgReleaseDate">Initial Release Date</label>
