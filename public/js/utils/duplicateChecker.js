@@ -9,7 +9,8 @@ export class Duplicate {
         this.type = type
     }
     async checkDuplicates () {
-        const response = await fetch('/sources/data?' + new URLSearchParams({
+        console.log('here!')
+        const response = await fetch('/utils/data?' + new URLSearchParams({
             title: this.title,
             mediaType: this.mediaType,
             sourceId: this.sourceId,

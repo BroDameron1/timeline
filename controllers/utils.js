@@ -4,6 +4,7 @@ const duplicateChecker = require('../utils/duplicateChecker')
 
 module.exports.getData = async (req, res) => { 
     const { title, mediaType, type, sourceId } = req.query
+    console.log('2')
     if (type === 'submitNew') {
         const duplicateResult = await duplicateChecker.submitNew(title, mediaType)
         return res.json(duplicateResult)

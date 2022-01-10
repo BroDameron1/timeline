@@ -57,7 +57,6 @@ export class FieldManager {
             //adds new input field into the previously created div
             newDiv.append(newInput)
 
-
             //Create a link with the method and add it inside the new div
             newDiv.append(this.createRemoveLink(this.job))
 

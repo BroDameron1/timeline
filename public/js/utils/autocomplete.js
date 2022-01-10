@@ -4,11 +4,11 @@ import serialize from 'form-serialize-improved'
 
 //creates autocomplete functionality for any field that contains the autocomplete class.
 
+//TODO: Figure out a way to skip the field replace stuff.
 
 export const autocompleteListener = (targetCollection) => {
     const formSelector = document.querySelector('.form')
     formSelector.addEventListener('focusin', event => {
-        //console.log(event, 'event')
         if (event.target && event.target.matches('.autocomplete')) {
             const autocompleteField = event.target
             autocomplete({

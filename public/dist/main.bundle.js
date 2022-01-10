@@ -10026,11 +10026,11 @@ __webpack_require__.r(__webpack_exports__);
 
 //creates autocomplete functionality for any field that contains the autocomplete class.
 
+//TODO: Figure out a way to skip the field replace stuff.
 
 const autocompleteListener = (targetCollection) => {
     const formSelector = document.querySelector('.form')
     formSelector.addEventListener('focusin', event => {
-        //console.log(event, 'event')
         if (event.target && event.target.matches('.autocomplete')) {
             const autocompleteField = event.target
             autocompleter__WEBPACK_IMPORTED_MODULE_0___default()({
@@ -10126,7 +10126,8 @@ class Duplicate {
         this.type = type
     }
     async checkDuplicates () {
-        const response = await fetch('/sources/data?' + new URLSearchParams({
+        console.log('here!')
+        const response = await fetch('/utils/data?' + new URLSearchParams({
             title: this.title,
             mediaType: this.mediaType,
             sourceId: this.sourceId,
@@ -10230,7 +10231,6 @@ class FieldManager {
             newInput.setAttribute('maxlength', '80')
             //adds new input field into the previously created div
             newDiv.append(newInput)
-
 
             //Create a link with the method and add it inside the new div
             newDiv.append(this.createRemoveLink(this.job))
@@ -10506,7 +10506,7 @@ const rejectPublish = (formProperties) => {
             const formFail = (0,_formValidation__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
 
             if (!formFail && !adminNoteCheck()) {
-                const response = await fetch('/sources/data', {
+                const response = await fetch('/utils/data', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'

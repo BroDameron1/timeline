@@ -308,60 +308,61 @@ module.exports.deletePublicSource = async (req,res) => {
 
 //controller to check for duplicate data by passing the title, mediaType, and sometimes review Id through
 //to check against the review and public collections
-module.exports.getData = async (req, res) => { 
-    const { title, mediaType, type, sourceId } = req.query
-    if (type === 'submitNew') {
-        const duplicateResult = await duplicateChecker.submitNew(title, mediaType)
-        return res.json(duplicateResult)
-    }
-    if (type === 'updateReview') {
-        const duplicateResult = await duplicateChecker.updateReview(title, mediaType, sourceId)
-        return res.json(duplicateResult)
-    }
-    if (type === 'publishRecord') {
-        const duplicateResult = await duplicateChecker.publishRecord(title, mediaType, sourceId)
-        return res.json(duplicateResult)
-    }
-    if (type === 'editPublic') {
-        const duplicateResult = await duplicateChecker.editPublic(title, mediaType, sourceId)
-        return res.json(duplicateResult)
-    }
+// module.exports.getData = async (req, res) => { 
+//     const { title, mediaType, type, sourceId } = req.query
+//     console.log('1')
+//     if (type === 'submitNew') {
+//         const duplicateResult = await duplicateChecker.submitNew(title, mediaType)
+//         return res.json(duplicateResult)
+//     }
+//     if (type === 'updateReview') {
+//         const duplicateResult = await duplicateChecker.updateReview(title, mediaType, sourceId)
+//         return res.json(duplicateResult)
+//     }
+//     if (type === 'publishRecord') {
+//         const duplicateResult = await duplicateChecker.publishRecord(title, mediaType, sourceId)
+//         return res.json(duplicateResult)
+//     }
+//     if (type === 'editPublic') {
+//         const duplicateResult = await duplicateChecker.editPublic(title, mediaType, sourceId)
+//         return res.json(duplicateResult)
+//     }
     
     
-    const { field, fieldValue } = req.query
+//     const { field, fieldValue } = req.query
 
 
-    // const autofillResponse = await Source.publicSource.find({ [`${field}`]: {$regex: `^${fieldValue}`, '$options' : 'i'} }).select(`${field} -_id`)
+//     // const autofillResponse = await Source.publicSource.find({ [`${field}`]: {$regex: `^${fieldValue}`, '$options' : 'i'} }).select(`${field} -_id`)
 
-    try {
-        const autofillResponse = await Source.publicSource.aggregate(
-            [
-                { $unwind: `$${field}`},
-                { $match: {[`${field}`]: {$regex: `^${fieldValue}`, '$options' : 'i'} }},
-                { $group: {_id: `$${field}`}},
-                { $sort: {_id: 1 } }
-            ]
-        )
-        const autofillArray = autofillResponse.map(option => {
-            return option._id
-        })
-        return res.json(autofillArray)
-    } catch (e) {
-        console.log(e)
-    }
-}
+//     try {
+//         const autofillResponse = await Source.publicSource.aggregate(
+//             [
+//                 { $unwind: `$${field}`},
+//                 { $match: {[`${field}`]: {$regex: `^${fieldValue}`, '$options' : 'i'} }},
+//                 { $group: {_id: `$${field}`}},
+//                 { $sort: {_id: 1 } }
+//             ]
+//         )
+//         const autofillArray = autofillResponse.map(option => {
+//             return option._id
+//         })
+//         return res.json(autofillArray)
+//     } catch (e) {
+//         console.log(e)
+//     }
+// }
 
 
 //controller for put route that lets JS files update data.  Right now only for
 //updating state of record
-module.exports.putData = async (req, res) => {
-    console.log(req.body, 'one')
-    if (typeof req.body === 'string') {
-        req.body = JSON.parse(req.body)
-    }
-    const { sourceId, collection } = req.body
-    const dataToUpdate = await mongoose.model(collection).findById(sourceId)
-    dataToUpdate.set({ ...req.body })
-    await dataToUpdate.save()
-    res.status(200).end()
-}
+// module.exports.putData = async (req, res) => {
+//     console.log(req.body, 'one')
+//     if (typeof req.body === 'string') {
+//         req.body = JSON.parse(req.body)
+//     }
+//     const { sourceId, collection } = req.body
+//     const dataToUpdate = await mongoose.model(collection).findById(sourceId)
+//     dataToUpdate.set({ ...req.body })
+//     await dataToUpdate.save()
+//     res.status(200).end()
+// }
