@@ -5,7 +5,7 @@ const utils = require('../controllers/utils')
 const multer = require('multer') //adds multer to process file uploads
 const { storage } = require('../utils/cloudinary')
 const upload = multer({ storage }) //initialize multer and add location for file uploads
-const { isLoggedIn, isAdmin, isAuthor, isCheckedOut, validateSource } = require('../middleware');
+const { isLoggedIn } = require('../middleware');
 
 //TODO: Add more route endpoints and controllers to be more specific to the data they are going to handle.
 

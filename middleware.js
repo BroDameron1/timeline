@@ -128,21 +128,6 @@ const isCheckedOut = (reviewCollection, publicCollection) => {
     }
 }
 
-// const isCheckedOut = async (req, res, next) => {
-//     const { sourceId, slug } = req.params
-//     if (sourceId && !ObjectID.isValid(sourceId)) {
-//         req.flash('error', 'This record does not exist.')
-//         return res.redirect('/dashboard')
-//     }
-//     const reviewSourceData = await Source.reviewSource.findById(sourceId)
-//     const publicSourceData = await Source.publicSource.findOne({ slug })
-//     if ((reviewSourceData && reviewSourceData.checkedOut) || (publicSourceData && publicSourceData.checkedOut)) {
-//         req.flash('error', 'This record is already in use.')
-//         return res.redirect('/dashboard')
-//     }
-//     next()
-// }
-
 module.exports = {
     isLoggedIn,
     validateUser,
