@@ -15,7 +15,7 @@ export class StateManager {
             collection: this.targetCollection
         })
 
-        const beacon = await navigator.sendBeacon('/sources/data', checkedOutRequest)
+        const beacon = await navigator.sendBeacon('/utils/data', checkedOutRequest)
         if (!beacon) {
             console.log('Something went wrong.',  err)
         }

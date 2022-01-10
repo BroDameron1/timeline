@@ -10018,15 +10018,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! autocompleter */ "./node_modules/autocompleter/autocomplete.js");
 /* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(autocompleter__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! form-serialize-improved */ "./node_modules/form-serialize-improved/index.js");
+/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(form_serialize_improved__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 
 //creates autocomplete functionality for any field that contains the autocomplete class.
 
-const autocompleteListener = () => {
-    const autocompleteFields = document.querySelectorAll('.autocomplete')
-    autocompleteFields.forEach((autocompleteField) => {
-        autocompleteField.addEventListener('focus', event => {
+
+const autocompleteListener = (targetCollection) => {
+    const formSelector = document.querySelector('.form')
+    formSelector.addEventListener('focusin', event => {
+        //console.log(event, 'event')
+        if (event.target && event.target.matches('.autocomplete')) {
+            const autocompleteField = event.target
             autocompleter__WEBPACK_IMPORTED_MODULE_0___default()({
                 input: autocompleteField,
                 emtpyMsg: 'No Results',
@@ -10039,9 +10045,10 @@ const autocompleteListener = () => {
                     field = field.replace('[', '.')
                     field = field.replace(']', '')
             
-                    const response = await fetch('/sources/data?' + new URLSearchParams({
+                    const response = await fetch('/utils/data?' + new URLSearchParams({
                         field,
-                        fieldValue: autocompleteField.value
+                        fieldValue: autocompleteField.value,
+                        collection: targetCollection
                     }))
                     const autofillOptions = await response.json()
                     console.log(autofillOptions)
@@ -10054,7 +10061,7 @@ const autocompleteListener = () => {
                     autocompleteField.value = item.label
                 } 
             })
-        })
+        }
     })
 }
 
@@ -10228,8 +10235,6 @@ class FieldManager {
             //Create a link with the method and add it inside the new div
             newDiv.append(this.createRemoveLink(this.job))
 
-            //fires the autocompleteListener function again so autocomplete works on the new field
-            ;(0,_autocomplete__WEBPACK_IMPORTED_MODULE_0__.autocompleteListener)()
         }
         //Check if we have the max number of inputs and then remove the add link if true
         if (totalFieldList.length === this.additionalFields) {
@@ -10555,7 +10560,7 @@ class StateManager {
             collection: this.targetCollection
         })
 
-        const beacon = await navigator.sendBeacon('/sources/data', checkedOutRequest)
+        const beacon = await navigator.sendBeacon('/utils/data', checkedOutRequest)
         if (!beacon) {
             console.log('Something went wrong.',  err)
         }
@@ -11246,7 +11251,7 @@ const formProperties = (0,_utils_formIdentifier__WEBPACK_IMPORTED_MODULE_8__.gat
 ;(0,_utils_imageTools_js__WEBPACK_IMPORTED_MODULE_10__.imagePreview)()
 
 //turns on autocomplete functionality for any associated fields with the autocomplete class
-;(0,_utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_11__.autocompleteListener)()
+;(0,_utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_11__.autocompleteListener)('PublicSource')
 
 //this function does multiple things.  For new records it hides or reveals the fields associated with the chosen media type.  In new and existing records it allows for the addition and removal of variable number fields as defined in the mediaDetails object.  In existing records it ensures that dynamically loaded fields saved previously load correctly.
 //TODO: rebuilt this function to allow any record to use it to add/remove fields

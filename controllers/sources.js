@@ -1,9 +1,6 @@
 const Source = require('../models/source');
 const mongoose = require('mongoose');
-const ExpressError = require('../utils/expressError');
 const duplicateChecker = require('../utils/duplicateChecker')
-const { ImageHandler } = require('../utils/cloudinary')
-const ObjectID = require('mongoose').Types.ObjectId;
 const { RecordHandler } = require('./record-handler-service');
 
 const recordDb = {

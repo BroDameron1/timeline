@@ -53,6 +53,7 @@ db.once('open', () => {
 //require the user routes
 const userRoutes = require('./routes/users');
 const sourceRoutes = require('./routes/sources');
+const utilRoutes = require('./routes/utils');
 
 //execute EJS and EJS mate
 app.engine('ejs', ejsMate)
@@ -150,6 +151,8 @@ app.use(function(req, res, next) {
 app.use('/', userRoutes);
 //direct requests to the source routes
 app.use('/sources', sourceRoutes);
+//direct requests to the util routes for various generic data handling requests
+app.use('/utils', utilRoutes);
 
 //route for the home page
 app.get('/', (req, res) => {

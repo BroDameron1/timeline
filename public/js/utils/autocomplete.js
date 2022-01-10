@@ -1,12 +1,16 @@
 
 import autocomplete from 'autocompleter';
+import serialize from 'form-serialize-improved'
 
 //creates autocomplete functionality for any field that contains the autocomplete class.
 
-export const autocompleteListener = () => {
-    const autocompleteFields = document.querySelectorAll('.autocomplete')
-    autocompleteFields.forEach((autocompleteField) => {
-        autocompleteField.addEventListener('focus', event => {
+
+export const autocompleteListener = (targetCollection) => {
+    const formSelector = document.querySelector('.form')
+    formSelector.addEventListener('focusin', event => {
+        //console.log(event, 'event')
+        if (event.target && event.target.matches('.autocomplete')) {
+            const autocompleteField = event.target
             autocomplete({
                 input: autocompleteField,
                 emtpyMsg: 'No Results',
@@ -19,9 +23,10 @@ export const autocompleteListener = () => {
                     field = field.replace('[', '.')
                     field = field.replace(']', '')
             
-                    const response = await fetch('/sources/data?' + new URLSearchParams({
+                    const response = await fetch('/utils/data?' + new URLSearchParams({
                         field,
-                        fieldValue: autocompleteField.value
+                        fieldValue: autocompleteField.value,
+                        collection: targetCollection
                     }))
                     const autofillOptions = await response.json()
                     console.log(autofillOptions)
@@ -34,6 +39,6 @@ export const autocompleteListener = () => {
                     autocompleteField.value = item.label
                 } 
             })
-        })
+        }
     })
 }

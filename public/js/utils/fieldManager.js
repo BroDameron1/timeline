@@ -61,8 +61,6 @@ export class FieldManager {
             //Create a link with the method and add it inside the new div
             newDiv.append(this.createRemoveLink(this.job))
 
-            //fires the autocompleteListener function again so autocomplete works on the new field
-            autocompleteListener()
         }
         //Check if we have the max number of inputs and then remove the add link if true
         if (totalFieldList.length === this.additionalFields) {

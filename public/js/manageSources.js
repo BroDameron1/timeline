@@ -87,7 +87,7 @@ maxDateSelector()
 imagePreview()
 
 //turns on autocomplete functionality for any associated fields with the autocomplete class
-autocompleteListener()
+autocompleteListener('PublicSource')
 
 //this function does multiple things.  For new records it hides or reveals the fields associated with the chosen media type.  In new and existing records it allows for the addition and removal of variable number fields as defined in the mediaDetails object.  In existing records it ensures that dynamically loaded fields saved previously load correctly.
 //TODO: rebuilt this function to allow any record to use it to add/remove fields
