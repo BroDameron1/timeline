@@ -91,19 +91,19 @@ const isAdmin = async (req, res, next) => {
 }
 
 
-const isAuthor = (dbCollection) => {
+const isAuthor = (reviewCollection) => {
     return async (req, res, next) => {
         const { sourceId } = req.params
         if (!ObjectID.isValid(sourceId)) {
             req.flash('error', 'This record does not exist.')
             return res.redirect('/dashboard')
         }
-        const reviewSourceData = await mongoose.model(dbCollection).findById(sourceId)
-        if (!reviewSourceData) {
+        const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
+        if (!reviewData) {
             req.flash('error', 'This record does not exist.')
             return res.redirect('/dashboard')
         }
-        if (!reviewSourceData.author[0].equals(req.user._id)) {
+        if (!reviewData.author[0].equals(req.user._id)) {
             req.flash('error', "You do not have the correct permissions.")
             return res.redirect('/dashboard')
         }
@@ -111,20 +111,37 @@ const isAuthor = (dbCollection) => {
     }
 }
 
-const isCheckedOut = async (req, res, next) => {
-    const { sourceId, slug } = req.params
-    if (sourceId && !ObjectID.isValid(sourceId)) {
-        req.flash('error', 'This record does not exist.')
-        return res.redirect('/dashboard')
+const isCheckedOut = (reviewCollection, publicCollection) => {
+    return async (req, res, next) => {
+        const { sourceId, slug } = req.params
+        if (sourceId && !ObjectID.isValid(sourceId)) {
+            req.flash('error', 'This record does not exist.')
+            return res.redirect('/dashboard')
+        }
+        const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
+        const publicData = await mongoose.model(publicCollection).findOne({ slug })
+        if ((reviewData && reviewData.checkedOut) || (publicData && publicData.checkedOut)) {
+            req.flash('error', 'This record is already in use.')
+            return res.redirect('/dashboard')
+        }
+        next()
     }
-    const reviewSourceData = await Source.reviewSource.findById(sourceId)
-    const publicSourceData = await Source.publicSource.findOne({ slug })
-    if ((reviewSourceData && reviewSourceData.checkedOut) || (publicSourceData && publicSourceData.checkedOut)) {
-        req.flash('error', 'This record is already in use.')
-        return res.redirect('/dashboard')
-    }
-    next()
 }
+
+// const isCheckedOut = async (req, res, next) => {
+//     const { sourceId, slug } = req.params
+//     if (sourceId && !ObjectID.isValid(sourceId)) {
+//         req.flash('error', 'This record does not exist.')
+//         return res.redirect('/dashboard')
+//     }
+//     const reviewSourceData = await Source.reviewSource.findById(sourceId)
+//     const publicSourceData = await Source.publicSource.findOne({ slug })
+//     if ((reviewSourceData && reviewSourceData.checkedOut) || (publicSourceData && publicSourceData.checkedOut)) {
+//         req.flash('error', 'This record is already in use.')
+//         return res.redirect('/dashboard')
+//     }
+//     next()
+// }
 
 module.exports = {
     isLoggedIn,

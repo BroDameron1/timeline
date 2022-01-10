@@ -15,7 +15,7 @@ router.route('/new')
 
 //routes for publishing a source to public
 router.route('/review/:sourceId')
-    .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderReviewSource))  //TODO: Add isAdmin here.  Right now public users might be able to access.  TEST THIS.
+    .get(isLoggedIn, isCheckedOut('ReviewSource', 'PublicSource'), catchAsync(sources.renderReviewSource))  //TODO: Add isAdmin here.  Right now public users might be able to access.  TEST THIS.
     .put(isLoggedIn, isAdmin, upload.single('sourceImage'), validateSource, catchAsync(sources.publishReviewSource))
     .post(isLoggedIn, isAdmin, upload.single('sourceImage'), validateSource, catchAsync(sources.publishReviewSource))
     .delete(isLoggedIn, isAuthor('ReviewSource'), catchAsync(sources.deleteReviewSource))
@@ -23,7 +23,7 @@ router.route('/review/:sourceId')
 //routes for editing a pending submission
 router.route('/review/:sourceId/edit')
     // .get(isLoggedIn, isAuthor, isCheckedOut, catchAsync(sources.renderUpdateReviewSource))
-    .get(isLoggedIn, isAuthor('ReviewSource'), isCheckedOut, catchAsync(sources.renderUpdateReviewSource))
+    .get(isLoggedIn, isAuthor('ReviewSource'), isCheckedOut('ReviewSource', 'PublicSource'), catchAsync(sources.renderUpdateReviewSource))
     .put(isLoggedIn, isAuthor('ReviewSource'), upload.single('sourceImage'), validateSource, catchAsync(sources.submitUpdateReviewSource))
 
 
@@ -32,7 +32,7 @@ router.route('/:slug')
      .delete(isLoggedIn, isAdmin, catchAsync(sources.deletePublicSource))
 
 router.route('/:slug/edit')
-    .get(isLoggedIn, isCheckedOut, catchAsync(sources.renderEditSource))
+    .get(isLoggedIn, isCheckedOut('ReviewSource', 'PublicSource'), catchAsync(sources.renderEditSource))
     .post(isLoggedIn, upload.single('sourceImage'), validateSource, catchAsync(sources.submitEditSource))
 
 router.route('/review/:sourceId/view')
