@@ -10126,7 +10126,6 @@ class Duplicate {
         this.type = type
     }
     async checkDuplicates () {
-        console.log('here!')
         const response = await fetch('/utils/data?' + new URLSearchParams({
             title: this.title,
             mediaType: this.mediaType,
@@ -11183,6 +11182,7 @@ const title = document.querySelector('#title')
 const mediaType = document.querySelector('#mediaType')
 
 
+//used to manage adding and removing dynamic fields
 const mediaDetails = [
     {
         type: 'Book',
@@ -11233,8 +11233,6 @@ const mediaDetails = [
         expandableFields: []
     },
 ]
-
-//allows adding additional fields for book authors
 
 
 
@@ -11332,8 +11330,11 @@ formProperties.formData.addEventListener('submit', async event => {
     const adminNote = (0,_utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_5__.adminNoteCheck)()
     const formFail = (0,_utils_formValidation_js__WEBPACK_IMPORTED_MODULE_4__.formValidation)(formProperties.formData, formProperties.schema)
 
-    const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__.Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
-    const duplicateResult = await submittedRecord.validateDuplicates()
+    //TODO: Uncomment this later
+    // const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
+    // const duplicateResult = await submittedRecord.validateDuplicates()
+
+    const duplicateResult = false
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.

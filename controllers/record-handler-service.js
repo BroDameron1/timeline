@@ -1,13 +1,14 @@
 //const { isValidObjectId } = require("mongoose")
 const duplicateChecker = require('../utils/duplicateChecker')
 const { ImageHandler } = require('../utils/cloudinary')
+const mongoose = require('mongoose');
 
 
 class RecordHandler {
-    constructor(req, res, recordDb, template) {
+    constructor(req, res, recordProps, template) {
         this.req = req
         this.res = res
-        this.recordDb = recordDb
+        this.recordProps = recordProps
         this.template = template || null
         this.redirectUrl = '/dashboard'
     }
@@ -16,8 +17,10 @@ class RecordHandler {
         const { slug, sourceId } = this.req.params
         let dbPlaceholder
         let data
-        if (dbToCheck === 'review') dbPlaceholder = this.recordDb.review
-        if (dbToCheck === 'public') dbPlaceholder = this.recordDb.public
+        if (dbToCheck === 'review') dbPlaceholder = mongoose.model(this.recordProps.review)
+        if (dbToCheck === 'public') dbPlaceholder = mongoose.model(this.recordProps.public)
+        // if (dbToCheck === 'review') dbPlaceholder = this.recordDb.review
+        // if (dbToCheck === 'public') dbPlaceholder = this.recordDb.public
         if (slug) {
             data = await dbPlaceholder.findOne({ slug })
                 .populate('author', 'username')
@@ -33,15 +36,16 @@ class RecordHandler {
 
     async publishReviewRecord() {
         const { sourceId } = this.req.params
-        const reviewData = await this.dataLookup('review')
+        let reviewData = await this.dataLookup('review')
         let publicData = await this.recordDb.public.findById(reviewData.publicId)
         if (!publicData) {
             publicData = new this.recordDb.public(this.req.body)
         } else {
             publicData.set({ ...this.req.body })
         }
-        //TODO: NEEDS TO BE FIXED FOR OTHER RECORDS
-        const duplicateCheck = await duplicateChecker.publishRecord(publicData.title, publicData.mediaType, sourceId)
+        // const duplicateCheck = await duplicateChecker.publishRecord(publicData.title, publicData.mediaType, sourceId)
+
+        const duplicateCheck = await duplicateChecker.publishRecord(publicData.duplicateSettings, sourceId)
         if (duplicateCheck) {
             this.req.flash('error', 'A record with these details already exists.')
             return this.res.redirect(this.redirectUrl)
@@ -79,7 +83,9 @@ class RecordHandler {
             const image = new ImageHandler(this.req.file.path, this.file.filename, reviewData)
             await image.updateReviewImage()
         }
-        const duplicateCheck = await duplicateChecker.updateReview(reviewData.title, reviewData.mediaType, sourceId)
+
+        // const duplicateCheck = await duplicateChecker.updateReview(reviewData.title, reviewData.mediaType, sourceId)
+        const duplicateCheck = await duplicateChecker.updateReview(reviewData.duplicateSettings)
         if (duplicateCheck) {
             this.req.flash('error', 'This record already exists.')
             return this.res.redirect(this.redirectUrl)
@@ -94,7 +100,8 @@ class RecordHandler {
     async editPublicRecord() {
         const publicData = await this.dataLookup('public')
         const reviewData = new this.recordDb.review(this.req.body)
-        const duplicateCheck = await duplicateChecker.editPublic(reviewData.title, reviewData.mediaType, publicData._id)
+        // const duplicateCheck = await duplicateChecker.editPublic(reviewData.title, reviewData.mediaType, publicData._id)
+        const duplicateCheck = await duplicateChecker.editPublic(reviewData.duplicateSettings, publicData._id)
         if (duplicateCheck) {
             this.req.flash('error', 'This record already exists.')
             return this.res.redirect(this.template+publicData.slug)
@@ -142,15 +149,15 @@ class RecordHandler {
     }
 
     async createNewRecord() {
-        const reviewData = new this.recordDb.review(this.req.body)
-        const duplicateCheckResult = await duplicateChecker.submitNew(reviewData.title, reviewData.mediaType)
-        if (duplicateCheckResult) {
-            req.flash('error', 'This record already exists.')
-            return res.redirect(this.redirectUrl)
+        const reviewData = new mongoose.model(this.recordProps.review)(this.req.body)
+        const duplicateCheck = await duplicateChecker.submitNew(reviewData.duplicateSettings)
+        if (duplicateCheck) {
+            this.req.flash('error', 'This record already exists.')
+            return this.res.redirect(this.redirectUrl)
         }
         this.updateAuthor(reviewData, this.req.user._id) //TODO: add author handling to this class instead of in the DB model
         if(this.req.file) {
-            const image = new ImageHandler(this.req.file.path, this.req.file.filename, reviewDdata)
+            const image = new ImageHandler(this.req.file.path, this.req.file.filename, reviewData)
             image.newReviewImage()
         }
         reviewData.state = 'new'
@@ -177,11 +184,14 @@ class RecordHandler {
         const staticFieldOptions = new Object()
         if (staticFields) {
             for (let field of staticFields) {
-                staticFieldOptions[field] = await this.recordDb.review.schema.path(field).enumValues
+                staticFieldOptions[field] = await mongoose.model(this.recordProps.review).schema.path(field).enumValues
+                // staticFieldOptions[field] = await this.recordDb.review.schema.path(field).enumValues
             }
         }
         return this.res.render(this.template, { data, staticFieldOptions })
     }
+
+
 
 
     updateAuthor(data, newAuthor) {

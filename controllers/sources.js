@@ -1,23 +1,27 @@
 const Source = require('../models/source');
 const { RecordHandler } = require('./record-handler-service');
 
-const recordDb = {
-    review: Source.reviewSource,
-    public: Source.publicSource
+const recordProperties = {
+    // review: Source.reviewSource,
+    // public: Source.publicSource,
+    review: 'ReviewSource',
+    public: 'PublicSource', 
+    duplicateCheckFields: ['title', 'mediaType']
 }
+
 
 const staticFields = ['mediaType']
 
 //controller for get route for rendering any existing source.
 module.exports.renderSource = async (req, res) => {
-    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/source.ejs')
+    const recordHandler = new RecordHandler(req, res, recordProperties, 'sources/source.ejs')
     const publicData = await recordHandler.dataLookup('public')
     recordHandler.renderPage(publicData)
 }
 
 //controller for rendering a review record AFTER it has been reviewed.
 module.exports.renderPostReviewSource = async (req, res) => {
-    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/source.ejs')
+    const recordHandler = new RecordHandler(req, res, recordProperties, 'sources/source.ejs')
     const reviewData = await recordHandler.dataLookup('review')
     recordHandler.renderPage(reviewData)
 
@@ -28,21 +32,20 @@ module.exports.renderPostReviewSource = async (req, res) => {
 module.exports.renderNewSource = async (req, res) => {
     const data = new Source.reviewSource()  //not sure i should be doing this
     
-    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/newSource.ejs')
+    const recordHandler = new RecordHandler(req, res, recordProperties, 'sources/newSource.ejs')
     recordHandler.renderPage(data, staticFields)
 }
 
 //controller for the post route for submitting a New Source to be approved.
 module.exports.submitNewSource = async (req, res) => {
-    const recordHandler = new RecordHandler(req, res, recordDb)
+    const recordHandler = new RecordHandler(req, res, recordProperties)
     return await recordHandler.createNewRecord()
 }
 
 //renders the page for an admin to update and approve any review record
 module.exports.renderReviewSource = async (req, res) => {
-    const { sourceId } = req.params
 
-    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/publishSource.ejs')
+    const recordHandler = new RecordHandler(req, res, recordProperties, 'sources/publishSource.ejs')
     const reviewData = await recordHandler.dataLookup('review')
 
     //TODO: Make this a middleware???
@@ -60,7 +63,7 @@ module.exports.renderReviewSource = async (req, res) => {
 //currently using req.body to capture changes made by the admin.
 module.exports.publishReviewSource = async (req, res) => {
  
-    const recordHandler = new RecordHandler(req, res, recordDb, '/sources/')
+    const recordHandler = new RecordHandler(req, res, recordProperties, '/sources/')
     await recordHandler.publishReviewRecord()
 }
 
@@ -68,7 +71,7 @@ module.exports.publishReviewSource = async (req, res) => {
 module.exports.renderUpdateReviewSource = async (req, res) => {
 
 
-    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/updateReviewSource.ejs')
+    const recordHandler = new RecordHandler(req, res, recordProperties, 'sources/updateReviewSource.ejs')
     const reviewData = await recordHandler.dataLookup('review')
     if (recordHandler.checkApprovalState(reviewData)) return
     recordHandler.renderPage(reviewData, staticFields)
@@ -78,7 +81,7 @@ module.exports.renderUpdateReviewSource = async (req, res) => {
 module.exports.submitUpdateReviewSource = async (req, res) => {
 
 
-    const recordHandler = new RecordHandler(req, res, recordDb)
+    const recordHandler = new RecordHandler(req, res, recordProperties)
     await recordHandler.editReviewRecord()
 }
 
@@ -86,7 +89,7 @@ module.exports.submitUpdateReviewSource = async (req, res) => {
 module.exports.deleteReviewSource = async (req, res) => {
 
 
-    const recordHandler = new RecordHandler(req, res, recordDb)
+    const recordHandler = new RecordHandler(req, res, recordProperties)
     recordHandler.deleteReviewData()
 }
 
@@ -94,7 +97,7 @@ module.exports.deleteReviewSource = async (req, res) => {
 module.exports.renderEditSource = async (req, res) => {
 
 
-    const recordHandler = new RecordHandler(req, res, recordDb, 'sources/updatePublicSource.ejs')
+    const recordHandler = new RecordHandler(req, res, recordProperties, 'sources/updatePublicSource.ejs')
     const publicData = await recordHandler.dataLookup('public')
     recordHandler.renderPage(publicData, staticFields)
 }
@@ -103,7 +106,7 @@ module.exports.renderEditSource = async (req, res) => {
 module.exports.submitEditSource = async (req, res) => {
 
 
-    const recordHandler = new RecordHandler(req, res, recordDb, '/sources/')
+    const recordHandler = new RecordHandler(req, res, recordProperties, '/sources/')
     await recordHandler.editPublicRecord()
 }
 
@@ -111,6 +114,6 @@ module.exports.submitEditSource = async (req, res) => {
 module.exports.deletePublicSource = async (req,res) => {
 
 
-    const recordHandler = new RecordHandler(req, res, recordDb)
+    const recordHandler = new RecordHandler(req, res, recordProperties)
     await recordHandler.deletePublicRecord()
 }

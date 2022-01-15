@@ -46,9 +46,13 @@ const SourceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    publicId: {
-        type: String
+    publicId: { //TODO: Changed this to relate to the PublicSource.  Check and make sure nothing broke.
+        type: Schema.Types.ObjectId,
+        ref: 'PublicSource'
     },
+    // publicId: {
+    //     type: String
+    // },
     updateDate: {
         type: Date,
         get: formatDate
@@ -117,19 +121,25 @@ const SourceSchema = new Schema({
     { timestamps: true });
 
 
-
-//virtual to access slugified URLs
-// SourceSchema.virtual('slug')
-//     .get(function () {
-//         const url = slugify(this.title, {
-//             replacement: '_',
-//             lower: true
-//         })
-//         return url
-//     })
-
 SourceSchema.virtual('displayImage').get(function() {
     return this.images.url.replace('/upload', '/upload/w_500,h_500,c_limit')
+})
+
+SourceSchema.virtual('duplicateSettings').get(function() {
+    const duplicateSettings = {
+        fields: {
+            title: this.title,
+            mediaType: this.mediaType
+        },
+        // fields: [this.title, this.mediaType],
+        // title: this.title,
+        // mediaType: this.mediaType,
+        review: 'ReviewSource',
+        public: 'PublicSource',
+        // collections: ['ReviewSource', 'PublicSource'],
+        id: this._id
+    }
+    return duplicateSettings
 })
 
 //adds new author to the front of the array of authors, removes any duplicates and stores the last 
