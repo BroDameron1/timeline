@@ -1,13 +1,37 @@
 import { generateWarning } from './warning'
 
 //TODO: Can it be expanded to work with any record?
+
+
+
 export class Duplicate {
-    constructor (title, mediaType, sourceId, type) {
-        this.title = title
-        this.mediaType = mediaType || null
-        this.sourceId = sourceId || null
-        this.type = type
+    // constructor (title, mediaType, sourceId, type) {
+    //     this.title = title
+    //     this.mediaType = mediaType || null
+    //     this.sourceId = sourceId || null
+    //     this.recordType = type
+    // }
+
+    constructor (recordType) {
+        this.recordType = recordType
     }
+
+    async getRecordProps () {
+        console.log(this.recordType, 'wat')
+        const response = await fetch('/utils/recordProps?' + new URLSearchParams({
+            recordType: this.recordType
+        }))
+        return await response.json()
+        // this.parseFields(response.json())
+    }
+
+    parseFields(fieldArr) {
+        console.log(fieldArr)
+        for (let field of fieldArr) {
+            
+        }
+    }
+
     async checkDuplicates () {
         const response = await fetch('/utils/data?' + new URLSearchParams({
             title: this.title,

@@ -13,7 +13,7 @@ const submitNew = async (duplicateSettings) => {
     return false
 }
 
-const updateReview = async (duplicateSettings) => {
+const editReview = async (duplicateSettings) => {
     const reviewData = await mongoose.model(duplicateSettings.review).findById(duplicateSettings.id)
     const publicDuplicate = await mongoose.model(duplicateSettings.public).findOne({ //finds any public records EXCLUDING the related review record.
         ...duplicateSettings.fields,
@@ -40,8 +40,6 @@ const publishRecord = async (duplicateSettings, reviewId) => {
     return false
 }
 
-
-
 const editPublic = async (duplicateSettings, publicId) => {
     const publicDuplicate = await mongoose.model(duplicateSettings.public).findOne({
         ...duplicateSettings.fields,
@@ -58,11 +56,9 @@ const editPublic = async (duplicateSettings, publicId) => {
     return false
 }
 
-
-
 module.exports = {
     submitNew,
-    updateReview,
+    editReview,
     publishRecord,
     editPublic
 }

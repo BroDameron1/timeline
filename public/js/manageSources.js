@@ -170,8 +170,11 @@ formProperties.formData.addEventListener('submit', async event => {
     //TODO: Uncomment this later
     // const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
     // const duplicateResult = await submittedRecord.validateDuplicates()
-
-    const duplicateResult = false
+    const submittedRecord = new Duplicate(formProperties.lockLocation)
+    const duplicateResult = await submittedRecord.getRecordProps()
+    console.log(duplicateResult)
+    return
+    // const duplicateResult = false
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.

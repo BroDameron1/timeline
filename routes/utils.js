@@ -14,4 +14,8 @@ router.route('/data')
     .put(isLoggedIn, catchAsync(utils.putData))
     .post(isLoggedIn, catchAsync(utils.putData))
 
+router.route('/recordProps')
+    .get(isLoggedIn, catchAsync(utils.getRecordProps))
+
+
 module.exports = router;

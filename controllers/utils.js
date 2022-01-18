@@ -56,3 +56,9 @@ module.exports.putData = async (req, res) => {
     await dataToUpdate.save()
     res.status(200).end()
 }
+
+module.exports.getRecordProps = async (req, res) => {
+    const recordProps = new mongoose.model(req.query.recordType)()
+    console.log(Object.keys(recordProps.duplicateSettings.fields), '1')
+    return res.json(Object.keys(recordProps.duplicateSettings.fields))
+}

@@ -12,6 +12,7 @@ const populateFormInfo = (formProperties) => {
                 case 'newSource':
                     formProperties.existingSource = false
                     formProperties.duplicateCheck = 'submitNew'
+                    formProperties.lockLocation = 'ReviewSource'
                 break;
                 case 'updateReviewSource':
                     formProperties.duplicateCheck = 'updateReview'

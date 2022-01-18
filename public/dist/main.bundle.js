@@ -10118,13 +10118,34 @@ __webpack_require__.r(__webpack_exports__);
 
 
 //TODO: Can it be expanded to work with any record?
+
+
+
 class Duplicate {
-    constructor (title, mediaType, sourceId, type) {
-        this.title = title
-        this.mediaType = mediaType || null
-        this.sourceId = sourceId || null
-        this.type = type
+    // constructor (title, mediaType, sourceId, type) {
+    //     this.title = title
+    //     this.mediaType = mediaType || null
+    //     this.sourceId = sourceId || null
+    //     this.recordType = type
+    // }
+
+    constructor (recordType) {
+        this.recordType = recordType
     }
+
+    async getRecordProps () {
+        console.log(this.recordType, 'wat')
+        const response = await fetch('/utils/recordProps?' + new URLSearchParams({
+            recordType: this.recordType
+        }))
+        console.log(await response.json())
+        // this.parseFields(response.json())
+    }
+
+    parseFields(fieldArr) {
+        console.log(fieldArr)
+    }
+
     async checkDuplicates () {
         const response = await fetch('/utils/data?' + new URLSearchParams({
             title: this.title,
@@ -10314,6 +10335,7 @@ const populateFormInfo = (formProperties) => {
                 case 'newSource':
                     formProperties.existingSource = false
                     formProperties.duplicateCheck = 'submitNew'
+                    formProperties.lockLocation = 'ReviewSource'
                 break;
                 case 'updateReviewSource':
                     formProperties.duplicateCheck = 'updateReview'
@@ -11333,8 +11355,11 @@ formProperties.formData.addEventListener('submit', async event => {
     //TODO: Uncomment this later
     // const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
     // const duplicateResult = await submittedRecord.validateDuplicates()
-
-    const duplicateResult = false
+    const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__.Duplicate(formProperties.lockLocation)
+    const duplicateResult = await submittedRecord.getRecordProps()
+    console.log(duplicateResult)
+    return
+    // const duplicateResult = false
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.

@@ -37,9 +37,9 @@ class RecordHandler {
     async publishReviewRecord() {
         const { sourceId } = this.req.params
         let reviewData = await this.dataLookup('review')
-        let publicData = await this.recordDb.public.findById(reviewData.publicId)
+        let publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId)
         if (!publicData) {
-            publicData = new this.recordDb.public(this.req.body)
+            publicData = new mongoose.model(this.recordProps.public)(this.req.body)
         } else {
             publicData.set({ ...this.req.body })
         }
@@ -85,7 +85,7 @@ class RecordHandler {
         }
 
         // const duplicateCheck = await duplicateChecker.updateReview(reviewData.title, reviewData.mediaType, sourceId)
-        const duplicateCheck = await duplicateChecker.updateReview(reviewData.duplicateSettings)
+        const duplicateCheck = await duplicateChecker.editReview(reviewData.duplicateSettings)
         if (duplicateCheck) {
             this.req.flash('error', 'This record already exists.')
             return this.res.redirect(this.redirectUrl)
@@ -99,7 +99,7 @@ class RecordHandler {
 
     async editPublicRecord() {
         const publicData = await this.dataLookup('public')
-        const reviewData = new this.recordDb.review(this.req.body)
+        const reviewData = new mongoose.model(this.recordProps.review)(this.req.body)
         // const duplicateCheck = await duplicateChecker.editPublic(reviewData.title, reviewData.mediaType, publicData._id)
         const duplicateCheck = await duplicateChecker.editPublic(reviewData.duplicateSettings, publicData._id)
         if (duplicateCheck) {
@@ -138,9 +138,9 @@ class RecordHandler {
         this.checkApprovalState(reviewData)
         const image = new ImageHandler(reviewData.images.url, reviewData.images.filename, reviewData)
         await image.deleteReviewImage()
-        await this.recordDb.review.findByIdAndDelete(sourceId)
+        await mongoose.model(this.recordProps.review).findByIdAndDelete(sourceId)
         if (reviewData.publicId) {
-            const publicData = await this.recordDb.public.findById(reviewData.publicId)
+            const publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId)
             publicData.checkedOut = false
             publicData.save()
         }
