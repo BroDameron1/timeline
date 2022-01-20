@@ -7,7 +7,8 @@ const submitNew = async (duplicateSettings) => {
     }).collation({ locale: 'en', strength: 2 })
     if (publicDuplicate) return publicDuplicate
     const reviewDuplicate = await mongoose.model(duplicateSettings.review).findOne({
-        ...duplicateSettings.fields
+        ...duplicateSettings.fields,
+        state: { $in: ['new', 'review'] }
     })
     if (reviewDuplicate) return true
     return false
@@ -37,6 +38,12 @@ const publishRecord = async (duplicateSettings, reviewId) => {
         _id: { $ne: reviewData.publicId }
     }).collation({ locale: 'en', strength: 2 })
     if (publicDuplicate) return publicDuplicate
+
+    const reviewDuplicate = await mongoose.model(duplicateSettings.review).findOne({ 
+        ...duplicateSettings.fields,
+        _id: { $ne: reviewId }
+        }).collation({ locale: 'en', strength: 2 })
+    if (reviewDuplicate) return true
     return false
 }
 

@@ -12,38 +12,77 @@ export class Duplicate {
     //     this.recordType = type
     // }
 
-    constructor (recordType) {
+    constructor (recordType, sourceId, recordState) {
         this.recordType = recordType
+        this.sourceId = sourceId
+        this.recordState = recordState
     }
 
     async getRecordProps () {
-        console.log(this.recordType, 'wat')
+        
         const response = await fetch('/utils/recordProps?' + new URLSearchParams({
             recordType: this.recordType
         }))
-        return await response.json()
-        // this.parseFields(response.json())
+
+        return this.parseResponse(await response.json())
     }
 
-    parseFields(fieldArr) {
-        console.log(fieldArr)
-        for (let field of fieldArr) {
-            
+    parseResponse(duplicateSettings) {
+        
+        for (let field in duplicateSettings.fields) {
+            duplicateSettings.fields[field] = document.querySelector(`#${field}`).value
         }
+        duplicateSettings.id = this.sourceId
+        return this.checkDuplicates(duplicateSettings)
     }
 
-    async checkDuplicates () {
-        const response = await fetch('/utils/data?' + new URLSearchParams({
-            title: this.title,
-            mediaType: this.mediaType,
-            sourceId: this.sourceId,
-            type: this.type
-        }))
-        return response.json()
+    // async checkDuplicates (duplicateSettings) {
+    //     console.log(duplicateSettings)
+    //     const response = await fetch('/utils/data?' + new URLSearchParams({
+    //         // title: this.title,
+    //         // mediaType: this.mediaType,
+    //         // sourceId: this.sourceId,
+    //         ...duplicateSettings,
+    //         recordState: this.recordState
+    //     }))
+    //     return response.json()
+    // }
+
+    async checkDuplicates (duplicateSettings) {
+        console.log(this.recordState, 'testsds')
+        const response = await fetch('/utils/duplicateCheck', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                duplicateSettings,
+                recordState: this.recordState
+            })
+        })
+        // console.log(await response.json(), 'responsetest')
+        // return response
+        return await response.json()
     }
+
+    // const response = await fetch('/utils/data', {
+    //     method: 'PUT',
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify({
+    //         sourceId,
+    //         adminNotes: formProperties.formData.adminNotes.value,
+    //         state: 'rejected',
+    //         collection: formProperties.lockLocation
+    //     })
+    // })
 
     async validateDuplicates () {
-        const duplicateResponse = await this.checkDuplicates()
+        // const duplicateResponse = await this.checkDuplicates()
+
+        const duplicateResponse = await this.getRecordProps()
+        console.log(duplicateResponse, 'here3')
         if (!duplicateResponse) return false
         if (duplicateResponse.title) {
             //create the link

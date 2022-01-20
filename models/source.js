@@ -46,7 +46,7 @@ const SourceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    publicId: { //TODO: Changed this to relate to the PublicSource.  Check and make sure nothing broke.
+    publicId: { //TODO: Changed this to relate to the PublicSource.  Check and make sure nothing broke. DONE just waiting to see if anything broke.
         type: Schema.Types.ObjectId,
         ref: 'PublicSource'
     },
@@ -128,8 +128,8 @@ SourceSchema.virtual('displayImage').get(function() {
 SourceSchema.virtual('duplicateSettings').get(function() {
     const duplicateSettings = {
         fields: {
-            title: this.title,
-            mediaType: this.mediaType
+            title: this.title || null,
+            mediaType: this.mediaType || null
         },
         // fields: [this.title, this.mediaType],
         // title: this.title,

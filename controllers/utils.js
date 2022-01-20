@@ -2,25 +2,28 @@ const Source = require('../models/source');
 const mongoose = require('mongoose');
 const duplicateChecker = require('../utils/duplicateChecker')
 
+module.exports.duplicateCheck = async (req, res) => {
+    const { duplicateSettings, recordState } = req.body
+    if (recordState === 'submitNew') {
+        const duplicateResult = await duplicateChecker.submitNew(duplicateSettings)
+        
+        return res.json(duplicateResult)
+    }
+    if (recordState === 'updateReview') {
+        const duplicateResult = await duplicateChecker.editReview(duplicateSettings)
+        return res.json(duplicateResult)
+    }
+    if (recordState === 'publishRecord') {
+        const duplicateResult = await duplicateChecker.publishRecord(duplicateSettings, duplicateSettings.id)
+        return res.json(duplicateResult)
+    }
+    if (recordState === 'editPublic') {
+        const duplicateResult = await duplicateChecker.editPublic(duplicateSettings, duplicateSettings.id)
+        return res.json(duplicateResult)
+    }
+}
+
 module.exports.getData = async (req, res) => { 
-    const { title, mediaType, type, sourceId } = req.query
-    if (type === 'submitNew') {
-        const duplicateResult = await duplicateChecker.submitNew(title, mediaType)
-        return res.json(duplicateResult)
-    }
-    if (type === 'updateReview') {
-        const duplicateResult = await duplicateChecker.updateReview(title, mediaType, sourceId)
-        return res.json(duplicateResult)
-    }
-    if (type === 'publishRecord') {
-        const duplicateResult = await duplicateChecker.publishRecord(title, mediaType, sourceId)
-        return res.json(duplicateResult)
-    }
-    if (type === 'editPublic') {
-        const duplicateResult = await duplicateChecker.editPublic(title, mediaType, sourceId)
-        return res.json(duplicateResult)
-    }
-    
     
     const { field, fieldValue, collection } = req.query
 
@@ -59,6 +62,6 @@ module.exports.putData = async (req, res) => {
 
 module.exports.getRecordProps = async (req, res) => {
     const recordProps = new mongoose.model(req.query.recordType)()
-    console.log(Object.keys(recordProps.duplicateSettings.fields), '1')
-    return res.json(Object.keys(recordProps.duplicateSettings.fields))
+    // console.log(Object.keys(recordProps.duplicateSettings.fields), '1')
+    return res.json(recordProps.duplicateSettings)
 }

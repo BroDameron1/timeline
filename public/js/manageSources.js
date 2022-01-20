@@ -170,10 +170,8 @@ formProperties.formData.addEventListener('submit', async event => {
     //TODO: Uncomment this later
     // const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
     // const duplicateResult = await submittedRecord.validateDuplicates()
-    const submittedRecord = new Duplicate(formProperties.lockLocation)
-    const duplicateResult = await submittedRecord.getRecordProps()
-    console.log(duplicateResult)
-    return
+    const submittedRecord = new Duplicate(formProperties.lockLocation, sourceId, formProperties.duplicateCheck)
+    const duplicateResult = await submittedRecord.validateDuplicates()
     // const duplicateResult = false
 
     if (!duplicateResult && !formFail && !adminNote) {

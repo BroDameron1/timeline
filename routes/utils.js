@@ -17,5 +17,8 @@ router.route('/data')
 router.route('/recordProps')
     .get(isLoggedIn, catchAsync(utils.getRecordProps))
 
+router.route('/duplicateCheck')
+    .post(isLoggedIn, catchAsync(utils.duplicateCheck))
+
 
 module.exports = router;
