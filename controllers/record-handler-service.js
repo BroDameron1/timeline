@@ -56,10 +56,12 @@ class RecordHandler {
         }
         //TODO: Streamline image handling?
         if (this.req.file) {
-            const image = new ImageHandler(this.req.file.path, this.req.file.filename, reviewData, publicData)
+            // const image = new ImageHandler(this.req.file.path, this.req.file.filename, reviewData, publicData)
+            const image = new ImageHandler(this.req.file, publicData, this.recordProps)
             image.publishImage()
         } else {
-            const image = new ImageHandler(reviewData.images.url, reviewData.images.filename, reviewData, publicData)
+            // const image = new ImageHandler(reviewData.images.url, reviewData.images.filename, reviewData, publicData)
+            const image = new ImageHandler(reviewData.images, publicData, this.recordProps)
             image.publishImage()
         }
         publicData.state = 'published'
@@ -76,11 +78,11 @@ class RecordHandler {
     }
 
     async editReviewRecord() {
-        const { sourceId } = this.req.params
         const reviewData = await this.dataLookup('review')
         reviewData.set({ ...this.req.body })
         if (this.req.file) {
-            const image = new ImageHandler(this.req.file.path, this.file.filename, reviewData)
+            // const image = new ImageHandler(this.req.file.path, this.file.filename, reviewData)
+            const image = new ImageHandler(this.req.file, reviewData, this.recordProps)
             await image.updateReviewImage()
         }
 
@@ -107,9 +109,9 @@ class RecordHandler {
             return this.res.redirect(this.template+publicData.slug)
         }
         if (this.req.file) {
-            reviewData.images = { url: this.req.file.path, filename: this.req.file.filename}
+            reviewData.images = { path: this.req.file.path, filename: this.req.file.filename}
         } else {
-            reviewData.images.url = publicData.images.url
+            reviewData.images.path = publicData.images.path
             reviewData.images.filename = publicData.images.filename
         }
         reviewData.author.unshift(this.req.user._id)
@@ -124,8 +126,9 @@ class RecordHandler {
 
     async deletePublicRecord() {
         const publicData = await this.dataLookup('public')
-        if (publicData.images.url) {
-            const image = new ImageHandler(publicData.images.url, publicData.images.filename, null, publicData)
+        if (publicData.images.path) {
+            // const image = new ImageHandler(publicData.images.path, publicData.images.filename, null, publicData)
+            const image = new ImageHandler(publicData.images, publicData, this.recordProps)
             await image.deletePublicImage()
         }
         await publicData.delete()
@@ -136,7 +139,8 @@ class RecordHandler {
         const { sourceId } = this.req.params
         const reviewData = await this.dataLookup('review')
         this.checkApprovalState(reviewData)
-        const image = new ImageHandler(reviewData.images.url, reviewData.images.filename, reviewData)
+        // const image = new ImageHandler(reviewData.images.path, reviewData.images.filename, reviewData)
+        const image = new ImageHandler(reviewData.images, reviewData, this.recordProps)
         await image.deleteReviewImage()
         await mongoose.model(this.recordProps.review).findByIdAndDelete(sourceId)
         if (reviewData.publicId) {
@@ -157,7 +161,8 @@ class RecordHandler {
         }
         this.updateAuthor(reviewData, this.req.user._id) //TODO: add author handling to this class instead of in the DB model
         if(this.req.file) {
-            const image = new ImageHandler(this.req.file.path, this.req.file.filename, reviewData)
+            // const image = new ImageHandler(this.req.file.path, this.req.file.filename, reviewData)
+            const image = new ImageHandler(this.req.file, reviewData, this.recordProps)
             image.newReviewImage()
         }
         reviewData.state = 'new'

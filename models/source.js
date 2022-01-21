@@ -25,7 +25,8 @@ const SourceSchema = new Schema({
         enum: ['Movie', 'TV Show', 'Book', 'Comic', 'Video Game']
     },
     images: {
-            url: String,
+            // url: String,
+            path: String,
             filename: String,
         },
     state: {
@@ -122,7 +123,7 @@ const SourceSchema = new Schema({
 
 
 SourceSchema.virtual('displayImage').get(function() {
-    return this.images.url.replace('/upload', '/upload/w_500,h_500,c_limit')
+    return this.images.path.replace('/upload', '/upload/w_500,h_500,c_limit')
 })
 
 SourceSchema.virtual('duplicateSettings').get(function() {
