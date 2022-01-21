@@ -3,22 +3,22 @@ const mongoose = require('mongoose');
 const duplicateChecker = require('../utils/duplicateChecker')
 
 module.exports.duplicateCheck = async (req, res) => {
-    const { duplicateSettings, recordState } = req.body
+    const { recordProps, recordState } = req.body
     if (recordState === 'submitNew') {
-        const duplicateResult = await duplicateChecker.submitNew(duplicateSettings)
+        const duplicateResult = await duplicateChecker.submitNew(recordProps)
         
         return res.json(duplicateResult)
     }
     if (recordState === 'updateReview') {
-        const duplicateResult = await duplicateChecker.editReview(duplicateSettings)
+        const duplicateResult = await duplicateChecker.editReview(recordProps)
         return res.json(duplicateResult)
     }
     if (recordState === 'publishRecord') {
-        const duplicateResult = await duplicateChecker.publishRecord(duplicateSettings, duplicateSettings.id)
+        const duplicateResult = await duplicateChecker.publishRecord(recordProps, recordProps.id)
         return res.json(duplicateResult)
     }
     if (recordState === 'editPublic') {
-        const duplicateResult = await duplicateChecker.editPublic(duplicateSettings, duplicateSettings.id)
+        const duplicateResult = await duplicateChecker.editPublic(recordProps, recordProps.id)
         return res.json(duplicateResult)
     }
 }
@@ -63,5 +63,5 @@ module.exports.putData = async (req, res) => {
 module.exports.getRecordProps = async (req, res) => {
     const recordProps = new mongoose.model(req.query.recordType)()
     // console.log(Object.keys(recordProps.duplicateSettings.fields), '1')
-    return res.json(recordProps.duplicateSettings)
+    return res.json(recordProps.recordProps)
 }

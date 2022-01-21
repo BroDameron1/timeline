@@ -45,7 +45,7 @@ class RecordHandler {
         }
         // const duplicateCheck = await duplicateChecker.publishRecord(publicData.title, publicData.mediaType, sourceId)
 
-        const duplicateCheck = await duplicateChecker.publishRecord(publicData.duplicateSettings, sourceId)
+        const duplicateCheck = await duplicateChecker.publishRecord(publicData.recordProps, sourceId)
         if (duplicateCheck) {
             this.req.flash('error', 'A record with these details already exists.')
             return this.res.redirect(this.redirectUrl)
@@ -87,7 +87,7 @@ class RecordHandler {
         }
 
         // const duplicateCheck = await duplicateChecker.updateReview(reviewData.title, reviewData.mediaType, sourceId)
-        const duplicateCheck = await duplicateChecker.editReview(reviewData.duplicateSettings)
+        const duplicateCheck = await duplicateChecker.editReview(reviewData.recordProps)
         if (duplicateCheck) {
             this.req.flash('error', 'This record already exists.')
             return this.res.redirect(this.redirectUrl)
@@ -103,7 +103,7 @@ class RecordHandler {
         const publicData = await this.dataLookup('public')
         const reviewData = new mongoose.model(this.recordProps.review)(this.req.body)
         // const duplicateCheck = await duplicateChecker.editPublic(reviewData.title, reviewData.mediaType, publicData._id)
-        const duplicateCheck = await duplicateChecker.editPublic(reviewData.duplicateSettings, publicData._id)
+        const duplicateCheck = await duplicateChecker.editPublic(reviewData.recordProps, publicData._id)
         if (duplicateCheck) {
             this.req.flash('error', 'This record already exists.')
             return this.res.redirect(this.template+publicData.slug)
@@ -135,13 +135,16 @@ class RecordHandler {
         this.res.redirect(this.redirectUrl)
     }
 
-    async deleteReviewData() {
+    async deleteReviewRecord() {
         const { sourceId } = this.req.params
         const reviewData = await this.dataLookup('review')
-        this.checkApprovalState(reviewData)
+        
+        if(this.checkApprovalState(reviewData)) return
         // const image = new ImageHandler(reviewData.images.path, reviewData.images.filename, reviewData)
+        console.log('here')
         const image = new ImageHandler(reviewData.images, reviewData, this.recordProps)
         await image.deleteReviewImage()
+        
         await mongoose.model(this.recordProps.review).findByIdAndDelete(sourceId)
         if (reviewData.publicId) {
             const publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId)
@@ -154,7 +157,7 @@ class RecordHandler {
 
     async createNewRecord() {
         const reviewData = new mongoose.model(this.recordProps.review)(this.req.body)
-        const duplicateCheck = await duplicateChecker.submitNew(reviewData.duplicateSettings)
+        const duplicateCheck = await duplicateChecker.submitNew(reviewData.recordProps)
         if (duplicateCheck) {
             this.req.flash('error', 'This record already exists.')
             return this.res.redirect(this.redirectUrl)

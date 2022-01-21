@@ -126,21 +126,19 @@ SourceSchema.virtual('displayImage').get(function() {
     return this.images.path.replace('/upload', '/upload/w_500,h_500,c_limit')
 })
 
-SourceSchema.virtual('duplicateSettings').get(function() {
-    const duplicateSettings = {
-        fields: {
+// SourceSchema.virtual('duplicateSettings').get(function() {
+SourceSchema.virtual('recordProps').get(function() {
+    const recordProps = {
+        duplicateFields: {
             title: this.title || null,
             mediaType: this.mediaType || null
         },
-        // fields: [this.title, this.mediaType],
-        // title: this.title,
-        // mediaType: this.mediaType,
         review: 'ReviewSource',
         public: 'PublicSource',
-        // collections: ['ReviewSource', 'PublicSource'],
+        staticFields: ['mediaType'],
         id: this._id
     }
-    return duplicateSettings
+    return recordProps
 })
 
 //adds new author to the front of the array of authors, removes any duplicates and stores the last 

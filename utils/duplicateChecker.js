@@ -1,61 +1,61 @@
 const mongoose = require('mongoose');
 
 
-const submitNew = async (duplicateSettings) => {
-    const publicDuplicate = await mongoose.model(duplicateSettings.public).findOne({ 
-        ...duplicateSettings.fields
+const submitNew = async (recordProps) => {
+    const publicDuplicate = await mongoose.model(recordProps.public).findOne({ 
+        ...recordProps.duplicateFields
     }).collation({ locale: 'en', strength: 2 })
     if (publicDuplicate) return publicDuplicate
-    const reviewDuplicate = await mongoose.model(duplicateSettings.review).findOne({
-        ...duplicateSettings.fields,
+    const reviewDuplicate = await mongoose.model(recordProps.review).findOne({
+        ...recordProps.duplicateFields,
         state: { $in: ['new', 'review'] }
     })
     if (reviewDuplicate) return true
     return false
 }
 
-const editReview = async (duplicateSettings) => {
-    const reviewData = await mongoose.model(duplicateSettings.review).findById(duplicateSettings.id)
-    const publicDuplicate = await mongoose.model(duplicateSettings.public).findOne({ //finds any public records EXCLUDING the related review record.
-        ...duplicateSettings.fields,
+const editReview = async (recordProps) => {
+    const reviewData = await mongoose.model(recordProps.review).findById(recordProps.id)
+    const publicDuplicate = await mongoose.model(recordProps.public).findOne({ //finds any public records EXCLUDING the related review record.
+        ...recordProps.duplicateFields,
         _id: { $ne: reviewData.publicId }
     }).collation({ locale: 'en', strength: 2 })
     if (publicDuplicate) return publicDuplicate
     
-    const reviewDuplicate = await mongoose.model(duplicateSettings.review).findOne({
-        ...duplicateSettings.fields,
-        _id: { $ne: duplicateSettings.id },
+    const reviewDuplicate = await mongoose.model(recordProps.review).findOne({
+        ...recordProps.duplicateFields,
+        _id: { $ne: recordProps.id },
         state: { $in: ['new', 'update'] }
     }).collation({ locale: 'en', strength: 2 })
     if (reviewDuplicate) return true
     return false
 }
 
-const publishRecord = async (duplicateSettings, reviewId) => {
-    const reviewData = await mongoose.model(duplicateSettings.review).findById(reviewId)
-    const publicDuplicate = await mongoose.model(duplicateSettings.public).findOne({ 
-        ...duplicateSettings.fields,
+const publishRecord = async (recordProps, reviewId) => {
+    const reviewData = await mongoose.model(recordProps.review).findById(reviewId)
+    const publicDuplicate = await mongoose.model(recordProps.public).findOne({ 
+        ...recordProps.duplicateFields,
         _id: { $ne: reviewData.publicId }
     }).collation({ locale: 'en', strength: 2 })
     if (publicDuplicate) return publicDuplicate
 
-    const reviewDuplicate = await mongoose.model(duplicateSettings.review).findOne({ 
-        ...duplicateSettings.fields,
+    const reviewDuplicate = await mongoose.model(recordProps.review).findOne({ 
+        ...recordProps.duplicateFields,
         _id: { $ne: reviewId }
         }).collation({ locale: 'en', strength: 2 })
     if (reviewDuplicate) return true
     return false
 }
 
-const editPublic = async (duplicateSettings, publicId) => {
-    const publicDuplicate = await mongoose.model(duplicateSettings.public).findOne({
-        ...duplicateSettings.fields,
+const editPublic = async (recordProps, publicId) => {
+    const publicDuplicate = await mongoose.model(recordProps.public).findOne({
+        ...recordProps.duplicateFields,
         _id: { $ne: publicId }
     }).collation({ locale: 'en', strength: 2 })
     console.log(publicDuplicate, 'here1')
     if (publicDuplicate) return publicDuplicate
-    const reviewDuplicate = await mongoose.model(duplicateSettings.review).findOne({
-        ...duplicateSettings.fields,
+    const reviewDuplicate = await mongoose.model(recordProps.review).findOne({
+        ...recordProps.duplicateFields,
         state: { $in: ['new', 'review'] }
     }).collation({ locale: 'en', strength: 2 })
     console.log(reviewDuplicate, 'here2')

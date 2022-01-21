@@ -109,8 +109,10 @@ class ImageHandler {
     //TODO: Test
     async deleteReviewImage() {
         //Cannot use publicID here because the images there may be different than the review image causing the review image to not be deleted.
+        
         const publicData = await mongoose.model(this.recordProps.public).findOne({ images: {filename: this.fileData.filename}})
-        if (!publicData) {
+        console.log(publicData, 'here1')
+        if (!publicData && this.recordData.images.filename) {
             await cloudinary.uploader.destroy(this.recordData.images.filename)
         }
     }
@@ -118,7 +120,7 @@ class ImageHandler {
     //recordData is publicData from record_handler_service for this method.
     async deletePublicImage() {
         const reviewData = await mongoose.model(this.recordProps.review).findOne({ images: { filename: this.fileData.filename }})
-        if (!reviewData) {
+        if (!reviewData && this.recordData.images.filename) {
             await cloudinary.uploader.destroy(this.recordData.images.filename)
         }
     }

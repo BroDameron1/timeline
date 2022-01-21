@@ -10018,9 +10018,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! autocompleter */ "./node_modules/autocompleter/autocomplete.js");
 /* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(autocompleter__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! form-serialize-improved */ "./node_modules/form-serialize-improved/index.js");
-/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(form_serialize_improved__WEBPACK_IMPORTED_MODULE_1__);
-
 
 
 
@@ -10144,13 +10141,13 @@ class Duplicate {
         return this.parseResponse(await response.json())
     }
 
-    parseResponse(duplicateSettings) {
+    parseResponse(recordProps) {
         
-        for (let field in duplicateSettings.fields) {
-            duplicateSettings.fields[field] = document.querySelector(`#${field}`).value
+        for (let field in recordProps.duplicateFields) {
+            recordProps.duplicateFields[field] = document.querySelector(`#${field}`).value
         }
-        duplicateSettings.id = this.sourceId
-        return this.checkDuplicates(duplicateSettings)
+        recordProps.id = this.sourceId
+        return this.checkDuplicates(recordProps)
     }
 
     // async checkDuplicates (duplicateSettings) {
@@ -10165,7 +10162,7 @@ class Duplicate {
     //     return response.json()
     // }
 
-    async checkDuplicates (duplicateSettings) {
+    async checkDuplicates (recordProps) {
         console.log(this.recordState, 'testsds')
         const response = await fetch('/utils/duplicateCheck', {
             method: 'POST',
@@ -10173,7 +10170,7 @@ class Duplicate {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                duplicateSettings,
+                recordProps,
                 recordState: this.recordState
             })
         })

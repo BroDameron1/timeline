@@ -1,6 +1,5 @@
 
 import autocomplete from 'autocompleter';
-import serialize from 'form-serialize-improved'
 
 //creates autocomplete functionality for any field that contains the autocomplete class.
 

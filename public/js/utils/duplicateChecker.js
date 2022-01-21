@@ -27,13 +27,13 @@ export class Duplicate {
         return this.parseResponse(await response.json())
     }
 
-    parseResponse(duplicateSettings) {
+    parseResponse(recordProps) {
         
-        for (let field in duplicateSettings.fields) {
-            duplicateSettings.fields[field] = document.querySelector(`#${field}`).value
+        for (let field in recordProps.duplicateFields) {
+            recordProps.duplicateFields[field] = document.querySelector(`#${field}`).value
         }
-        duplicateSettings.id = this.sourceId
-        return this.checkDuplicates(duplicateSettings)
+        recordProps.id = this.sourceId
+        return this.checkDuplicates(recordProps)
     }
 
     // async checkDuplicates (duplicateSettings) {
@@ -48,7 +48,7 @@ export class Duplicate {
     //     return response.json()
     // }
 
-    async checkDuplicates (duplicateSettings) {
+    async checkDuplicates (recordProps) {
         console.log(this.recordState, 'testsds')
         const response = await fetch('/utils/duplicateCheck', {
             method: 'POST',
@@ -56,7 +56,7 @@ export class Duplicate {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                duplicateSettings,
+                recordProps,
                 recordState: this.recordState
             })
         })
