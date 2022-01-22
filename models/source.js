@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const slugify = require('slugify')
+const slugify = require('slugify') //pull in slugify library to help create URL slugs
 
 Schema.Types.String.set('trim', true); //sets all strings to trim()
 
@@ -25,7 +25,6 @@ const SourceSchema = new Schema({
         enum: ['Movie', 'TV Show', 'Book', 'Comic', 'Video Game']
     },
     images: {
-            // url: String,
             path: String,
             filename: String,
         },
@@ -47,13 +46,10 @@ const SourceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    publicId: { //TODO: Changed this to relate to the PublicSource.  Check and make sure nothing broke. DONE just waiting to see if anything broke.
+    publicId: { 
         type: Schema.Types.ObjectId,
         ref: 'PublicSource'
     },
-    // publicId: {
-    //     type: String
-    // },
     updateDate: {
         type: Date,
         get: formatDate
@@ -121,12 +117,12 @@ const SourceSchema = new Schema({
 },
     { timestamps: true });
 
-
+//virtual property that updates the path/URL of the image request to cloudinary with a request for a specific size of the image.
 SourceSchema.virtual('displayImage').get(function() {
     return this.images.path.replace('/upload', '/upload/w_500,h_500,c_limit')
 })
 
-// SourceSchema.virtual('duplicateSettings').get(function() {
+//virtual property that stores specific properties of the record so that they can be called in functions that need to work with every record type (duplicatechecker, record-handler-service, etc...)
 SourceSchema.virtual('recordProps').get(function() {
     const recordProps = {
         duplicateFields: {
@@ -152,7 +148,8 @@ SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
     }
 }
 
-//sets the date/time for updateDate.  Not sure why we can't use the timestamps.  TODO
+//pre-save middleware that sets the updateDate timestamp and creates a slug of the record title.
+//TODO: Figure out why we can't use Mongo's timestamp.  Might be because we can't edit it using the formatDate function.
 SourceSchema.pre('save', function(next) { 
     this.updateDate = Date.now()
     this.slug = slugify(this.title + '_' + this.mediaType, {
@@ -163,24 +160,18 @@ SourceSchema.pre('save', function(next) {
     next()
 })
 
-function formatDate (date) { //formats and passes through the last updated time to be displayed.
+//function to take any date and format it to a display date of the month, day, year and time (example: Jan 1, 2022 at 12:01 AM)
+//TODO: extract this so it can be used by multiple models
+function formatDate (date) { 
     const month = date.toLocaleString('default', { month: 'short' });
     const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-    const displayDate = `${month} ${date.getDate()} ${date.getFullYear()} at ${time}`
+    const displayDate = `${month} ${date.getDate()}, ${date.getFullYear()} at ${time}`
     return displayDate;
 }
 
+//function to take the date as it exists in the database and format it so that it fits into the date selector field on the form. 
 function formDate (date) {
-    if (date) {
-        console.log('test1')
-        return date.toISOString().substring(0, 10)
-    } else {
-        return null
-    }
-}
-
-function capitalize (stringToCapitalize) {
-    return stringToCapitalize.charAt(0).toUpperCase() + stringToCapitalize.slice(1)
+    if (date) return date.toISOString().substring(0, 10) //needs to check if the date exist since undefined can't be changed.  Turns date into a string and cuts it to the 0-10th character.
 }
 
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);
