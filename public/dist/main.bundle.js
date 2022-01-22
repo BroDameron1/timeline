@@ -10042,7 +10042,7 @@ const autocompleteListener = (targetCollection) => {
                     field = field.replace('[', '.')
                     field = field.replace(']', '')
             
-                    const response = await fetch('/utils/data?' + new URLSearchParams({
+                    const response = await fetch('/utils/autocomplete?' + new URLSearchParams({
                         field,
                         fieldValue: autocompleteField.value,
                         collection: targetCollection
@@ -10566,7 +10566,8 @@ const rejectPublish = (formProperties) => {
             const formFail = (0,_formValidation__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
 
             if (!formFail && !adminNoteCheck()) {
-                const response = await fetch('/utils/data', {
+                const response = await fetch('/utils/rejectPublish', {
+                // const response = await fetch('/utils/data', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -10620,7 +10621,8 @@ class StateManager {
             collection: this.targetCollection
         })
 
-        const beacon = await navigator.sendBeacon('/utils/data', checkedOutRequest)
+        // const beacon = await navigator.sendBeacon('/utils/data', checkedOutRequest)
+        const beacon = await navigator.sendBeacon('/utils/stateManager', checkedOutRequest)
         if (!beacon) {
             console.log('Something went wrong.',  err)
         }

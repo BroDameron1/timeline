@@ -193,7 +193,6 @@ class RecordHandler {
         if (staticFields) {
             for (let field of staticFields) {
                 staticFieldOptions[field] = await mongoose.model(this.recordProps.review).schema.path(field).enumValues
-                // staticFieldOptions[field] = await this.recordDb.review.schema.path(field).enumValues
             }
         }
         return this.res.render(this.template, { data, staticFieldOptions })

@@ -22,7 +22,7 @@ export const autocompleteListener = (targetCollection) => {
                     field = field.replace('[', '.')
                     field = field.replace(']', '')
             
-                    const response = await fetch('/utils/data?' + new URLSearchParams({
+                    const response = await fetch('/utils/autocomplete?' + new URLSearchParams({
                         field,
                         fieldValue: autocompleteField.value,
                         collection: targetCollection
