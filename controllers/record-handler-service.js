@@ -1,120 +1,121 @@
-//const { isValidObjectId } = require("mongoose")
-const duplicateChecker = require('../utils/duplicateChecker')
-const { ImageHandler } = require('../utils/cloudinary')
+const duplicateChecker = require('../utils/duplicateChecker') //pull in duplicatechecker functions
+const { ImageHandler } = require('../utils/cloudinary') //pull in imagehandler class
 const mongoose = require('mongoose');
 
 
 class RecordHandler {
     constructor(req, res, recordProps, template) {
-        this.req = req
-        this.res = res
-        this.recordProps = recordProps
-        this.template = template || null
-        this.redirectUrl = '/dashboard'
+        this.req = req //request data including body from express
+        this.res = res //response data from express
+        this.recordProps = recordProps //recordProps are sent it from the controller which pulls them from the related DB collection.
+        this.template = template || null //the EJS template that will be used to render the related request
+        this.redirectUrl = '/dashboard' //redirecturl for issues that redirect the user.
     }
 
-    async dataLookup(dbToCheck) {
-        const { slug, sourceId } = this.req.params
-        let dbPlaceholder
+    //method to lookup data when given a sourceId or slug
+    async dataLookup() { //parameter determines if we are looking in the review or public collection
+        const { slug, sourceId } = this.req.params //pulls out the slug OR sourceId from the req object
         let data
-        if (dbToCheck === 'review') dbPlaceholder = mongoose.model(this.recordProps.review)
-        if (dbToCheck === 'public') dbPlaceholder = mongoose.model(this.recordProps.public)
-        // if (dbToCheck === 'review') dbPlaceholder = this.recordDb.review
-        // if (dbToCheck === 'public') dbPlaceholder = this.recordDb.public
-        if (slug) {
-            data = await dbPlaceholder.findOne({ slug })
+        //TODO: Is there a better way to do this.
+        // if (dbToCheck === 'review') dbPlaceholder = mongoose.model(this.recordProps.review) //sets to the review database if the param is review
+        // if (dbToCheck === 'public') dbPlaceholder = mongoose.model(this.recordProps.public) //sets to the public database if the param is public
+        // if (slug) { //if there is a slug, query by that to find the record and provide the author and last approver usernames.
+        //     data = await dbPlaceholder.findOne({ slug })
+        //         .populate('author', 'username')
+        //         .populate('lastApprover', 'username')
+        // } else { //if there is a sourceId, query by that and find the record and provide the author and last approver usernames.
+        //     data = await dbPlaceholder.findById(sourceId)
+        //         .populate('author', 'username')
+        //         .populate('lastApprover', 'username')
+        // }
+        if (slug) { //if there is a slug, query by that to find the record and provide the author and last approver usernames.
+            data = await mongoose.model(this.recordProps.public).findOne({ slug })
                 .populate('author', 'username')
                 .populate('lastApprover', 'username')
-        } else {
-            data = await dbPlaceholder.findById(sourceId)
+        } else { //if there is a sourceId, query by that and find the record and provide the author and last approver usernames.
+            data = await mongoose.model(this.recordProps.review).findById(sourceId)
                 .populate('author', 'username')
                 .populate('lastApprover', 'username')
         }
         return data
     }
 
-
+    //method for publishing a record from the review queue to the public queue
     async publishReviewRecord() {
         const { sourceId } = this.req.params
         let reviewData = await this.dataLookup('review')
-        let publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId)
+        let publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId) //queries to see if there is a public record already associated with the review record (in the case of an updated record rather than a new one)
         if (!publicData) {
-            publicData = new mongoose.model(this.recordProps.public)(this.req.body)
+            publicData = new mongoose.model(this.recordProps.public)(this.req.body) //if no record exists, create a new object based on the collection model
         } else {
-            publicData.set({ ...this.req.body })
+            publicData.set({ ...this.req.body }) //if one does exist, set the properties to the request body
         }
-        // const duplicateCheck = await duplicateChecker.publishRecord(publicData.title, publicData.mediaType, sourceId)
-
-        const duplicateCheck = await duplicateChecker.publishRecord(publicData.recordProps, sourceId)
-        if (duplicateCheck) {
+        //TODO: Pull this into it's own method
+        const duplicateCheck = await duplicateChecker.publishRecord(publicData.recordProps, sourceId) //send appropriate data to the publishrecord duplicaterecord checker
+        if (duplicateCheck) { //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
             this.req.flash('error', 'A record with these details already exists.')
             return this.res.redirect(this.redirectUrl)
         }
-        if (reviewData.author[0].equals(this.req.user._id)) {
+        if (reviewData.author[0].equals(this.req.user._id)) { //checks to ensure an admin isn't publishing their own record.  TODO:  This is in the middleware as well, verify it can be removed.
             this.req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
             return this.res.redirect(this.redirectUrl)
         }
-        //TODO: Streamline image handling?
-        if (this.req.file) {
-            // const image = new ImageHandler(this.req.file.path, this.req.file.filename, reviewData, publicData)
-            const image = new ImageHandler(this.req.file, publicData, this.recordProps)
-            image.publishImage()
+        if (this.req.file) { //checks if a new image got uploaded DURING the publish process
+            const image = new ImageHandler(this.req.file, publicData, this.recordProps) //instantiates a new imagehandler class. Sends the NEW file data through if uploaded during the approval.
+            image.publishImage() //uses the publishimage method to update the record
         } else {
-            // const image = new ImageHandler(reviewData.images.url, reviewData.images.filename, reviewData, publicData)
-            const image = new ImageHandler(reviewData.images, publicData, this.recordProps)
-            image.publishImage()
+            const image = new ImageHandler(reviewData.images, publicData, this.recordProps) //instantiates a new imagehandler class.  If no new file was upload during the approval process, sends the image data that already exists in the review record
+            image.publishImage() //uses the publish image method to update the record
         }
-        publicData.state = 'published'
+        publicData.state = 'published' //update the other public data properties
         publicData.lastApprover = this.req.user._id
         publicData.checkedOut = false
         publicData.adminNotes = ''
-        this.updateAuthor(publicData, reviewData.author[0]) //TODO: Make sure this works.
+        this.updateAuthor(publicData, reviewData.author[0]) //TODO: Make sure this works and remove from database model.  Takes the review record author and adds them to the public record with the updateauthor method
         await publicData.save()
-        reviewData.adminNotes = this.req.body.adminNotes
+        reviewData.adminNotes = this.req.body.adminNotes //update the other review data properties
         reviewData.lastApprover = this.req.user._id
         reviewData.state = 'approved'
         await reviewData.save()
-        this.res.redirect(this.template+publicData.slug)
+        this.res.redirect(this.template+publicData.slug) //redirects to the newly published record
     }
 
+    //method that updates a review record if a user makes changes after intial submission
     async editReviewRecord() {
-        const reviewData = await this.dataLookup('review')
-        reviewData.set({ ...this.req.body })
-        if (this.req.file) {
-            // const image = new ImageHandler(this.req.file.path, this.file.filename, reviewData)
-            const image = new ImageHandler(this.req.file, reviewData, this.recordProps)
-            await image.updateReviewImage()
+        const reviewData = await this.dataLookup('review') //lookup the review record
+        reviewData.set({ ...this.req.body }) //sets all the properties in the review record to match the request body
+        if (this.req.file) { //checks if a new image was uploaded during this edit
+            const image = new ImageHandler(this.req.file, reviewData, this.recordProps) //instantiates a new imagehandler class and sends the new image data to it
+            await image.updateReviewImage() //uses the updatereviewimage method to update the record
         }
-
-        // const duplicateCheck = await duplicateChecker.updateReview(reviewData.title, reviewData.mediaType, sourceId)
-        const duplicateCheck = await duplicateChecker.editReview(reviewData.recordProps)
-        if (duplicateCheck) {
+        const duplicateCheck = await duplicateChecker.editReview(reviewData.recordProps)  //sends data to the editreview duplicatechecker function
+        if (duplicateCheck) { //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
             this.req.flash('error', 'This record already exists.')
             return this.res.redirect(this.redirectUrl)
         }
-        this.checkApprovalState(reviewData)
+        this.checkApprovalState(reviewData) //checks the approval state and fails the record if it is already approved or rejected TODO: check to see if this works correctly.  Can it be moved to the middleware?
         reviewData.checkedOut = false
         await reviewData.save()
         this.req.flash('info', 'Your changes have been saved successfully.')
         this.res.redirect(this.redirectUrl)
     }
 
+    //method that creates a review record if someone submits an update to a public record
     async editPublicRecord() {
-        const publicData = await this.dataLookup('public')
-        const reviewData = new mongoose.model(this.recordProps.review)(this.req.body)
-        // const duplicateCheck = await duplicateChecker.editPublic(reviewData.title, reviewData.mediaType, publicData._id)
-        const duplicateCheck = await duplicateChecker.editPublic(reviewData.recordProps, publicData._id)
-        if (duplicateCheck) {
+        const publicData = await this.dataLookup('public') //look up the current public record
+        const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new object for the review queue based on the request body.
+        const duplicateCheck = await duplicateChecker.editPublic(reviewData.recordProps, publicData._id) //sends data to the editpublic duplicate checker
+        if (duplicateCheck) { //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
             this.req.flash('error', 'This record already exists.')
-            return this.res.redirect(this.template+publicData.slug)
+            return this.res.redirect(this.template+publicData.slug)  //sends user back to the original public record
         }
-        if (this.req.file) {
-            reviewData.images = { path: this.req.file.path, filename: this.req.file.filename}
+        if (this.req.file) { //checks if a new image was added
+            reviewData.images = { path: this.req.file.path, filename: this.req.file.filename} //if so, updates the review record data with the new image data
         } else {
-            reviewData.images.path = publicData.images.path
+            reviewData.images.path = publicData.images.path //if not, carries over the original public image data to the review record
             reviewData.images.filename = publicData.images.filename
         }
-        reviewData.author.unshift(this.req.user._id)
+        reviewData.author.unshift(this.req.user._id) //updates other review record data, including adding the new author to that record (but not the public)
         reviewData.publicId = publicData._id;
         reviewData.state = 'update';
         await reviewData.save()
@@ -124,87 +125,85 @@ class RecordHandler {
         this.res.redirect(this.redirectUrl)
     }
 
+    //method that allows an admin to delete a public record
     async deletePublicRecord() {
-        const publicData = await this.dataLookup('public')
-        if (publicData.images.path) {
-            // const image = new ImageHandler(publicData.images.path, publicData.images.filename, null, publicData)
-            const image = new ImageHandler(publicData.images, publicData, this.recordProps)
-            await image.deletePublicImage()
+        const publicData = await this.dataLookup('public') //lookup the public record requested
+        if (publicData.images.path) { //check if there is an image
+            const image = new ImageHandler(publicData.images, publicData, this.recordProps) //if so, instantiate a new instance of the imagehandler class and send in the appropriate data
+            await image.deletePublicImage() //use the deletepublicimage method to delete the image
         }
-        await publicData.delete()
-        this.res.redirect(this.redirectUrl)
+        await publicData.delete() //delete the record
+        this.res.redirect(this.redirectUrl) //redirect user to default url
     }
 
+    //method that allows a user to delete a record in thier review queue
     async deleteReviewRecord() {
         const { sourceId } = this.req.params
-        const reviewData = await this.dataLookup('review')
+        const reviewData = await this.dataLookup('review') //lookup the review record data
         
-        if(this.checkApprovalState(reviewData)) return
-        // const image = new ImageHandler(reviewData.images.path, reviewData.images.filename, reviewData)
-        console.log('here')
-        const image = new ImageHandler(reviewData.images, reviewData, this.recordProps)
-        await image.deleteReviewImage()
+        if(this.checkApprovalState(reviewData)) return //checks the approval state and if it is already approved or rejected, stops the code TODO: Middleware? Error?
+        const image = new ImageHandler(reviewData.images, reviewData, this.recordProps) //instantiates a new instance of the imagehandler class with the image data from the review record
+        await image.deleteReviewImage() //uses the deletereviewimage method to delete the image
         
-        await mongoose.model(this.recordProps.review).findByIdAndDelete(sourceId)
-        if (reviewData.publicId) {
-            const publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId)
-            publicData.checkedOut = false
+        await mongoose.model(this.recordProps.review).findByIdAndDelete(sourceId) //deletes the review record
+        if (reviewData.publicId) { //checks to see if the review record is related to existing public record
+            const publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId) //if so, finds the public record TODO:  Should this use the lookup method
+            publicData.checkedOut = false //sets the checkout flag to false on the public record
             publicData.save()
         }
         this.req.flash('info', 'Your submission was successfully deleted.')
         this.res.redirect(this.redirectUrl)
     }
 
+    //method that allows a new record to be published to the review queue
     async createNewRecord() {
-        const reviewData = new mongoose.model(this.recordProps.review)(this.req.body)
-        const duplicateCheck = await duplicateChecker.submitNew(reviewData.recordProps)
-        if (duplicateCheck) {
+        const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new review record object with the data from the request body
+        const duplicateCheck = await duplicateChecker.submitNew(reviewData.recordProps) //runs the data through submitnew duplicate checker
+        if (duplicateCheck) { //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
             this.req.flash('error', 'This record already exists.')
             return this.res.redirect(this.redirectUrl)
         }
-        this.updateAuthor(reviewData, this.req.user._id) //TODO: add author handling to this class instead of in the DB model
-        if(this.req.file) {
-            // const image = new ImageHandler(this.req.file.path, this.req.file.filename, reviewData)
-            const image = new ImageHandler(this.req.file, reviewData, this.recordProps)
-            image.newReviewImage()
+        this.updateAuthor(reviewData, this.req.user._id) //TODO: Make sure this works and remove from database model. TODO: Does this even need to be here? We can just add the author to the field.  Takes the review record author and adds them to the public record with the updateauthor method
+        if(this.req.file) { //checks if there is an image uploaded
+            const image = new ImageHandler(this.req.file, reviewData, this.recordProps) //if so, instantiates a new instance of the imagehandler class with the new file
+            image.newReviewImage() //runs the newreviewimage method to add the file information to the new review record
         }
-        reviewData.state = 'new'
+        reviewData.state = 'new' //sets new review record status
         await reviewData.save()
         this.req.flash('info', 'Your new Source has been submitted for approval.')
         return this.res.redirect(this.redirectUrl);
     }
 
-    //can this be done in a middleware?
+    //TODO: can this be done in a middleware?
+    //method to check the approval state of any review record
     checkApprovalState(reviewData) {
-        if (reviewData.state === 'approved' || reviewData.state === 'rejected') {
-            this.req.flash('error', 'This record is not eligible to be editted or deleted.')
+        if (reviewData.state === 'approved' || reviewData.state === 'rejected') { //checks if the reviewdata is in the approved or rejected state
+            this.req.flash('error', 'This record is not eligible to be editted or deleted.') //if so, errors out the form
             this.res.redirect(this.redirectUrl)
             return true
         }
     }
 
-
-    async renderPage(data, staticFields) {
-        if (!data) {
+    //method to render any EJS template
+    async renderPage(data, staticFields) { //parameters accepted are the data needing to be rendered (either review or public) and any static fields that pull their values from the database model
+        if (!data) { //if no data is sent or is available, returns an error to the user and redirects them to the redirecturl TODO: check if this is in the middleware
             this.req.flash('error', 'This record does not exist.')
             return this.res.redirect(this.redirectUrl)
         }
-        const staticFieldOptions = new Object()
-        if (staticFields) {
-            for (let field of staticFields) {
-                staticFieldOptions[field] = await mongoose.model(this.recordProps.review).schema.path(field).enumValues
+        const staticFieldOptions = new Object() //creates a new object to store static values
+        if (staticFields) { //checks if there are static values
+            for (let field of staticFields) { //if so, loops through each field that can be a static value and collects them into the object.
+                staticFieldOptions[field] = await mongoose.model(this.recordProps.review).schema.path(field).enumValues  //Each key is the field name with an an associated array of options pulled from database model //TODO: Can this line be used to pull data from a virtual property for the controller.
             }
         }
-        return this.res.render(this.template, { data, staticFieldOptions })
+        return this.res.render(this.template, { data, staticFieldOptions }) //renders the page with the data and the options for their static fields
     }
 
-
-
-
-    updateAuthor(data, newAuthor) {
-        data.author = data.author.filter(previousAuthor => !previousAuthor.equals(newAuthor))
-        data.author.unshift(newAuthor)
-        if (data.author.length > 5) {
+    //method that updates the author of a public record  TODO:  This method is only used by the publishReview method, incorporate it into that.
+    updateAuthor(data, newAuthor) { //accepts the parameters of the existing record object and the id of the new author
+        data.author = data.author.filter(previousAuthor => !previousAuthor.equals(newAuthor)) //updates the array to only include authors who are not the author being added (effectively removing the new author from the array first)
+        data.author.unshift(newAuthor) //adds the new author to the beginning of the array
+        if (data.author.length > 5) { //if the array length is greater than 5, cuts it down to 5, removing the oldest contributors
             data.author.splice(5)
         }
     }
