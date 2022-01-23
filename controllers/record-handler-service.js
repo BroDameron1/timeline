@@ -185,7 +185,7 @@ class RecordHandler {
 
     //method that updates the author of a public record  TODO:  This method is only used by the publishReview method, incorporate it into that.
     updateAuthor(data, newAuthor) { //accepts the parameters of the existing record object and the id of the new author
-        data.author = data.author.filter(previousAuthor => !previousAuthor.equals(newAuthor._id)) //updates the array to only include authors who are not the author being added (effectively removing the new author from the array first)
+        data.author = data.author.filter(previousAuthor => !previousAuthor.equals(newAuthor._id)) //updates the array to only include authors who are not the author being added (effectively removing the new author from the array first).  .equals() is from mongoose.
         data.author.unshift(newAuthor) //adds the new author to the beginning of the array
         if (data.author.length > 5) { //if the array length is greater than 5, cuts it down to 5, removing the oldest contributors
             data.author.splice(5)
