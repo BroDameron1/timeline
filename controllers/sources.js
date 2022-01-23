@@ -7,14 +7,14 @@ const sourceRecordProps = new Source.reviewSource().recordProps
 //controller for get route for rendering any existing public source
 module.exports.renderSource = async (req, res) => {
     const recordHandler = new RecordHandler(req, res, sourceRecordProps, 'sources/source.ejs') //instantiates a new RecordHandler class in the record-handler-service
-    const publicData = await recordHandler.dataLookup('public') //uses the datalookup method to get the public record
+    const publicData = await recordHandler.dataLookup() //uses the datalookup method to get the public record
     recordHandler.renderPage(publicData) //uses the renderpage method to render the public record
 }
 
 //controller for get route for rendering a review record AFTER it has been reviewed
 module.exports.renderPostReviewSource = async (req, res) => {
     const recordHandler = new RecordHandler(req, res, sourceRecordProps, 'sources/source.ejs') //instantiates a new RecordHandler class in the record-handler-service
-    const reviewData = await recordHandler.dataLookup('review') //uses dataloopup method to get the review record
+    const reviewData = await recordHandler.dataLookup() //uses dataloopup method to get the review record
     recordHandler.renderPage(reviewData)  //uses the renderpage method to render the review record for the author after review
 }
 
@@ -34,7 +34,7 @@ module.exports.submitNewSource = async (req, res) => {
 //controller for the get request to render the page for an admin to review a record
 module.exports.renderReviewSource = async (req, res) => {
     const recordHandler = new RecordHandler(req, res, sourceRecordProps, 'sources/publishSource.ejs') //instantiates a new RecordHandler class in the record-handler-service
-    const reviewData = await recordHandler.dataLookup('review') //uses datalookup method to get the review record
+    const reviewData = await recordHandler.dataLookup() //uses datalookup method to get the review record
     //TODO: Make this a middleware???
     if (reviewData.author[0].equals(req.user._id)) { //this compares the author of the review against the admin currently reviewing it so ensure and admin isn't reviewing their own record (this is also checked in the middleware)  //TODO: Check if we need this.
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
@@ -53,7 +53,7 @@ module.exports.publishReviewSource = async (req, res) => {
 //controller for the get request to render the form to allow a user to edit a record they have in the review queue
 module.exports.renderUpdateReviewSource = async (req, res) => {
     const recordHandler = new RecordHandler(req, res, sourceRecordProps, 'sources/updateReviewSource.ejs') //instantiates a new RecordHandler class in the record-handler-service
-    const reviewData = await recordHandler.dataLookup('review') //uses datalookup method to get the review record
+    const reviewData = await recordHandler.dataLookup() //uses datalookup method to get the review record
     if (recordHandler.checkApprovalState(reviewData)) return //uses the checkapprovalstate method and if it is already approved or rejected, stops the execution of the render
     recordHandler.renderPage(reviewData, sourceRecordProps.staticFields) //uses the renderpage method to render the record to be editted
 }
@@ -73,7 +73,7 @@ module.exports.deleteReviewSource = async (req, res) => {
 //controller for the get request for the edit page for a public record
 module.exports.renderEditSource = async (req, res) => {
     const recordHandler = new RecordHandler(req, res, sourceRecordProps, 'sources/updatePublicSource.ejs') //instantiates a new RecordHandler class in the record-handler-service
-    const publicData = await recordHandler.dataLookup('public') //uses the datalookup method to find the record information requested
+    const publicData = await recordHandler.dataLookup() //uses the datalookup method to find the record information requested
     recordHandler.renderPage(publicData, sourceRecordProps.staticFields) //uses the renderpage method to render the data previously requested
 }
 

@@ -137,17 +137,6 @@ SourceSchema.virtual('recordProps').get(function() {
     return recordProps
 })
 
-//adds new author to the front of the array of authors, removes any duplicates and stores the last 
-//five total authors
-//TODO: Don't use this at all.  Replaced by the record handler service.
-SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
-    this.author = previousAuthors.filter(previousAuthor => !previousAuthor.equals(newAuthor))
-    this.author.unshift(newAuthor)
-    if (this.author.length > 5) {
-        this.author.splice(5)
-    }
-}
-
 //pre-save middleware that sets the updateDate timestamp and creates a slug of the record title.
 //TODO: Figure out why we can't use Mongo's timestamp.  Might be because we can't edit it using the formatDate function.
 SourceSchema.pre('save', function(next) { 

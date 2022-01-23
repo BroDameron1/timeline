@@ -41,8 +41,10 @@ const publishRecord = async (recordProps, reviewId) => {
 
     const reviewDuplicate = await mongoose.model(recordProps.review).findOne({ 
         ...recordProps.duplicateFields,
-        _id: { $ne: reviewId }
+        _id: { $ne: reviewId },
+        state: { $in: ['new', 'review'] }
         }).collation({ locale: 'en', strength: 2 })
+    console.log(reviewDuplicate, 'jake')
     if (reviewDuplicate) return true
     return false
 }

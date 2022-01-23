@@ -13,21 +13,9 @@ class RecordHandler {
     }
 
     //method to lookup data when given a sourceId or slug
-    async dataLookup() { //parameter determines if we are looking in the review or public collection
+    async dataLookup(dbToCheck) { //parameter determines if we are looking in the review or public collection
         const { slug, sourceId } = this.req.params //pulls out the slug OR sourceId from the req object
         let data
-        //TODO: Is there a better way to do this.
-        // if (dbToCheck === 'review') dbPlaceholder = mongoose.model(this.recordProps.review) //sets to the review database if the param is review
-        // if (dbToCheck === 'public') dbPlaceholder = mongoose.model(this.recordProps.public) //sets to the public database if the param is public
-        // if (slug) { //if there is a slug, query by that to find the record and provide the author and last approver usernames.
-        //     data = await dbPlaceholder.findOne({ slug })
-        //         .populate('author', 'username')
-        //         .populate('lastApprover', 'username')
-        // } else { //if there is a sourceId, query by that and find the record and provide the author and last approver usernames.
-        //     data = await dbPlaceholder.findById(sourceId)
-        //         .populate('author', 'username')
-        //         .populate('lastApprover', 'username')
-        // }
         if (slug) { //if there is a slug, query by that to find the record and provide the author and last approver usernames.
             data = await mongoose.model(this.recordProps.public).findOne({ slug })
                 .populate('author', 'username')
@@ -43,20 +31,16 @@ class RecordHandler {
     //method for publishing a record from the review queue to the public queue
     async publishReviewRecord() {
         const { sourceId } = this.req.params
-        let reviewData = await this.dataLookup('review')
+        let reviewData = await this.dataLookup()
         let publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId) //queries to see if there is a public record already associated with the review record (in the case of an updated record rather than a new one)
         if (!publicData) {
             publicData = new mongoose.model(this.recordProps.public)(this.req.body) //if no record exists, create a new object based on the collection model
         } else {
             publicData.set({ ...this.req.body }) //if one does exist, set the properties to the request body
         }
-        //TODO: Pull this into it's own method
         const duplicateCheck = await duplicateChecker.publishRecord(publicData.recordProps, sourceId) //send appropriate data to the publishrecord duplicaterecord checker
-        if (duplicateCheck) { //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
-            this.req.flash('error', 'A record with these details already exists.')
-            return this.res.redirect(this.redirectUrl)
-        }
-        if (reviewData.author[0].equals(this.req.user._id)) { //checks to ensure an admin isn't publishing their own record.  TODO:  This is in the middleware as well, verify it can be removed.
+        if (duplicateCheck) return this.duplicateError() //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
+        if (reviewData.author[0].equals(this.req.user._id)) { //checks to ensure an admin isn't publishing their own record.
             this.req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
             return this.res.redirect(this.redirectUrl)
         }
@@ -82,17 +66,14 @@ class RecordHandler {
 
     //method that updates a review record if a user makes changes after intial submission
     async editReviewRecord() {
-        const reviewData = await this.dataLookup('review') //lookup the review record
+        const reviewData = await this.dataLookup() //lookup the review record
         reviewData.set({ ...this.req.body }) //sets all the properties in the review record to match the request body
         if (this.req.file) { //checks if a new image was uploaded during this edit
             const image = new ImageHandler(this.req.file, reviewData, this.recordProps) //instantiates a new imagehandler class and sends the new image data to it
             await image.updateReviewImage() //uses the updatereviewimage method to update the record
         }
         const duplicateCheck = await duplicateChecker.editReview(reviewData.recordProps)  //sends data to the editreview duplicatechecker function
-        if (duplicateCheck) { //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
-            this.req.flash('error', 'This record already exists.')
-            return this.res.redirect(this.redirectUrl)
-        }
+        if (duplicateCheck) return this.duplicateError() //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
         this.checkApprovalState(reviewData) //checks the approval state and fails the record if it is already approved or rejected TODO: check to see if this works correctly.  Can it be moved to the middleware?
         reviewData.checkedOut = false
         await reviewData.save()
@@ -102,7 +83,7 @@ class RecordHandler {
 
     //method that creates a review record if someone submits an update to a public record
     async editPublicRecord() {
-        const publicData = await this.dataLookup('public') //look up the current public record
+        const publicData = await this.dataLookup() //look up the current public record
         const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new object for the review queue based on the request body.
         const duplicateCheck = await duplicateChecker.editPublic(reviewData.recordProps, publicData._id) //sends data to the editpublic duplicate checker
         if (duplicateCheck) { //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
@@ -127,7 +108,7 @@ class RecordHandler {
 
     //method that allows an admin to delete a public record
     async deletePublicRecord() {
-        const publicData = await this.dataLookup('public') //lookup the public record requested
+        const publicData = await this.dataLookup() //lookup the public record requested
         if (publicData.images.path) { //check if there is an image
             const image = new ImageHandler(publicData.images, publicData, this.recordProps) //if so, instantiate a new instance of the imagehandler class and send in the appropriate data
             await image.deletePublicImage() //use the deletepublicimage method to delete the image
@@ -139,7 +120,7 @@ class RecordHandler {
     //method that allows a user to delete a record in thier review queue
     async deleteReviewRecord() {
         const { sourceId } = this.req.params
-        const reviewData = await this.dataLookup('review') //lookup the review record data
+        const reviewData = await this.dataLookup() //lookup the review record data
         
         if(this.checkApprovalState(reviewData)) return //checks the approval state and if it is already approved or rejected, stops the code TODO: Middleware? Error?
         const image = new ImageHandler(reviewData.images, reviewData, this.recordProps) //instantiates a new instance of the imagehandler class with the image data from the review record
@@ -159,10 +140,7 @@ class RecordHandler {
     async createNewRecord() {
         const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new review record object with the data from the request body
         const duplicateCheck = await duplicateChecker.submitNew(reviewData.recordProps) //runs the data through submitnew duplicate checker
-        if (duplicateCheck) { //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
-            this.req.flash('error', 'This record already exists.')
-            return this.res.redirect(this.redirectUrl)
-        }
+        if (duplicateCheck) return this.duplicateError() //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
         this.updateAuthor(reviewData, this.req.user._id) //TODO: Make sure this works and remove from database model. TODO: Does this even need to be here? We can just add the author to the field.  Takes the review record author and adds them to the public record with the updateauthor method
         if(this.req.file) { //checks if there is an image uploaded
             const image = new ImageHandler(this.req.file, reviewData, this.recordProps) //if so, instantiates a new instance of the imagehandler class with the new file
@@ -172,6 +150,12 @@ class RecordHandler {
         await reviewData.save()
         this.req.flash('info', 'Your new Source has been submitted for approval.')
         return this.res.redirect(this.redirectUrl);
+    }
+
+    //can be called to create an error when there is a duplicate record (not for submitting changes to a public record since there is a different redirect)
+    duplicateError() {
+        this.req.flash('error', 'This record already exists.')
+        this.res.redirect(this.redirectUrl)
     }
 
     //TODO: can this be done in a middleware?
@@ -201,7 +185,7 @@ class RecordHandler {
 
     //method that updates the author of a public record  TODO:  This method is only used by the publishReview method, incorporate it into that.
     updateAuthor(data, newAuthor) { //accepts the parameters of the existing record object and the id of the new author
-        data.author = data.author.filter(previousAuthor => !previousAuthor.equals(newAuthor)) //updates the array to only include authors who are not the author being added (effectively removing the new author from the array first)
+        data.author = data.author.filter(previousAuthor => !previousAuthor.equals(newAuthor._id)) //updates the array to only include authors who are not the author being added (effectively removing the new author from the array first)
         data.author.unshift(newAuthor) //adds the new author to the beginning of the array
         if (data.author.length > 5) { //if the array length is greater than 5, cuts it down to 5, removing the oldest contributors
             data.author.splice(5)
