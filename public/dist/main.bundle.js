@@ -10841,7 +10841,7 @@ module.exports.userSchema = Joi.object({
 }).unknown()
 
 //regex string for all text input boxes
-const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.? ]+$/i
+const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.'? ]+$/i
 
 const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80)
 
