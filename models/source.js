@@ -163,6 +163,8 @@ function formDate (date) {
     if (date) return date.toISOString().substring(0, 10) //needs to check if the date exist since undefined can't be changed.  Turns date into a string and cuts it to the 0-10th character.
 }
 
+//TODO: image deletion middleware instead of functions?
+
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);
 const publicSource = mongoose.model('PublicSource', SourceSchema);
 

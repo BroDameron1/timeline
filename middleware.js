@@ -5,6 +5,7 @@ const { userSchema, sourceSchema } = require('./schemas');
 const mongoose = require('mongoose');
 const ObjectID = require('mongoose').Types.ObjectId;
 
+//TODO: Avoid repeated calls to database
 
 const isLoggedIn = async (req, res, next) => {
     //checks to see if a user is already logged in.  If so, get their info from the DB so it can be checked
@@ -94,6 +95,7 @@ const isAdmin = async (req, res, next) => {
 const isAuthor = (reviewCollection) => {
     return async (req, res, next) => {
         const { sourceId } = req.params
+        //TODO: Should record validation be it's own middleware?
         if (!ObjectID.isValid(sourceId)) {
             req.flash('error', 'This record does not exist.')
             return res.redirect('/dashboard')
@@ -128,6 +130,18 @@ const isCheckedOut = (reviewCollection, publicCollection) => {
     }
 }
 
+const checkApprovalState = (reviewCollection) => {
+    return async (req, res, next) => {
+        const { sourceId } = req.params
+        const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
+        if (reviewData.state === 'approved' || reviewData.state === 'rejected') { //checks if the reviewdata is in the approved or rejected state
+            req.flash('error', 'This record is not eligible to be editted or deleted.') //if so, errors out the form
+            return res.redirect('/dashboard')
+        }
+        next()
+    }
+}
+
 module.exports = {
     isLoggedIn,
     validateUser,
@@ -135,5 +149,6 @@ module.exports = {
     notLoggedIn,
     isAdmin,
     isAuthor,
-    isCheckedOut
+    isCheckedOut,
+    checkApprovalState
 }

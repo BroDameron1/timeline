@@ -5,7 +5,7 @@ const sources = require('../controllers/sources');
 const multer = require('multer') //adds multer to process file uploads
 const { storage } = require('../utils/cloudinary')
 const upload = multer({ storage }) //initialize multer and add location for file uploads
-const { isLoggedIn, isAdmin, isAuthor, isCheckedOut, validateSource } = require('../middleware');
+const { isLoggedIn, isAdmin, isAuthor, isCheckedOut, validateSource, checkApprovalState } = require('../middleware');
 
 
 //routes for creating and submitting a new source
@@ -15,15 +15,15 @@ router.route('/new')
 
 //routes for publishing a record from the review queue to the public database
 router.route('/review/:sourceId')
-    .get(isLoggedIn, isCheckedOut('ReviewSource', 'PublicSource'), catchAsync(sources.renderReviewSource))  //TODO: Add isAdmin here.  Right now public users might be able to access.  TEST THIS.  Renders the page for an admin to review the submitted record.
+    .get(isLoggedIn, isCheckedOut('ReviewSource', 'PublicSource'), checkApprovalState('ReviewSource'), catchAsync(sources.renderReviewSource))  //TODO: Add isAdmin here.  Right now public users might be able to access.  TEST THIS.  Renders the page for an admin to review the submitted record.
     .put(isLoggedIn, isAdmin, upload.single('sourceImage'), validateSource, catchAsync(sources.publishReviewSource)) //handles moving the data to the public record IF a public record already exists.  Updates the necessary parts of the review record.
     .post(isLoggedIn, isAdmin, upload.single('sourceImage'), validateSource, catchAsync(sources.publishReviewSource)) //handles moving the data to the public record IF there is no existing public record.  Updates the necessary parts of the review record.
-    .delete(isLoggedIn, isAuthor('ReviewSource'), catchAsync(sources.deleteReviewSource)) //handles deleting of submissions in the review queue by the author.
+    .delete(isLoggedIn, isAuthor('ReviewSource'), checkApprovalState('ReviewSource'), catchAsync(sources.deleteReviewSource)) //handles deleting of submissions in the review queue by the author.
 
 //routes for editing a pending submission by the author
 router.route('/review/:sourceId/edit')
-    .get(isLoggedIn, isAuthor('ReviewSource'), isCheckedOut('ReviewSource', 'PublicSource'), catchAsync(sources.renderUpdateReviewSource)) //renders the form for editting a pending review.
-    .put(isLoggedIn, isAuthor('ReviewSource'), upload.single('sourceImage'), validateSource, catchAsync(sources.submitUpdateReviewSource)) //handles sending the updated data in the record in the review queue.
+    .get(isLoggedIn, isAuthor('ReviewSource'), isCheckedOut('ReviewSource', 'PublicSource'), checkApprovalState('ReviewSource'), catchAsync(sources.renderUpdateReviewSource)) //renders the form for editting a pending review.
+    .put(isLoggedIn, isAuthor('ReviewSource'), checkApprovalState('ReviewSource'), upload.single('sourceImage'),  validateSource, catchAsync(sources.submitUpdateReviewSource)) //handles sending the updated data in the record in the review queue.
 
 //route for displaying and delete public records
 router.route('/:slug')

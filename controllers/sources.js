@@ -40,7 +40,6 @@ module.exports.renderReviewSource = async (req, res) => {
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
         return res.redirect('/dashboard')
     }
-    if (recordHandler.checkApprovalState(reviewData)) return //uses the checkapprovalstate method and if it is already approved or rejected, stops the execution of the render
     recordHandler.renderPage(reviewData, sourceRecordProps.staticFields) //uses the renderpage method to render the record to be reviewed
 }
 
@@ -54,7 +53,6 @@ module.exports.publishReviewSource = async (req, res) => {
 module.exports.renderUpdateReviewSource = async (req, res) => {
     const recordHandler = new RecordHandler(req, res, sourceRecordProps, 'sources/updateReviewSource.ejs') //instantiates a new RecordHandler class in the record-handler-service
     const reviewData = await recordHandler.dataLookup() //uses datalookup method to get the review record
-    if (recordHandler.checkApprovalState(reviewData)) return //uses the checkapprovalstate method and if it is already approved or rejected, stops the execution of the render
     recordHandler.renderPage(reviewData, sourceRecordProps.staticFields) //uses the renderpage method to render the record to be editted
 }
 
