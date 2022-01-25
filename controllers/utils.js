@@ -6,29 +6,21 @@ const duplicateChecker = require('../utils/duplicateChecker')
 //controller that accepts duplicatecheck data from the frontend to validate and send back.
 module.exports.duplicateCheck = async (req, res) => {
     const { recordProps, recordState } = req.body //recordProps are the data required to check for duplicates on.  recordState defines which duplicatechecker function to use.
-    //TODO: Update to a switch statement
-    if (recordState === 'submitNew') {
-        const duplicateResult = await duplicateChecker.submitNew(recordProps) //sends in data to the appropriate duplicate checker
-        return res.json(duplicateResult) //returns the data to the front end as a json object.
-    }
-    if (recordState === 'updateReview') {
-        const duplicateResult = await duplicateChecker.editReview(recordProps)
-        return res.json(duplicateResult)
-    }
-    if (recordState === 'publishRecord') {
-        const duplicateResult = await duplicateChecker.publishRecord(recordProps, recordProps.id) //TODO: not sure why this requires the ID seperately.  Verify.
-        return res.json(duplicateResult)
-    }
-    if (recordState === 'editPublic') {
-        const duplicateResult = await duplicateChecker.editPublic(recordProps, recordProps.id) //TODO: not sure why this requires the ID seperately.  Verify.
-        return res.json(duplicateResult)
+    switch (recordState) {
+        case 'submitNew': 
+            return res.json(await duplicateChecker.submitNew(recordProps)) //sends data to the appropriate duplicatechecker function, waits for the results and returns the data to the front end as a json object.
+        case 'updateReview': 
+            return res.json(await duplicateChecker.editReview(recordProps))
+        case 'publishRecord': 
+            return res.json(await duplicateChecker.publishRecord(recordProps, recordProps.id)) //TODO: not sure why this requires the ID seperately.  Verify.
+        case 'editPublic': 
+            return res.json(await duplicateChecker.editPublic(recordProps, recordProps.id))  //TODO: not sure why this requires the ID seperately.  Verify.
     }
 }
 
 //controller that accepts data needed for autocomplete results and returns the results.
 //TODO: This is receiving more than one call per key stroke.  validate.
 module.exports.autocomplete = async (req, res) => { 
-    console.log('test')
     const { field, fieldValue, collection } = req.query //field is the field that needs autocomplete data (key), fieldValue is the current value of that field (value), collection is which collection to check.  TODO:  See if we can avoid passing in the collection by using recordProps
     try {
         const autofillResponse = await mongoose.model(collection).aggregate(  //makes a call to the appropriate db collection

@@ -35,8 +35,7 @@ module.exports.submitNewSource = async (req, res) => {
 module.exports.renderReviewSource = async (req, res) => {
     const recordHandler = new RecordHandler(req, res, sourceRecordProps, 'sources/publishSource.ejs') //instantiates a new RecordHandler class in the record-handler-service
     const reviewData = await recordHandler.dataLookup() //uses datalookup method to get the review record
-    //TODO: Make this a middleware???
-    if (reviewData.author[0].equals(req.user._id)) { //this compares the author of the review against the admin currently reviewing it so ensure and admin isn't reviewing their own record (this is also checked in the middleware)  //TODO: Check if we need this.
+    if (reviewData.author[0].equals(req.user._id)) { //this compares the author of the review against the admin currently reviewing it so ensure and admin isn't reviewing their own record (this is also checked in the middleware) 
         req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
         return res.redirect('/dashboard')
     }
