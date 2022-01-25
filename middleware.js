@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const ObjectID = require('mongoose').Types.ObjectId;
 
 //TODO: Avoid repeated calls to database
+//TODO: Should I check if something is checkedOut (true) before making put/post requests
 
 const isLoggedIn = async (req, res, next) => {
     //checks to see if a user is already logged in.  If so, get their info from the DB so it can be checked
@@ -14,7 +15,7 @@ const isLoggedIn = async (req, res, next) => {
         req.flash('error', 'You must be logged in');
         return res.redirect('/login');
     }
-    const user = await User.findById(req.user._id)   
+    const user = await User.findById(req.user._id) //TODO:  Verified status is attached to req.user, probably don't need to check, but double check.  Already made this change in the admin check.
     //This checks if the user is authenticated (Passport.js) and if the user has been verified.
     //If either one is false, the user cannot access any route this middleware is attached to
     if (!req.isAuthenticated() || !user.verified) {
@@ -35,7 +36,7 @@ const validateUser = (req, res, next) => {
     }
 }
 
-const validateSource = (req, res, next) => {
+const cleanSubmission = (req, res, next) => {
 
     //checks the req.body object for any empty fields and changes them to undefined so they don't get stored.
     for (let [key, value] of Object.entries(req.body)) {
@@ -78,8 +79,9 @@ const notLoggedIn = (req, res, next) => {
 }
 
 const isAdmin = async (req, res, next) => {
-    const user = await User.findById(req.user._id)
-    if (user.role !== 'admin') {
+    // const user = await User.findById(req.user._id)
+    console.log(req.user, 'blah')
+    if (req.user.role !== 'admin') {
         const redirectUrl = req.session.returnTo || '/dashboard';
         //deletes returnTo from the session object
         delete req.session.returnTo;
@@ -90,64 +92,171 @@ const isAdmin = async (req, res, next) => {
     next()
 }
 
+// const isAdmin = async (req, res, next) => {
+//     const user = await User.findById(req.user._id)
+//     if (user.role !== 'admin') {
+//         const redirectUrl = req.session.returnTo || '/dashboard';
+//         //deletes returnTo from the session object
+//         delete req.session.returnTo;
+//         //send user back to the URL they came from
+//         req.flash('error', 'You do not have the correct permissions')
+//         return res.redirect(redirectUrl);
+//     }
+//     next()
+// }
 
-const isAuthor = (reviewCollection) => {
+const getRequestData = (targetCollection) => {
     return async (req, res, next) => {
-        const { sourceId } = req.params
-        //TODO: Should record validation be it's own middleware?
-        if (!ObjectID.isValid(sourceId)) {
-            req.flash('error', 'This record does not exist.')
-            return res.redirect('/dashboard')
+        const { slug, sourceId } = req.params
+        if (sourceId) {   
+            if (!ObjectID.isValid(sourceId)) {
+                req.flash('error', 'This record does not exist.')
+                return res.redirect('/dashboard')
+            }
+            res.locals.requestData = await mongoose.model(targetCollection).findById(sourceId)
         }
-        const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
-        if (!reviewData) {
-            req.flash('error', 'This record does not exist.')
-            return res.redirect('/dashboard')
-        }
-        if (!reviewData.author[0].equals(req.user._id)) {
-            req.flash('error', "You do not have the correct permissions.")
-            return res.redirect('/dashboard')
+        if (slug) {
+            res.locals.requestData = await mongoose.model(targetCollection).findOne({ slug })
         }
         next()
     }
 }
 
-const isCheckedOut = (reviewCollection, publicCollection) => {
-    return async (req, res, next) => {
-        const { sourceId, slug } = req.params
-        if (sourceId && !ObjectID.isValid(sourceId)) {
-            req.flash('error', 'This record does not exist.')
-            return res.redirect('/dashboard')
-        }
-        const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
-        const publicData = await mongoose.model(publicCollection).findOne({ slug })
-        if ((reviewData && reviewData.checkedOut) || (publicData && publicData.checkedOut)) {
-            req.flash('error', 'This record is already in use.')
-            return res.redirect('/dashboard')
-        }
-        next()
+const validateRecord = async (req, res, next) => {
+    if (!res.locals.requestData) {
+        req.flash('error', 'This record does not exist.')
+        return res.redirect('/dashboard')
     }
+    next()
 }
 
-const checkApprovalState = (reviewCollection) => {
-    return async (req, res, next) => {
-        const { sourceId } = req.params
-        const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
-        if (reviewData.state === 'approved' || reviewData.state === 'rejected') { //checks if the reviewdata is in the approved or rejected state
-            req.flash('error', 'This record is not eligible to be editted or deleted.') //if so, errors out the form
-            return res.redirect('/dashboard')
-        }
-        next()
+const isAuthor = (req, res, next) => {
+    if (!res.locals.requestData.author[0].equals(req.user._id)) {
+        req.flash('error', "You do not have the correct permissions.")
+        return res.redirect('/dashboard')
     }
+    next()
 }
+
+const checkApprovalState = (req, res, next) => {
+    if (res.locals.requestData.state === 'approved' || res.locals.requestData.state === 'rejected') { //checks if the reviewdata is in the approved or rejected state
+        req.flash('error', 'This record is not eligible to be editted or deleted.') //if so, errors out the form
+        return res.redirect('/dashboard')
+    }
+    next()
+}
+
+const isCheckedOut = (req, res, next) => {
+    if (res.locals.requestData.checkedOut) {
+        req.flash('error', 'This record is already in use.')
+        return res.redirect('/dashboard')
+    }
+    next()
+}
+
+
+
+
+// const isAuthor = (req, res, next) => {
+//     console.log(res.locals.requestData)
+//     if (!res.locals.requestData.author[0].equals(req.user._id)) {
+//         req.flash('error', "You do not have the correct permissions.")
+//         return res.redirect('/dashboard')
+//     }
+//     next()
+// }
+
+// const validateRecord = (req, res, next) => {
+//     console.log(res.locals.requestData)
+//     if (!res.locals.requestData) {
+//         req.flash('error', 'This record does not exist.')
+//         return res.redirect('/dashboard')
+//     }
+//     next()
+// }
+
+// const isAuthor = (reviewCollection) => {
+//     return async (req, res, next) => {
+//         const { sourceId } = req.params
+//         console.log(res.locals.requestData, '2')
+//         const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
+//         if (!reviewData.author[0].equals(req.user._id)) {
+//             req.flash('error', "You do not have the correct permissions.")
+//             return res.redirect('/dashboard')
+//         }
+//         next()
+//     }
+// }
+
+// const validateRecord = (targetCollection) => {
+//     return async (req, res, next) => {
+//         console.log('im here')
+//         const { slug, sourceId } = req.params //pulls out the slug OR sourceId from the req object
+//         let recordCheck
+//         if (sourceId) {   
+//             if (!ObjectID.isValid(sourceId)) {
+//                 req.flash('error', 'This record does not exist.')
+//                 return res.redirect('/dashboard')
+//             }
+//             recordCheck = await mongoose.model(targetCollection).findById(sourceId)
+//         }
+//         if (slug) {
+//             recordCheck = await mongoose.model(targetCollection).findOne({ slug })
+//         }
+//         if (!recordCheck) {
+//             req.flash('error', 'This record does not exist.')
+//             return res.redirect('/dashboard')
+//         }
+//         next()
+//     }
+// }
+
+
+// const isCheckedOut = (targetCollection) => {
+//     return async (req, res, next) => {
+//         const { sourceId, slug } = req.params
+//         // const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
+//         // const publicData = await mongoose.model(publicCollection).findOne({ slug })
+//         // if ((reviewData && reviewData.checkedOut) || (publicData && publicData.checkedOut)) {
+//         //     req.flash('error', 'This record is already in use.')
+//         //     return res.redirect('/dashboard')
+//         // }
+//         let recordCheck
+//         if (sourceId) {  
+//             recordCheck = await mongoose.model(targetCollection).findById(sourceId)
+//         }
+//         if (slug) {
+//             recordCheck = await mongoose.model(targetCollection).findOne({ slug })
+//         }
+//         if (recordCheck.checkedOut) {
+//             req.flash('error', 'This record is already in use.')
+//             return res.redirect('/dashboard')
+//         }
+//         next()
+//     }
+// }
+
+// const checkApprovalState = (reviewCollection) => {
+//     return async (req, res, next) => {
+//         const { sourceId } = req.params
+//         const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
+//         if (reviewData.state === 'approved' || reviewData.state === 'rejected') { //checks if the reviewdata is in the approved or rejected state
+//             req.flash('error', 'This record is not eligible to be editted or deleted.') //if so, errors out the form
+//             return res.redirect('/dashboard')
+//         }
+//         next()
+//     }
+// }
 
 module.exports = {
     isLoggedIn,
     validateUser,
-    validateSource,
     notLoggedIn,
     isAdmin,
+    getRequestData,
+    validateRecord,
     isAuthor,
+    checkApprovalState,
     isCheckedOut,
-    checkApprovalState
+    cleanSubmission
 }
