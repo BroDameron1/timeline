@@ -7,11 +7,11 @@ import autocomplete from 'autocompleter';
 
 export const autocompleteListener = (targetCollection) => {
     const formSelector = document.querySelector('.form')
-    
+    let autoResults
     formSelector.addEventListener('focusin', event => {
         if (event.target && event.target.matches('.autocomplete')) {
             const autocompleteField = event.target
-            autocomplete({
+            autoResults = autocomplete({
                 input: autocompleteField,
                 emtpyMsg: 'No Results',
                 debounceWaitMs: 200,
@@ -37,8 +37,13 @@ export const autocompleteListener = (targetCollection) => {
                 },
                 onSelect: function(item) {
                     autocompleteField.value = item.label
-                } 
+                }
             })
+        }
+    })
+    formSelector.addEventListener('focusout', event => {
+        if (event.target && event.target.matches('.autocomplete')) {
+            autoResults.destroy()
         }
     })
 }

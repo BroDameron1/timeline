@@ -10027,18 +10027,17 @@ __webpack_require__.r(__webpack_exports__);
 
 const autocompleteListener = (targetCollection) => {
     const formSelector = document.querySelector('.form')
-    
+    let autoResults
     formSelector.addEventListener('focusin', event => {
         if (event.target && event.target.matches('.autocomplete')) {
             const autocompleteField = event.target
-            autocompleter__WEBPACK_IMPORTED_MODULE_0___default()({
-                                input: autocompleteField,
+            autoResults = autocompleter__WEBPACK_IMPORTED_MODULE_0___default()({
+                input: autocompleteField,
                 emtpyMsg: 'No Results',
                 debounceWaitMs: 200,
                 preventSubmit: true,
                 disableAutoSelect: true,
                 fetch: async function(text, update) {
-                    console.log('test')
                     let field = autocompleteField.name
                     field = field.replace('[]', '')
                     field = field.replace('[', '.')
@@ -10058,8 +10057,14 @@ const autocompleteListener = (targetCollection) => {
                 },
                 onSelect: function(item) {
                     autocompleteField.value = item.label
-                } 
+                }
             })
+
+        }
+    })
+    formSelector.addEventListener('focusout', event => {
+        if (event.target && event.target.matches('.autocomplete')) {
+            autoResults.destroy()
         }
     })
 }
