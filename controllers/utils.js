@@ -12,16 +12,17 @@ module.exports.duplicateCheck = async (req, res) => {
         case 'updateReview': 
             return res.json(await duplicateChecker.editReview(recordProps))
         case 'publishRecord': 
-            return res.json(await duplicateChecker.publishRecord(recordProps, recordProps.id)) //TODO: not sure why this requires the ID seperately.  Verify.
+            return res.json(await duplicateChecker.publishRecord(recordProps, recordProps.id))
         case 'editPublic': 
-            return res.json(await duplicateChecker.editPublic(recordProps, recordProps.id))  //TODO: not sure why this requires the ID seperately.  Verify.
+            return res.json(await duplicateChecker.editPublic(recordProps, recordProps.id))
     }
 }
 
 //controller that accepts data needed for autocomplete results and returns the results.
-//TODO: This is receiving more than one call per key stroke.  validate.
+//TODO: This is receiving more than one call per key stroke.  validate.  A new event listener seems to get created if i put my cursor into the title field
 module.exports.autocomplete = async (req, res) => { 
     const { field, fieldValue, collection } = req.query //field is the field that needs autocomplete data (key), fieldValue is the current value of that field (value), collection is which collection to check.  TODO:  See if we can avoid passing in the collection by using recordProps
+    console.log('fire')
     try {
         const autofillResponse = await mongoose.model(collection).aggregate(  //makes a call to the appropriate db collection
             [

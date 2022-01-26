@@ -10027,16 +10027,18 @@ __webpack_require__.r(__webpack_exports__);
 
 const autocompleteListener = (targetCollection) => {
     const formSelector = document.querySelector('.form')
+    
     formSelector.addEventListener('focusin', event => {
         if (event.target && event.target.matches('.autocomplete')) {
             const autocompleteField = event.target
             autocompleter__WEBPACK_IMPORTED_MODULE_0___default()({
-                input: autocompleteField,
+                                input: autocompleteField,
                 emtpyMsg: 'No Results',
                 debounceWaitMs: 200,
                 preventSubmit: true,
                 disableAutoSelect: true,
                 fetch: async function(text, update) {
+                    console.log('test')
                     let field = autocompleteField.name
                     field = field.replace('[]', '')
                     field = field.replace('[', '.')
@@ -10231,9 +10233,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "FieldManager": () => (/* binding */ FieldManager)
 /* harmony export */ });
-/* harmony import */ var _autocomplete__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autocomplete */ "./public/js/utils/autocomplete.js");
-
-
 
 class FieldManager {
     constructor (media, job, additionalFields) {
@@ -10842,8 +10841,8 @@ module.exports.userSchema = Joi.object({ //schema validation for user data.  TOD
         })
 }).unknown() //allows for information not defined in the schema to be added to the DB and not validated. TODO: Should we just check all fields.
 
-//regex string for all text input boxes
-const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.'? ]*$/i  //TODO: Fix since it errors with a "illegal character" if only one legal character is entered.
+//regex string for all text input boxes.  Must star with a letter and includes any number of the defined characters after that.
+const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.'? ]*$/i  
 
 const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80) //defines the validations for a string with a max length.  Checks against regex.
 
@@ -11349,6 +11348,7 @@ if (formProperties.existingSource) { //for non-new records only.
         await state.updateState()
     })
 
+    
     //starts the inactivity timer.
     ;(0,_utils_timeout_js__WEBPACK_IMPORTED_MODULE_1__.formTimeout)()
 
@@ -11372,6 +11372,8 @@ if (formProperties.existingSource) { //for non-new records only.
     mediaType.addEventListener('input', event => {
         multiFieldManager()
     })
+
+
 }
 
 formProperties.formData.addEventListener('submit', async event => {

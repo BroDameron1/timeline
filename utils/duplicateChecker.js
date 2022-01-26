@@ -38,7 +38,7 @@ const editReview = async (recordProps) => {
 
 //TODO: Can we reduce redundant code here?
 //duplicate check for records being published from the review db to the public db
-const publishRecord = async (recordProps, reviewId) => { //TODO check if I need the review ID or if it is already the recordProps.id
+const publishRecord = async (recordProps, reviewId) => { 
     const reviewData = await mongoose.model(recordProps.review).findById(reviewId) //uses the id to find ALL data related to the record be checked.
     const publicDuplicate = await mongoose.model(recordProps.public).findOne({ 
         ...recordProps.duplicateFields,

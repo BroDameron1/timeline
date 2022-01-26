@@ -7,6 +7,7 @@ import autocomplete from 'autocompleter';
 
 export const autocompleteListener = (targetCollection) => {
     const formSelector = document.querySelector('.form')
+    
     formSelector.addEventListener('focusin', event => {
         if (event.target && event.target.matches('.autocomplete')) {
             const autocompleteField = event.target

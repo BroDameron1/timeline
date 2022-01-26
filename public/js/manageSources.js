@@ -130,6 +130,7 @@ if (formProperties.existingSource) { //for non-new records only.
         await state.updateState()
     })
 
+    
     //starts the inactivity timer.
     formTimeout()
 
@@ -153,6 +154,8 @@ if (formProperties.existingSource) { //for non-new records only.
     mediaType.addEventListener('input', event => {
         multiFieldManager()
     })
+
+
 }
 
 formProperties.formData.addEventListener('submit', async event => {
