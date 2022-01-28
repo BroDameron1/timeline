@@ -111,7 +111,6 @@ class ImageHandler {
         //Cannot use publicID here because the images there may be different than the review image causing the review image to not be deleted.
         
         const publicData = await mongoose.model(this.recordProps.public).findOne({ images: {filename: this.fileData.filename}})
-        console.log(publicData, 'here1')
         if (!publicData && this.recordData.images.filename) {
             await cloudinary.uploader.destroy(this.recordData.images.filename)
         }

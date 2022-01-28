@@ -50,10 +50,6 @@ const SourceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'PublicSource'
     },
-    updateDate: {
-        type: Date,
-        get: formatDate
-    },
     adminNotes: { 
         type: String
     },
@@ -127,7 +123,10 @@ SourceSchema.virtual('recordProps').get(function() {
     const recordProps = {
         duplicateFields: {
             title: this.title || null,
-            mediaType: this.mediaType || null
+            mediaType: this.mediaType || null,
+            // videoGame: {
+            //     studio: this.videoGame.studio || null
+            // }
         },
         review: 'ReviewSource',
         public: 'PublicSource',
@@ -137,10 +136,16 @@ SourceSchema.virtual('recordProps').get(function() {
     return recordProps
 })
 
+SourceSchema.virtual('updateDate').get(function() {
+    const date = this.updatedAt
+    const month = date.toLocaleString('default', { month: 'short' });
+    const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    const displayDate = `${month} ${date.getDate()}, ${date.getFullYear()} at ${time}`
+    return displayDate;
+})
+
 //pre-save middleware that sets the updateDate timestamp and creates a slug of the record title.
-//TODO: Figure out why we can't use Mongo's timestamp.  Might be because we can't edit it using the formatDate function.
 SourceSchema.pre('save', function(next) { 
-    this.updateDate = Date.now()
     this.slug = slugify(this.title + '_' + this.mediaType, {
         replacement: '_',
         lower: true,
@@ -148,15 +153,6 @@ SourceSchema.pre('save', function(next) {
     })
     next()
 })
-
-//function to take any date and format it to a display date of the month, day, year and time (example: Jan 1, 2022 at 12:01 AM)
-//TODO: extract this so it can be used by multiple models
-function formatDate (date) { 
-    const month = date.toLocaleString('default', { month: 'short' });
-    const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-    const displayDate = `${month} ${date.getDate()}, ${date.getFullYear()} at ${time}`
-    return displayDate;
-}
 
 //function to take the date as it exists in the database and format it so that it fits into the date selector field on the form. 
 function formDate (date) {

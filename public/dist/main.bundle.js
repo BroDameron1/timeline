@@ -10023,6 +10023,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 //TODO: Figure out a way to skip the field replace stuff.
+//TODO: Add styling
 
 const autocompleteListener = (targetCollection) => { //targetCollection is where the autofill function is the collection autofill should check for the data.  This should always be public.
     const formSelector = document.querySelector('.form') //select the entire form
@@ -10056,16 +10057,15 @@ const autocompleteListener = (targetCollection) => { //targetCollection is where
                 },
                 onSelect: function(item) {
                     autocompleteField.value = item.label //sents the autocomplete value to the previously defined item label when a user clicks on it.
-                destroy()
                 }
             })
         }
     })
-    // formSelector.addEventListener('focusout', event => {
-    //     if (event.target && event.target.matches('.autocomplete')) {
-    //         autocomplMethods.destroy()
-    //     }
-    // })
+    formSelector.addEventListener('focusout', event => { //when the user leaves the field, runs the autocomplete destroy method which gets rid of all related eventlisteners and stored data
+        if (event.target && event.target.matches('.autocomplete')) {
+            autocomplMethods.destroy()
+        }
+    })
 }
 
 /***/ }),
@@ -10120,18 +10120,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./warning */ "./public/js/utils/warning.js");
 
 
-//TODO: Can it be expanded to work with any record?
-
 
 
 class Duplicate {
-    // constructor (title, mediaType, sourceId, type) {
-    //     this.title = title
-    //     this.mediaType = mediaType || null
-    //     this.sourceId = sourceId || null
-    //     this.recordType = type
-    // }
-
     constructor (recordType, sourceId, recordState) {
         this.recordType = recordType
         this.sourceId = sourceId
@@ -10139,16 +10130,13 @@ class Duplicate {
     }
 
     async getRecordProps () {
-        
         const response = await fetch('/utils/recordProps?' + new URLSearchParams({
             recordType: this.recordType
         }))
-
         return this.parseResponse(await response.json())
     }
 
     parseResponse(recordProps) {
-        
         for (let field in recordProps.duplicateFields) {
             recordProps.duplicateFields[field] = document.querySelector(`#${field}`).value
         }
@@ -10156,20 +10144,7 @@ class Duplicate {
         return this.checkDuplicates(recordProps)
     }
 
-    // async checkDuplicates (duplicateSettings) {
-    //     console.log(duplicateSettings)
-    //     const response = await fetch('/utils/data?' + new URLSearchParams({
-    //         // title: this.title,
-    //         // mediaType: this.mediaType,
-    //         // sourceId: this.sourceId,
-    //         ...duplicateSettings,
-    //         recordState: this.recordState
-    //     }))
-    //     return response.json()
-    // }
-
     async checkDuplicates (recordProps) {
-        console.log(this.recordState, 'testsds')
         const response = await fetch('/utils/duplicateCheck', {
             method: 'POST',
             headers: {
@@ -10180,29 +10155,11 @@ class Duplicate {
                 recordState: this.recordState
             })
         })
-        // console.log(await response.json(), 'responsetest')
-        // return response
         return await response.json()
     }
 
-    // const response = await fetch('/utils/data', {
-    //     method: 'PUT',
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({
-    //         sourceId,
-    //         adminNotes: formProperties.formData.adminNotes.value,
-    //         state: 'rejected',
-    //         collection: formProperties.lockLocation
-    //     })
-    // })
-
     async validateDuplicates () {
-        // const duplicateResponse = await this.checkDuplicates()
-
         const duplicateResponse = await this.getRecordProps()
-        console.log(duplicateResponse, 'here3')
         if (!duplicateResponse) return false
         if (duplicateResponse.title) {
             //create the link
@@ -11307,7 +11264,7 @@ const formProperties = (0,_utils_formIdentifier__WEBPACK_IMPORTED_MODULE_8__.gat
 //creates an image preview whenever the image is changed
 ;(0,_utils_imageTools_js__WEBPACK_IMPORTED_MODULE_10__.imagePreview)()
 
-//turns on autocomplete functionality for any associated fields with the autocomplete class
+//turns on autocomplete functionality for any associated fields with the autocomplete class.  Can't use formProperties because it always has to be the public source.
 ;(0,_utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_11__.autocompleteListener)('PublicSource')
 
 //this function does multiple things.  For new records it hides or reveals the fields associated with the chosen media type.  In new and existing records it allows for the addition and removal of variable number fields as defined in the mediaDetails object.  In existing records it ensures that dynamically loaded fields saved previously load correctly.
@@ -11392,12 +11349,10 @@ formProperties.formData.addEventListener('submit', async event => {
     const adminNote = (0,_utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_5__.adminNoteCheck)()
     const formFail = (0,_utils_formValidation_js__WEBPACK_IMPORTED_MODULE_4__.formValidation)(formProperties.formData, formProperties.schema)
 
-    //TODO: Uncomment this later
-    // const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
-    // const duplicateResult = await submittedRecord.validateDuplicates()
+    //
     const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__.Duplicate(formProperties.lockLocation, sourceId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
-    // const duplicateResult = false
+
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.

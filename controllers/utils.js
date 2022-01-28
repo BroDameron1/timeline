@@ -19,10 +19,8 @@ module.exports.duplicateCheck = async (req, res) => {
 }
 
 //controller that accepts data needed for autocomplete results and returns the results.
-//TODO: This is receiving more than one call per key stroke.  validate.  A new event listener seems to get created if i put my cursor into the title field
 module.exports.autocomplete = async (req, res) => { 
-    const { field, fieldValue, collection } = req.query //field is the field that needs autocomplete data (key), fieldValue is the current value of that field (value), collection is which collection to check.  TODO:  See if we can avoid passing in the collection by using recordProps
-    console.log('fire')
+    const { field, fieldValue, collection } = req.query //field is the field that needs autocomplete data (key), fieldValue is the current value of that field (value), collection is which collection to check.  
     try {
         const autofillResponse = await mongoose.model(collection).aggregate(  //makes a call to the appropriate db collection
             [
