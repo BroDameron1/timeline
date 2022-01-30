@@ -2,7 +2,9 @@ const Source = require('../models/source'); //pull in the Source database model
 const { RecordHandler } = require('./record-handler-service'); //pull in the RecordHandler class
 
 //pulls the following data from the database model: fields to check for duplicates, the name of the review database collection, the name of the public database collection, which fields have predefined choices (staticFields) and the record _id(since no record is being search here, the id is irrelevent for this request)
-const sourceRecordProps = new Source.reviewSource().recordProps
+// const sourceRecordProps = new Source.reviewSource().recordProps
+const sourceRecordProps = Source.reviewSource.schema.virtualpath('recordProps').getters[0]()
+
 
 //controller for get route for rendering any existing public source
 module.exports.renderSource = async (req, res) => {

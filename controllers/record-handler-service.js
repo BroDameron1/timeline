@@ -46,10 +46,10 @@ class RecordHandler {
         }
         if (this.req.file) { //checks if a new image got uploaded DURING the publish process
             const image = new ImageHandler(this.req.file, publicData, this.recordProps) //instantiates a new imagehandler class. Sends the NEW file data through if uploaded during the approval.
-            image.publishImage() //uses the publishimage method to update the record
+            await image.publishImage() //uses the publishimage method to update the record
         } else {
             const image = new ImageHandler(reviewData.images, publicData, this.recordProps) //instantiates a new imagehandler class.  If no new file was upload during the approval process, sends the image data that already exists in the review record
-            image.publishImage() //uses the publish image method to update the record
+            await image.publishImage() //uses the publish image method to update the record
         }
         publicData.state = 'published' //update the other public data properties
         publicData.lastApprover = this.req.user._id
@@ -110,9 +110,10 @@ class RecordHandler {
         const publicData = await this.dataLookup() //lookup the public record requested
         if (publicData.images.path) { //check if there is an image
             const image = new ImageHandler(publicData.images, publicData, this.recordProps) //if so, instantiate a new instance of the imagehandler class and send in the appropriate data
-            await image.deletePublicImage() //use the deletepublicimage method to delete the image
+            // await image.deletePublicImage() //use the deletepublicimage method to delete the image
         }
-        await publicData.delete() //delete the record
+        // await publicData.delete() //delete the record
+        await publicData.remove() //delete the record
         this.res.redirect(this.redirectUrl) //redirect user to default url
     }
 
@@ -121,9 +122,10 @@ class RecordHandler {
         const { sourceId } = this.req.params
         const reviewData = await this.dataLookup() //lookup the review record data
         const image = new ImageHandler(reviewData.images, reviewData, this.recordProps) //instantiates a new instance of the imagehandler class with the image data from the review record
-        await image.deleteReviewImage() //uses the deletereviewimage method to delete the image
-        
-        await mongoose.model(this.recordProps.review).findByIdAndDelete(sourceId) //deletes the review record
+        // await image.deleteReviewImage() //uses the deletereviewimage method to delete the image
+        await reviewData.remove()        
+        // await mongoose.model(this.recordProps.review).findByIdAndDelete(sourceId) //deletes the review record
+
         if (reviewData.publicId) { //checks to see if the review record is related to existing public record
             const publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId) //if so, finds the public record
             publicData.checkedOut = false //sets the checkout flag to false on the public record
@@ -160,13 +162,9 @@ class RecordHandler {
         const staticFieldOptions = new Object() //creates a new object to store static values
         if (staticFields) { //checks if there are static values
             for (let field of staticFields) { //if so, loops through each field that can be a static value and collects them into the object.
-                staticFieldOptions[field] = await mongoose.model(this.recordProps.review).schema.path(field).enumValues  //Each key is the field name with an an associated array of options pulled from database model //TODO: Can this line be used to pull data from a virtual property for the controller.
+                staticFieldOptions[field] = await mongoose.model(this.recordProps.review).schema.path(field).enumValues  //Each key is the field name with an an associated array of options pulled from database model
             }
         }
-        // console.log(await mongoose.model(this.recordProps.review).schema.get('mediaType'))
-
-        //console.log(await mongoose.model(this.recordProps.review).schema.virtual('recordProps').get())
-        //console.log(await mongoose.model(this.recordProps.review).schema.path('mediaType'))
         return this.res.render(this.template, { data, staticFieldOptions }) //renders the page with the data and the options for their static fields
     }
 

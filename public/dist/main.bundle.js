@@ -10136,7 +10136,7 @@ class Duplicate {
         return this.parseResponse(await response.json())
     }
 
-    parseResponse(recordProps) {
+    parseResponse(recordProps) { //TODO: Figure out how to handle and passthrough nested objects from the db model
         for (let field in recordProps.duplicateFields) {
             recordProps.duplicateFields[field] = document.querySelector(`#${field}`).value
         }

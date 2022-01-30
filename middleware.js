@@ -79,7 +79,6 @@ const notLoggedIn = (req, res, next) => {
 
 const isAdmin = async (req, res, next) => {
     // const user = await User.findById(req.user._id)
-    console.log(req.user, 'blah')
     if (req.user.role !== 'admin') {
         const redirectUrl = req.session.returnTo || '/dashboard';
         //deletes returnTo from the session object

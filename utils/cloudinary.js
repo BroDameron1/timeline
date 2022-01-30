@@ -65,14 +65,6 @@ const storage = new CloudinaryStorage({
 
 
 class ImageHandler {
-    // constructor(url, filename, reviewData, publicData, sourceId) {
-    //     this.url = url
-    //     this.filename = filename
-    //     this.reviewData = reviewData
-    //     this.publicData = publicData || null
-    //     this.sourceId = sourceId || null
-    // }
-
     constructor(fileData, recordData, recordProps) {
         this.fileData = fileData
         this.recordData = recordData
@@ -100,29 +92,32 @@ class ImageHandler {
     }
 
     //recordData is publicData from record_handler_service for this method.
-    publishImage () {
+    async publishImage () {
+        const reviewData = await mongoose.model(this.recordProps.review).findOne({'images.filename': this.recordData.images.filename })
+        if (!reviewData) await cloudinary.uploader.destroy(this.recordData.images.filename)
         this.recordData.images = { path: this.fileData.path, filename: this.fileData.filename}
     }
     
     //recordData is reviewData from record_handler_service for this method
-    //TODO: Can this logic be used in the previous two methods (and maybe combine them?)
-    //TODO: Test
-    async deleteReviewImage() {
-        //Cannot use publicID here because the images there may be different than the review image causing the review image to not be deleted.
+    // TODO: Can this logic be used in the previous two methods (and maybe combine them?)
+    // TODO: Test
+    // async deleteReviewImage() {
+    //     //Cannot use publicID here because the images there may be different than the review image causing the review image to not be deleted.
         
-        const publicData = await mongoose.model(this.recordProps.public).findOne({ images: {filename: this.fileData.filename}})
-        if (!publicData && this.recordData.images.filename) {
-            await cloudinary.uploader.destroy(this.recordData.images.filename)
-        }
-    }
-    //TODO: Test
-    //recordData is publicData from record_handler_service for this method.
-    async deletePublicImage() {
-        const reviewData = await mongoose.model(this.recordProps.review).findOne({ images: { filename: this.fileData.filename }})
-        if (!reviewData && this.recordData.images.filename) {
-            await cloudinary.uploader.destroy(this.recordData.images.filename)
-        }
-    }
+    //     const publicData = await mongoose.model(this.recordProps.public).findOne({ 'images.filename': this.fileData.filename})
+    //     console.log(publicData, 'test here')
+    //     if (!publicData && this.recordData.images.filename) {
+    //         await cloudinary.uploader.destroy(this.recordData.images.filename)
+    //     }
+    // }
+    // //TODO: Test
+    // //recordData is publicData from record_handler_service for this method.
+    // async deletePublicImage() {
+    //     const reviewData = await mongoose.model(this.recordProps.review).findOne({ images: { filename: this.fileData.filename }})
+    //     if (!reviewData && this.recordData.images.filename) {
+    //         await cloudinary.uploader.destroy(this.recordData.images.filename)
+    //     }
+    // }
 }
 
 
