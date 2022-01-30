@@ -57,6 +57,7 @@ module.exports.stateManager = async (req, res) => {
 
 //controller for retrieving record properties that can be passed back in for other requests (like duplicatechecking)
 module.exports.getRecordProps = async (req, res) => {
-    const recordProps = new mongoose.model(req.query.recordType)() //uses the recordtype in the query paramaters to create a db object from that model
-    return res.json(recordProps.recordProps) //passes the recordprops virtual object back to the frontend as a json object
+    const recordProps = mongoose.model(req.query.recordType).schema.virtualpath('recordProps').getters[0]() //queries the DB model for the record properties to send back.
+
+    return res.json(recordProps) //passes the recordprops virtual object back to the frontend as a json object
 }
