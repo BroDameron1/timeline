@@ -156,9 +156,7 @@ SourceSchema.pre('save', function(next) {
 SourceSchema.post('remove', { document: true, query: false }, async function(doc, next) { //keep testing and then delete old code
     if (doc.images) {
         const publicData = await mongoose.model(this.recordProps.public).findOne({'images.filename': this.images.filename })
-        console.log(publicData, 'public')
         const reviewData = await mongoose.model(this.recordProps.review).findOne({'images.filename': this.images.filename })
-        console.log(reviewData, 'review')
         if (!publicData && !reviewData) {
             await cloudinary.uploader.destroy(this.images.filename)
         }

@@ -47,7 +47,7 @@ class ImageHandler {
     //recordData is publicData from record_handler_service for this method.
     async publishImage () {
         const reviewData = await mongoose.model(this.recordProps.review).findOne({'images.filename': this.recordData.images.filename })
-        if (!reviewData) await cloudinary.uploader.destroy(this.recordData.images.filename)
+        if (!reviewData && this.recordData.images.filename) await cloudinary.uploader.destroy(this.recordData.images.filename)
         this.recordData.images = { path: this.fileData.path, filename: this.fileData.filename}
     }
 }
