@@ -10,7 +10,7 @@ const SourceSchema = new Schema({
         type: String,
         required: true
     },
-    recordType: { //TODO: Where are we checking this
+    recordType: { //currently not used any where but may be useful in the future
         type: String,
         default: 'Source',
         required: true,
@@ -152,15 +152,6 @@ SourceSchema.pre('save', function(next) {
     next()
 })
 
-// SourceSchema.post('findOneAndDelete', async function(doc, next) {
-//     console.log(doc)
-//     // const publicData = await mongoose.model(doc.recordProps.public).findOne({ images: { filename: doc.images.filename } })
-//     const publicData = await mongoose.model(doc.recordProps.public).findOne({ comic: { series: 'Doctor Aphra' } })
-//     const publicData2 = await mongoose.model(doc.recordProps.public).findOne({ images: { filename: 'butt' }})
-//     console.log(publicData, 'first check')
-//     console.log(publicData2, 'second check')
-//     next()
-// })
 
 SourceSchema.post('remove', { document: true, query: false }, async function(doc, next) { //keep testing and then delete old code
     if (doc.images) {
@@ -173,33 +164,6 @@ SourceSchema.post('remove', { document: true, query: false }, async function(doc
         }
     }
     next()
-    // console.log(doc)
-    // console.log(doc.recordProps)
-    // console.log(this.images.filename, 'filename')
-    // if (doc.images) {
-    //     const publicData = await mongoose.model(doc.recordProps.public).findOne({ images: { filename: doc.images.filename }})
-    //     console.log(publicData, 'public')
-    //     try {
-    //     const reviewData = await mongoose.model(doc.recordProps.review).findOne({ images: { filename: doc.images.filename }})
-
-    //     console.log(doc.images.filename, reviewData, 'review')
-    //     if (!publicData && !reviewData) await cloudinary.uploader.destroy(doc.images.filename)
-    // } catch (err) {
-    //     console.log(err, 'error?')
-    // }
-    // }
-
-    // if (doc) {
-    //     const test = await mongoose.model(this.recordProps.review).findOne({ title: 'test1' })
-    //     console.log(test, 'test')
-    //     const publicData = await mongoose.model(this.recordProps.public).findOne({ images: { filename: this.images.filename }})
-    //     console.log(publicData, 'public')
-    //     const reviewData = await mongoose.model(this.recordProps.review).findOne({ images: { filename: this.images.filename }})
-
-    //     console.log(reviewData, 'review')
-    //     if (!publicData && !reviewData) await cloudinary.uploader.destroy(doc.images.filename)
-    // }
-
 })
 
 //function to take the date as it exists in the database and format it so that it fits into the date selector field on the form. 
@@ -207,7 +171,6 @@ function formDate (date) {
     if (date) return date.toISOString().substring(0, 10) //needs to check if the date exist since undefined can't be changed.  Turns date into a string and cuts it to the 0-10th character.
 }
 
-//TODO: image deletion middleware instead of functions?
 
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);
 const publicSource = mongoose.model('PublicSource', SourceSchema);
