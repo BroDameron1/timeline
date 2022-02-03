@@ -92,13 +92,13 @@ const isAdmin = async (req, res, next) => {
 
 const getRequestData = (targetCollection) => {
     return async (req, res, next) => {
-        const { slug, sourceId } = req.params
-        if (sourceId) {   
-            if (!ObjectID.isValid(sourceId)) {
+        const { slug, recordId } = req.params
+        if (recordId) {   
+            if (!ObjectID.isValid(recordId)) {
                 req.flash('error', 'This record does not exist.')
                 return res.redirect('/dashboard')
             }
-            res.locals.requestData = await mongoose.model(targetCollection).findById(sourceId)
+            res.locals.requestData = await mongoose.model(targetCollection).findById(recordId)
         }
         if (slug) {
             res.locals.requestData = await mongoose.model(targetCollection).findOne({ slug })

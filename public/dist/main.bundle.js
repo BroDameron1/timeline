@@ -10123,9 +10123,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Duplicate {
-    constructor (recordType, sourceId, recordState) {
+    constructor (recordType, recordId, recordState) {
         this.recordType = recordType
-        this.sourceId = sourceId
+        this.recordId = recordId
         this.recordState = recordState
     }
 
@@ -10140,7 +10140,7 @@ class Duplicate {
         for (let field in recordProps.duplicateFields) {
             recordProps.duplicateFields[field] = document.querySelector(`#${field}`).value
         }
-        recordProps.id = this.sourceId
+        recordProps.id = this.recordId
         return this.checkDuplicates(recordProps)
     }
 
@@ -10524,8 +10524,8 @@ const rejectPublish = (formProperties) => {
         try {
             ;(0,_warning_js__WEBPACK_IMPORTED_MODULE_0__.clearWarning)()
             const formFail = (0,_formValidation__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
-
             if (!formFail && !adminNoteCheck()) {
+                console.log('test1')
                 const response = await fetch('/utils/rejectPublish', {
                 // const response = await fetch('/utils/data', {
                     method: 'PUT',
@@ -10533,15 +10533,18 @@ const rejectPublish = (formProperties) => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        sourceId,
+                        recordId,
                         adminNotes: formProperties.formData.adminNotes.value,
                         state: 'rejected',
                         collection: formProperties.lockLocation
                     })
                 })
+
+                // const data = await response.status
+                // console.log(data, 'did i make it here')
                 ;(0,_leavePrompt__WEBPACK_IMPORTED_MODULE_2__.suppressLeavePrompt)()
                 location.href = "/dashboard"
-                return response
+                return
             }
         } catch (err) {
             console.log('Something went wrong.', err)
@@ -10568,20 +10571,19 @@ __webpack_require__.r(__webpack_exports__);
 
 //Class for managing record state from the front end
 class StateManager {
-    constructor(checkedOut, sourceId, targetCollection) {
+    constructor(checkedOut, recordId, targetCollection) {
         this.checkedOut = checkedOut
-        this.sourceId = sourceId
+        this.recordId = recordId
         this.targetCollection = targetCollection
     }
 
     async updateState () {
         const checkedOutRequest = JSON.stringify({
             checkedOut: this.checkedOut,
-            sourceId: this.sourceId,
+            recordId: this.recordId,
             collection: this.targetCollection
         })
 
-        // const beacon = await navigator.sendBeacon('/utils/data', checkedOutRequest)
         const beacon = await navigator.sendBeacon('/utils/stateManager', checkedOutRequest)
         if (!beacon) {
             console.log('Something went wrong.',  err)
@@ -11303,9 +11305,9 @@ const multiFieldManager = () => {
 
 if (formProperties.existingSource) { //for non-new records only.
     
-    //updates the record to being locked on load.  sourceId is pulled from the HTML.
+    //updates the record to being locked on load.  recordId is pulled from the HTML.
     window.addEventListener('load', async event => {
-        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_3__.StateManager(true, sourceId, formProperties.lockLocation)
+        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_3__.StateManager(true, recordId, formProperties.lockLocation)
         await state.updateState()
     })
 
@@ -11317,7 +11319,7 @@ if (formProperties.existingSource) { //for non-new records only.
     window.addEventListener('beforeunload', async event => {
         event.preventDefault()  
         
-        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_3__.StateManager(false, sourceId, formProperties.lockLocation)
+        const state = new _utils_stateManager__WEBPACK_IMPORTED_MODULE_3__.StateManager(false, recordId, formProperties.lockLocation)
         await state.updateState()
     })
 
@@ -11350,7 +11352,7 @@ formProperties.formData.addEventListener('submit', async event => {
     const formFail = (0,_utils_formValidation_js__WEBPACK_IMPORTED_MODULE_4__.formValidation)(formProperties.formData, formProperties.schema)
 
     //
-    const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__.Duplicate(formProperties.lockLocation, sourceId, formProperties.duplicateCheck)
+    const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__.Duplicate(formProperties.lockLocation, recordId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
 
 

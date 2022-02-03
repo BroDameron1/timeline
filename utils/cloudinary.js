@@ -31,7 +31,6 @@ class ImageHandler {
 
     //recordData is reviewData from record_handler_service for this method.
     async updateReviewImage () {
-        //const reviewSourceData = await Source.reviewSource.findById(this.sourceId)
         const publicData = await mongoose.model(this.recordProps.public).findById(this.recordData.publicId)
         if (publicData) {
             if (this.recordData.images.filename && this.recordData.images.filename !== publicData.images.filename) {

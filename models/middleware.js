@@ -13,8 +13,7 @@ function createSlug(next) {
 }
 
 async function imageDelete(doc, next) {
-    console.log(doc, 'doc')
-    if (doc.images) {
+    if (doc.images.filename) {
         const publicData = await mongoose.model(this.recordProps.public).findOne({'images.filename': this.images.filename })
         const reviewData = await mongoose.model(this.recordProps.review).findOne({'images.filename': this.images.filename })
         if (!publicData && !reviewData) {

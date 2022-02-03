@@ -23,8 +23,8 @@ export const rejectPublish = (formProperties) => {
         try {
             clearWarning()
             const formFail = formValidation(formProperties.formData, formProperties.schema)
-
             if (!formFail && !adminNoteCheck()) {
+                console.log('test1')
                 const response = await fetch('/utils/rejectPublish', {
                 // const response = await fetch('/utils/data', {
                     method: 'PUT',
@@ -32,7 +32,7 @@ export const rejectPublish = (formProperties) => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        sourceId,
+                        recordId,
                         adminNotes: formProperties.formData.adminNotes.value,
                         state: 'rejected',
                         collection: formProperties.lockLocation
@@ -40,7 +40,7 @@ export const rejectPublish = (formProperties) => {
                 })
                 suppressLeavePrompt()
                 location.href = "/dashboard"
-                return response
+                return
             }
         } catch (err) {
             console.log('Something went wrong.', err)

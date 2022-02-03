@@ -8,7 +8,6 @@ const upload = multer({ storage }) //initialize multer and add location for file
 const { isLoggedIn, isAdmin, getRequestData, validateRecord, isAuthor, checkApprovalState, isCheckedOut, cleanSubmission } = require('../middleware');
 
 //NOTE: removed all image middleware
-//TODO: Replace all "sourceId" with "recordId"
 
 //routes for creating and submitting a new event
 router.route('/new')
