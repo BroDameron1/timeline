@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const slugify = require('slugify'); //pull in slugify library to help create URL slugs
-const { cloudinary } = require('../utils/cloudinary');
 const { createSlug, imageDelete, formDate, updateDate, displayImage } = require('./middleware.js')
 
 Schema.Types.String.set('trim', true); //sets all strings to trim()
 
-const SourceSchema = new Schema({
+const sourceSchema = new Schema({
     title: {
         type: String,
         required: true
@@ -116,7 +114,7 @@ const SourceSchema = new Schema({
     { timestamps: true });
 
 //virtual property that stores specific properties of the record so that they can be called in functions that need to work with every record type (duplicatechecker, record-handler-service, etc...)
-SourceSchema.virtual('recordProps').get(function() {
+sourceSchema.virtual('recordProps').get(function() {
     const recordProps = {
         duplicateFields: {
             title: this.title || null,
@@ -131,16 +129,19 @@ SourceSchema.virtual('recordProps').get(function() {
 })
 
 //virtual property that updates the path/URL of the image request to cloudinary with a request for a specific size of the image.
-SourceSchema.virtual('displayImage').get(displayImage)
+sourceSchema.virtual('displayImage').get(displayImage)
 
-SourceSchema.virtual('updateDate').get(updateDate)
+//virtual property that uses the timestamp field to construct a readable update date
+sourceSchema.virtual('updateDate').get(updateDate)
 
-SourceSchema.pre('save', createSlug)
+//middleware that creates and adds the slug to the document before saving.
+sourceSchema.pre('save', createSlug)
 
-SourceSchema.post('remove', {document: true, query: false}, imageDelete)
+//middleware that removes any unnecessary images if a document is deleted TODO: search multiple collections at once
+sourceSchema.post('remove', {document: true, query: false}, imageDelete)
 
-const reviewSource = mongoose.model('ReviewSource', SourceSchema);
-const publicSource = mongoose.model('PublicSource', SourceSchema);
+const reviewSource = mongoose.model('ReviewSource', sourceSchema);
+const publicSource = mongoose.model('PublicSource', sourceSchema);
 
 module.exports = {
     reviewSource,
