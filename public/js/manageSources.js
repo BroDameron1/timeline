@@ -85,7 +85,7 @@ maxDateSelector()
 //creates an image preview whenever the image is changed
 imagePreview()
 
-//turns on autocomplete functionality for any associated fields with the autocomplete class
+//turns on autocomplete functionality for any associated fields with the autocomplete class.  Can't use formProperties because it always has to be the public source.
 autocompleteListener('PublicSource')
 
 //this function does multiple things.  For new records it hides or reveals the fields associated with the chosen media type.  In new and existing records it allows for the addition and removal of variable number fields as defined in the mediaDetails object.  In existing records it ensures that dynamically loaded fields saved previously load correctly.
@@ -130,6 +130,7 @@ if (formProperties.existingSource) { //for non-new records only.
         await state.updateState()
     })
 
+    
     //starts the inactivity timer.
     formTimeout()
 
@@ -153,6 +154,8 @@ if (formProperties.existingSource) { //for non-new records only.
     mediaType.addEventListener('input', event => {
         multiFieldManager()
     })
+
+
 }
 
 formProperties.formData.addEventListener('submit', async event => {
@@ -167,12 +170,10 @@ formProperties.formData.addEventListener('submit', async event => {
     const adminNote = adminNoteCheck()
     const formFail = formValidation(formProperties.formData, formProperties.schema)
 
-    //TODO: Uncomment this later
-    // const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
-    // const duplicateResult = await submittedRecord.validateDuplicates()
+    //
     const submittedRecord = new Duplicate(formProperties.lockLocation, sourceId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
-    // const duplicateResult = false
+
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.

@@ -1,6 +1,4 @@
 
-import { autocompleteListener } from "./autocomplete"
-
 export class FieldManager {
     constructor (media, job, additionalFields) {
         this.media = media,

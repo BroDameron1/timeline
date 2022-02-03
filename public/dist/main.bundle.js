@@ -10018,49 +10018,52 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! autocompleter */ "./node_modules/autocompleter/autocomplete.js");
 /* harmony import */ var autocompleter__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(autocompleter__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! form-serialize-improved */ "./node_modules/form-serialize-improved/index.js");
-/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(form_serialize_improved__WEBPACK_IMPORTED_MODULE_1__);
 
 
 
-
-//creates autocomplete functionality for any field that contains the autocomplete class.
 
 //TODO: Figure out a way to skip the field replace stuff.
+//TODO: Add styling
 
-const autocompleteListener = (targetCollection) => {
-    const formSelector = document.querySelector('.form')
-    formSelector.addEventListener('focusin', event => {
-        if (event.target && event.target.matches('.autocomplete')) {
-            const autocompleteField = event.target
-            autocompleter__WEBPACK_IMPORTED_MODULE_0___default()({
-                input: autocompleteField,
-                emtpyMsg: 'No Results',
-                debounceWaitMs: 200,
-                preventSubmit: true,
-                disableAutoSelect: true,
-                fetch: async function(text, update) {
-                    let field = autocompleteField.name
-                    field = field.replace('[]', '')
+const autocompleteListener = (targetCollection) => { //targetCollection is where the autofill function is the collection autofill should check for the data.  This should always be public.
+    const formSelector = document.querySelector('.form') //select the entire form
+    let autocomplMethods //sets a variable for the entire autocomplete library so the destroy method can be run later
+    formSelector.addEventListener('focusin', event => { //event listener for focusing on the form
+        if (event.target && event.target.matches('.autocomplete')) { //listener only triggers if a field with the autocomplete class is chosen.
+            const autocompleteField = event.target //sents the chosen field to a variable
+            autocomplMethods = autocompleter__WEBPACK_IMPORTED_MODULE_0___default()({ //runs the autocomplete library with set options and data
+                input: autocompleteField, //defines which field the autocompleter is working with
+                emtpyMsg: 'No Results', //message to display if there are no matches
+                debounceWaitMs: 200, //ensures the query is made only if a user stops typing for the set number of milliseconds
+                preventSubmit: true, //doesn't submit the form if a user pushes the enter key
+                disableAutoSelect: true, //prevents the first item in the list from being auto-selected
+                fetch: async function(text, update) { //defines where to fetch the data from
+                    let field = autocompleteField.name //sets the field name to a new variable
+                    field = field.replace('[]', '') //the next three lines remove current formatting and replaces it with JSON friendly formatting.
                     field = field.replace('[', '.')
                     field = field.replace(']', '')
             
-                    const response = await fetch('/utils/data?' + new URLSearchParams({
-                        field,
-                        fieldValue: autocompleteField.value,
-                        collection: targetCollection
+                    const response = await fetch('/utils/autocomplete?' + new URLSearchParams({ //fetch request to send the data
+                        field, //field name
+                        fieldValue: autocompleteField.value, //field value
+                        collection: targetCollection //collection to search
                     }))
-                    const autofillOptions = await response.json()
+                    const autofillOptions = await response.json() //sets the response values to a variable
                     console.log(autofillOptions)
-                    let suggestions = autofillOptions.map(option => {
+                    let suggestions = autofillOptions.map(option => { //creates a new array that makes each response an object with a label and value
                         return { 'label': option, 'value:': option}
                     })
-                    update(suggestions)
+                    update(suggestions) //updates the available options with the array of objects from the suggestions variable
                 },
                 onSelect: function(item) {
-                    autocompleteField.value = item.label
-                } 
+                    autocompleteField.value = item.label //sents the autocomplete value to the previously defined item label when a user clicks on it.
+                }
             })
+        }
+    })
+    formSelector.addEventListener('focusout', event => { //when the user leaves the field, runs the autocomplete destroy method which gets rid of all related eventlisteners and stored data
+        if (event.target && event.target.matches('.autocomplete')) {
+            autocomplMethods.destroy()
         }
     })
 }
@@ -10117,18 +10120,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./warning */ "./public/js/utils/warning.js");
 
 
-//TODO: Can it be expanded to work with any record?
-
 
 
 class Duplicate {
-    // constructor (title, mediaType, sourceId, type) {
-    //     this.title = title
-    //     this.mediaType = mediaType || null
-    //     this.sourceId = sourceId || null
-    //     this.recordType = type
-    // }
-
     constructor (recordType, sourceId, recordState) {
         this.recordType = recordType
         this.sourceId = sourceId
@@ -10136,70 +10130,36 @@ class Duplicate {
     }
 
     async getRecordProps () {
-        
         const response = await fetch('/utils/recordProps?' + new URLSearchParams({
             recordType: this.recordType
         }))
-
         return this.parseResponse(await response.json())
     }
 
-    parseResponse(duplicateSettings) {
-        
-        for (let field in duplicateSettings.fields) {
-            duplicateSettings.fields[field] = document.querySelector(`#${field}`).value
+    parseResponse(recordProps) { //TODO: Figure out how to handle and passthrough nested objects from the db model
+        for (let field in recordProps.duplicateFields) {
+            recordProps.duplicateFields[field] = document.querySelector(`#${field}`).value
         }
-        duplicateSettings.id = this.sourceId
-        return this.checkDuplicates(duplicateSettings)
+        recordProps.id = this.sourceId
+        return this.checkDuplicates(recordProps)
     }
 
-    // async checkDuplicates (duplicateSettings) {
-    //     console.log(duplicateSettings)
-    //     const response = await fetch('/utils/data?' + new URLSearchParams({
-    //         // title: this.title,
-    //         // mediaType: this.mediaType,
-    //         // sourceId: this.sourceId,
-    //         ...duplicateSettings,
-    //         recordState: this.recordState
-    //     }))
-    //     return response.json()
-    // }
-
-    async checkDuplicates (duplicateSettings) {
-        console.log(this.recordState, 'testsds')
+    async checkDuplicates (recordProps) {
         const response = await fetch('/utils/duplicateCheck', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                duplicateSettings,
+                recordProps,
                 recordState: this.recordState
             })
         })
-        // console.log(await response.json(), 'responsetest')
-        // return response
         return await response.json()
     }
 
-    // const response = await fetch('/utils/data', {
-    //     method: 'PUT',
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({
-    //         sourceId,
-    //         adminNotes: formProperties.formData.adminNotes.value,
-    //         state: 'rejected',
-    //         collection: formProperties.lockLocation
-    //     })
-    // })
-
     async validateDuplicates () {
-        // const duplicateResponse = await this.checkDuplicates()
-
         const duplicateResponse = await this.getRecordProps()
-        console.log(duplicateResponse, 'here3')
         if (!duplicateResponse) return false
         if (duplicateResponse.title) {
             //create the link
@@ -10234,9 +10194,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "FieldManager": () => (/* binding */ FieldManager)
 /* harmony export */ });
-/* harmony import */ var _autocomplete__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./autocomplete */ "./public/js/utils/autocomplete.js");
-
-
 
 class FieldManager {
     constructor (media, job, additionalFields) {
@@ -10569,7 +10526,8 @@ const rejectPublish = (formProperties) => {
             const formFail = (0,_formValidation__WEBPACK_IMPORTED_MODULE_1__.formValidation)(formProperties.formData, formProperties.schema)
 
             if (!formFail && !adminNoteCheck()) {
-                const response = await fetch('/utils/data', {
+                const response = await fetch('/utils/rejectPublish', {
+                // const response = await fetch('/utils/data', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -10623,7 +10581,8 @@ class StateManager {
             collection: this.targetCollection
         })
 
-        const beacon = await navigator.sendBeacon('/utils/data', checkedOutRequest)
+        // const beacon = await navigator.sendBeacon('/utils/data', checkedOutRequest)
+        const beacon = await navigator.sendBeacon('/utils/stateManager', checkedOutRequest)
         if (!beacon) {
             console.log('Something went wrong.',  err)
         }
@@ -10790,10 +10749,11 @@ const clearWarning = () => {
   \********************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const BaseJoi = __webpack_require__(/*! joi */ "./node_modules/joi/dist/joi-browser.min.js");
-const sanitizeHtml = __webpack_require__(/*! sanitize-html */ "./node_modules/sanitize-html/index.js");
+const BaseJoi = __webpack_require__(/*! joi */ "./node_modules/joi/dist/joi-browser.min.js"); //pull in Joi library
+const sanitizeHtml = __webpack_require__(/*! sanitize-html */ "./node_modules/sanitize-html/index.js"); //pull in santizeHTML library 
 
-const extension = (joi) => ({
+const extension = (joi) => ({  //this function creates a custom rule for Joi that errors out submissions that include HTML by leveraging the sanitizeHTML library to identify it.  I did not write this, no idea how it works.
+//More here: https://joi.dev/api/?v=17.5.0#anycustommethod-description
     type: 'string',
     base: joi.string(),
     messages: {
@@ -10813,9 +10773,10 @@ const extension = (joi) => ({
     }
 })
 
-const Joi = BaseJoi.extend(extension)
+const Joi = BaseJoi.extend(extension) //adds the previously defined rule to a new object
 
-module.exports.userSchema = Joi.object({
+module.exports.userSchema = Joi.object({ //schema validation for user data.  TODO: Check if the password regex is checked elsewhere.
+    //TODO: Can we now leverage this on the front end.
     username: Joi.string()
         .required()
         .alphanum()
@@ -10839,16 +10800,16 @@ module.exports.userSchema = Joi.object({
             "string.email": 'You must enter a valid email address.',
             "string.empty": 'You must enter an email address.'
         })
-}).unknown()
+}).unknown() //allows for information not defined in the schema to be added to the DB and not validated. TODO: Should we just check all fields.
 
-//regex string for all text input boxes
-const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.? ]+$/i
+//regex string for all text input boxes.  Must star with a letter and includes any number of the defined characters after that.
+const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.'? ]*$/i  
 
-const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80)
+const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80) //defines the validations for a string with a max length.  Checks against regex.
 
-const stringRulesNoMax = Joi.string().escapeHTML().pattern(regex).min(3)
+const stringRulesNoMax = Joi.string().escapeHTML().pattern(regex).min(3) //defines the validations for a string with no max length. Checks against regex.
 
-const customStringErrors = {
+const customStringErrors = { //Defines the custom errors that will appear to the user.
     'string.pattern.base': '{{#label}} contains one or more illegal characters.',
     'string.min': '{{#label}} must be at least {{#limit}} characters.',
     'string.max': '{{#label}} must be less than {{#limit}} charaters.',
@@ -10856,14 +10817,13 @@ const customStringErrors = {
     'array.unique': '{{#label}} is a duplicate entry.'
 }
 
-//TODO:  Remove fields not in form and test if this still works
+//schema for validating the Source form entries.
 module.exports.sourceSchema = Joi.object({
     title: stringRulesNoMax
         .required()
         .max(100)
-        .label('Title')
+        .label('Title') //labels are for the error message.
         .messages(customStringErrors),
-    slug: Joi.string(),
     mediaType: Joi.string()
         .required()
         .valid('Movie', 'TV Show', 'Book', 'Comic', 'Video Game')
@@ -10871,14 +10831,6 @@ module.exports.sourceSchema = Joi.object({
         .messages({
             'any.only': 'Please choose a Media Type.'
         }),
-    state: Joi.string()
-        .valid('new', 'update', 'approved', 'published', 'rejected'),
-    author: Joi.array()
-        .items(Joi.object())
-        .max(5)
-        .unique(),
-    lastApprover: Joi.string()
-        .escapeHTML(),
     adminNotes: stringRulesNoMax
         .max(500)
         .label('Admin Notes')
@@ -11312,7 +11264,7 @@ const formProperties = (0,_utils_formIdentifier__WEBPACK_IMPORTED_MODULE_8__.gat
 //creates an image preview whenever the image is changed
 ;(0,_utils_imageTools_js__WEBPACK_IMPORTED_MODULE_10__.imagePreview)()
 
-//turns on autocomplete functionality for any associated fields with the autocomplete class
+//turns on autocomplete functionality for any associated fields with the autocomplete class.  Can't use formProperties because it always has to be the public source.
 ;(0,_utils_autocomplete_js__WEBPACK_IMPORTED_MODULE_11__.autocompleteListener)('PublicSource')
 
 //this function does multiple things.  For new records it hides or reveals the fields associated with the chosen media type.  In new and existing records it allows for the addition and removal of variable number fields as defined in the mediaDetails object.  In existing records it ensures that dynamically loaded fields saved previously load correctly.
@@ -11357,6 +11309,7 @@ if (formProperties.existingSource) { //for non-new records only.
         await state.updateState()
     })
 
+    
     //starts the inactivity timer.
     ;(0,_utils_timeout_js__WEBPACK_IMPORTED_MODULE_1__.formTimeout)()
 
@@ -11380,6 +11333,8 @@ if (formProperties.existingSource) { //for non-new records only.
     mediaType.addEventListener('input', event => {
         multiFieldManager()
     })
+
+
 }
 
 formProperties.formData.addEventListener('submit', async event => {
@@ -11394,12 +11349,10 @@ formProperties.formData.addEventListener('submit', async event => {
     const adminNote = (0,_utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_5__.adminNoteCheck)()
     const formFail = (0,_utils_formValidation_js__WEBPACK_IMPORTED_MODULE_4__.formValidation)(formProperties.formData, formProperties.schema)
 
-    //TODO: Uncomment this later
-    // const submittedRecord = new Duplicate(title.value, mediaType.value, sourceId, formProperties.duplicateCheck)
-    // const duplicateResult = await submittedRecord.validateDuplicates()
+    //
     const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__.Duplicate(formProperties.lockLocation, sourceId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
-    // const duplicateResult = false
+
 
     if (!duplicateResult && !formFail && !adminNote) {
         //sets the unload check to true so that the checkedOut flag isn't flipped because the user exited the page because of submit.

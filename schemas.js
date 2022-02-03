@@ -1,7 +1,8 @@
-const BaseJoi = require('joi');
-const sanitizeHtml = require('sanitize-html');
+const BaseJoi = require('joi'); //pull in Joi library
+const sanitizeHtml = require('sanitize-html'); //pull in santizeHTML library 
 
-const extension = (joi) => ({
+const extension = (joi) => ({  //this function creates a custom rule for Joi that errors out submissions that include HTML by leveraging the sanitizeHTML library to identify it.  I did not write this, no idea how it works.
+//More here: https://joi.dev/api/?v=17.5.0#anycustommethod-description
     type: 'string',
     base: joi.string(),
     messages: {
@@ -21,9 +22,10 @@ const extension = (joi) => ({
     }
 })
 
-const Joi = BaseJoi.extend(extension)
+const Joi = BaseJoi.extend(extension) //adds the previously defined rule to a new object
 
-module.exports.userSchema = Joi.object({
+module.exports.userSchema = Joi.object({ //schema validation for user data.  TODO: Check if the password regex is checked elsewhere.
+    //TODO: Can we now leverage this on the front end.
     username: Joi.string()
         .required()
         .alphanum()
@@ -47,16 +49,16 @@ module.exports.userSchema = Joi.object({
             "string.email": 'You must enter a valid email address.',
             "string.empty": 'You must enter an email address.'
         })
-}).unknown()
+}).unknown() //allows for information not defined in the schema to be added to the DB and not validated. TODO: Should we just check all fields.
 
-//regex string for all text input boxes
-const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.? ]+$/i
+//regex string for all text input boxes.  Must star with a letter and includes any number of the defined characters after that.
+const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.'? ]*$/i  
 
-const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80)
+const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80) //defines the validations for a string with a max length.  Checks against regex.
 
-const stringRulesNoMax = Joi.string().escapeHTML().pattern(regex).min(3)
+const stringRulesNoMax = Joi.string().escapeHTML().pattern(regex).min(3) //defines the validations for a string with no max length. Checks against regex.
 
-const customStringErrors = {
+const customStringErrors = { //Defines the custom errors that will appear to the user.
     'string.pattern.base': '{{#label}} contains one or more illegal characters.',
     'string.min': '{{#label}} must be at least {{#limit}} characters.',
     'string.max': '{{#label}} must be less than {{#limit}} charaters.',
@@ -64,14 +66,13 @@ const customStringErrors = {
     'array.unique': '{{#label}} is a duplicate entry.'
 }
 
-//TODO:  Remove fields not in form and test if this still works
+//schema for validating the Source form entries.
 module.exports.sourceSchema = Joi.object({
     title: stringRulesNoMax
         .required()
         .max(100)
-        .label('Title')
+        .label('Title') //labels are for the error message.
         .messages(customStringErrors),
-    slug: Joi.string(),
     mediaType: Joi.string()
         .required()
         .valid('Movie', 'TV Show', 'Book', 'Comic', 'Video Game')
@@ -79,14 +80,6 @@ module.exports.sourceSchema = Joi.object({
         .messages({
             'any.only': 'Please choose a Media Type.'
         }),
-    state: Joi.string()
-        .valid('new', 'update', 'approved', 'published', 'rejected'),
-    author: Joi.array()
-        .items(Joi.object())
-        .max(5)
-        .unique(),
-    lastApprover: Joi.string()
-        .escapeHTML(),
     adminNotes: stringRulesNoMax
         .max(500)
         .label('Admin Notes')

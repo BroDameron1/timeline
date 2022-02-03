@@ -25,7 +25,8 @@ export const rejectPublish = (formProperties) => {
             const formFail = formValidation(formProperties.formData, formProperties.schema)
 
             if (!formFail && !adminNoteCheck()) {
-                const response = await fetch('/utils/data', {
+                const response = await fetch('/utils/rejectPublish', {
+                // const response = await fetch('/utils/data', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'

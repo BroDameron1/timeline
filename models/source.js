@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const slugify = require('slugify')
+const slugify = require('slugify'); //pull in slugify library to help create URL slugs
+const { cloudinary } = require('../utils/cloudinary');
+const { createSlug, imageDelete, formDate, updateDate, displayImage } = require('./middleware.js')
 
 Schema.Types.String.set('trim', true); //sets all strings to trim()
 
@@ -9,7 +11,7 @@ const SourceSchema = new Schema({
         type: String,
         required: true
     },
-    recordType: {
+    recordType: { //currently not used any where but may be useful in the future
         type: String,
         default: 'Source',
         required: true,
@@ -25,7 +27,6 @@ const SourceSchema = new Schema({
         enum: ['Movie', 'TV Show', 'Book', 'Comic', 'Video Game']
     },
     images: {
-            // url: String,
             path: String,
             filename: String,
         },
@@ -47,16 +48,9 @@ const SourceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    publicId: { //TODO: Changed this to relate to the PublicSource.  Check and make sure nothing broke. DONE just waiting to see if anything broke.
+    publicId: { 
         type: Schema.Types.ObjectId,
         ref: 'PublicSource'
-    },
-    // publicId: {
-    //     type: String
-    // },
-    updateDate: {
-        type: Date,
-        get: formatDate
     },
     adminNotes: { 
         type: String
@@ -121,69 +115,29 @@ const SourceSchema = new Schema({
 },
     { timestamps: true });
 
-
-SourceSchema.virtual('displayImage').get(function() {
-    return this.images.path.replace('/upload', '/upload/w_500,h_500,c_limit')
-})
-
-SourceSchema.virtual('duplicateSettings').get(function() {
-    const duplicateSettings = {
-        fields: {
+//virtual property that stores specific properties of the record so that they can be called in functions that need to work with every record type (duplicatechecker, record-handler-service, etc...)
+SourceSchema.virtual('recordProps').get(function() {
+    const recordProps = {
+        duplicateFields: {
             title: this.title || null,
-            mediaType: this.mediaType || null
+            mediaType: this.mediaType || null,
         },
-        // fields: [this.title, this.mediaType],
-        // title: this.title,
-        // mediaType: this.mediaType,
         review: 'ReviewSource',
         public: 'PublicSource',
-        // collections: ['ReviewSource', 'PublicSource'],
+        staticFields: ['mediaType'],
         id: this._id
     }
-    return duplicateSettings
+    return recordProps
 })
 
-//adds new author to the front of the array of authors, removes any duplicates and stores the last 
-//five total authors
-//TODO: Don't use this at all.  Replaced by the record handler service.
-SourceSchema.methods.updateAuthor = function (previousAuthors, newAuthor) {
-    this.author = previousAuthors.filter(previousAuthor => !previousAuthor.equals(newAuthor))
-    this.author.unshift(newAuthor)
-    if (this.author.length > 5) {
-        this.author.splice(5)
-    }
-}
+//virtual property that updates the path/URL of the image request to cloudinary with a request for a specific size of the image.
+SourceSchema.virtual('displayImage').get(displayImage)
 
-//sets the date/time for updateDate.  Not sure why we can't use the timestamps.  TODO
-SourceSchema.pre('save', function(next) { 
-    this.updateDate = Date.now()
-    this.slug = slugify(this.title + '_' + this.mediaType, {
-        replacement: '_',
-        lower: true,
-        strict: true
-    })
-    next()
-})
+SourceSchema.virtual('updateDate').get(updateDate)
 
-function formatDate (date) { //formats and passes through the last updated time to be displayed.
-    const month = date.toLocaleString('default', { month: 'short' });
-    const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-    const displayDate = `${month} ${date.getDate()} ${date.getFullYear()} at ${time}`
-    return displayDate;
-}
+SourceSchema.pre('save', createSlug)
 
-function formDate (date) {
-    if (date) {
-        console.log('test1')
-        return date.toISOString().substring(0, 10)
-    } else {
-        return null
-    }
-}
-
-function capitalize (stringToCapitalize) {
-    return stringToCapitalize.charAt(0).toUpperCase() + stringToCapitalize.slice(1)
-}
+SourceSchema.post('remove', {document: true, query: false}, imageDelete)
 
 const reviewSource = mongoose.model('ReviewSource', SourceSchema);
 const publicSource = mongoose.model('PublicSource', SourceSchema);

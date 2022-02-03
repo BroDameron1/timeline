@@ -1,10 +1,10 @@
 const User = require('./models/user');
-const Source = require('./models/source');
 const ExpressError = require('./utils/expressError')
 const { userSchema, sourceSchema } = require('./schemas');
 const mongoose = require('mongoose');
 const ObjectID = require('mongoose').Types.ObjectId;
 
+//TODO: Should I check if something is checkedOut (true) before making put/post requests
 
 const isLoggedIn = async (req, res, next) => {
     //checks to see if a user is already logged in.  If so, get their info from the DB so it can be checked
@@ -14,10 +14,10 @@ const isLoggedIn = async (req, res, next) => {
         req.flash('error', 'You must be logged in');
         return res.redirect('/login');
     }
-    const user = await User.findById(req.user._id)   
     //This checks if the user is authenticated (Passport.js) and if the user has been verified.
     //If either one is false, the user cannot access any route this middleware is attached to
-    if (!req.isAuthenticated() || !user.verified) {
+
+    if (!req.isAuthenticated() || !req.user.verified) {
         req.session.returnTo = req.originalUrl;
         req.flash('error', 'Please verify your account.');
         return res.redirect('/register');
@@ -35,7 +35,7 @@ const validateUser = (req, res, next) => {
     }
 }
 
-const validateSource = (req, res, next) => {
+const cleanSubmission = (req, res, next) => {
 
     //checks the req.body object for any empty fields and changes them to undefined so they don't get stored.
     for (let [key, value] of Object.entries(req.body)) {
@@ -78,8 +78,8 @@ const notLoggedIn = (req, res, next) => {
 }
 
 const isAdmin = async (req, res, next) => {
-    const user = await User.findById(req.user._id)
-    if (user.role !== 'admin') {
+    // const user = await User.findById(req.user._id)
+    if (req.user.role !== 'admin') {
         const redirectUrl = req.session.returnTo || '/dashboard';
         //deletes returnTo from the session object
         delete req.session.returnTo;
@@ -90,50 +90,64 @@ const isAdmin = async (req, res, next) => {
     next()
 }
 
-
-const isAuthor = (reviewCollection) => {
+const getRequestData = (targetCollection) => {
     return async (req, res, next) => {
-        const { sourceId } = req.params
-        if (!ObjectID.isValid(sourceId)) {
-            req.flash('error', 'This record does not exist.')
-            return res.redirect('/dashboard')
+        const { slug, sourceId } = req.params
+        if (sourceId) {   
+            if (!ObjectID.isValid(sourceId)) {
+                req.flash('error', 'This record does not exist.')
+                return res.redirect('/dashboard')
+            }
+            res.locals.requestData = await mongoose.model(targetCollection).findById(sourceId)
         }
-        const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
-        if (!reviewData) {
-            req.flash('error', 'This record does not exist.')
-            return res.redirect('/dashboard')
-        }
-        if (!reviewData.author[0].equals(req.user._id)) {
-            req.flash('error', "You do not have the correct permissions.")
-            return res.redirect('/dashboard')
+        if (slug) {
+            res.locals.requestData = await mongoose.model(targetCollection).findOne({ slug })
         }
         next()
     }
 }
 
-const isCheckedOut = (reviewCollection, publicCollection) => {
-    return async (req, res, next) => {
-        const { sourceId, slug } = req.params
-        if (sourceId && !ObjectID.isValid(sourceId)) {
-            req.flash('error', 'This record does not exist.')
-            return res.redirect('/dashboard')
-        }
-        const reviewData = await mongoose.model(reviewCollection).findById(sourceId)
-        const publicData = await mongoose.model(publicCollection).findOne({ slug })
-        if ((reviewData && reviewData.checkedOut) || (publicData && publicData.checkedOut)) {
-            req.flash('error', 'This record is already in use.')
-            return res.redirect('/dashboard')
-        }
-        next()
+const validateRecord = async (req, res, next) => {
+    if (!res.locals.requestData) {
+        req.flash('error', 'This record does not exist.')
+        return res.redirect('/dashboard')
     }
+    next()
+}
+
+const isAuthor = (req, res, next) => {
+    if (!res.locals.requestData.author[0].equals(req.user._id)) {
+        req.flash('error', "You do not have the correct permissions.")
+        return res.redirect('/dashboard')
+    }
+    next()
+}
+
+const checkApprovalState = (req, res, next) => {
+    if (res.locals.requestData.state === 'approved' || res.locals.requestData.state === 'rejected') { //checks if the reviewdata is in the approved or rejected state
+        req.flash('error', 'This record is not eligible to be editted or deleted.') //if so, errors out the form
+        return res.redirect('/dashboard')
+    }
+    next()
+}
+
+const isCheckedOut = (req, res, next) => {
+    if (res.locals.requestData.checkedOut) {
+        req.flash('error', 'This record is already in use.')
+        return res.redirect('/dashboard')
+    }
+    next()
 }
 
 module.exports = {
     isLoggedIn,
     validateUser,
-    validateSource,
     notLoggedIn,
     isAdmin,
+    getRequestData,
+    validateRecord,
     isAuthor,
-    isCheckedOut
+    checkApprovalState,
+    isCheckedOut,
+    cleanSubmission
 }
