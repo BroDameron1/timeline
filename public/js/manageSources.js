@@ -124,9 +124,9 @@ const multiFieldManager = () => {
 
 if (formProperties.existingSource) { //for non-new records only.
     
-    //updates the record to being locked on load.  sourceId is pulled from the HTML.
+    //updates the record to being locked on load.  recordId is pulled from the HTML.
     window.addEventListener('load', async event => {
-        const state = new StateManager(true, sourceId, formProperties.lockLocation)
+        const state = new StateManager(true, recordId, formProperties.lockLocation)
         await state.updateState()
     })
 
@@ -138,7 +138,7 @@ if (formProperties.existingSource) { //for non-new records only.
     window.addEventListener('beforeunload', async event => {
         event.preventDefault()  
         
-        const state = new StateManager(false, sourceId, formProperties.lockLocation)
+        const state = new StateManager(false, recordId, formProperties.lockLocation)
         await state.updateState()
     })
 
@@ -171,7 +171,7 @@ formProperties.formData.addEventListener('submit', async event => {
     const formFail = formValidation(formProperties.formData, formProperties.schema)
 
     //
-    const submittedRecord = new Duplicate(formProperties.lockLocation, sourceId, formProperties.duplicateCheck)
+    const submittedRecord = new Duplicate(formProperties.lockLocation, recordId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
 
 

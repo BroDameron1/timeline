@@ -3,9 +3,9 @@ import { generateWarning } from './warning'
 
 
 export class Duplicate {
-    constructor (recordType, sourceId, recordState) {
+    constructor (recordType, recordId, recordState) {
         this.recordType = recordType
-        this.sourceId = sourceId
+        this.recordId = recordId
         this.recordState = recordState
     }
 
@@ -20,7 +20,7 @@ export class Duplicate {
         for (let field in recordProps.duplicateFields) {
             recordProps.duplicateFields[field] = document.querySelector(`#${field}`).value
         }
-        recordProps.id = this.sourceId
+        recordProps.id = this.recordId
         return this.checkDuplicates(recordProps)
     }
 

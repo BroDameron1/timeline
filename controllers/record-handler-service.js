@@ -12,16 +12,16 @@ class RecordHandler {
         this.redirectUrl = '/dashboard' //redirecturl for issues that redirect the user.
     }
 
-    //method to lookup data when given a sourceId or slug
+    //method to lookup data when given a recordId or slug
     async dataLookup() { //parameter determines if we are looking in the review or public collection
-        const { slug, sourceId } = this.req.params //pulls out the slug OR sourceId from the req object
+        const { slug, recordId } = this.req.params //pulls out the slug OR recordId from the req object
         let data
         if (slug) { //if there is a slug, query by that to find the record and provide the author and last approver usernames.
             data = await mongoose.model(this.recordProps.public).findOne({ slug })
                 .populate('author', 'username')
                 .populate('lastApprover', 'username')
-        } else { //if there is a sourceId, query by that and find the record and provide the author and last approver usernames.
-            data = await mongoose.model(this.recordProps.review).findById(sourceId)
+        } else { //if there is a recordId, query by that and find the record and provide the author and last approver usernames.
+            data = await mongoose.model(this.recordProps.review).findById(recordId)
                 .populate('author', 'username')
                 .populate('lastApprover', 'username')
         }
@@ -30,7 +30,7 @@ class RecordHandler {
 
     //method for publishing a record from the review queue to the public queue
     async publishReviewRecord() {
-        const { sourceId } = this.req.params
+        const { recordId } = this.req.params
         let reviewData = await this.dataLookup()
         let publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId) //queries to see if there is a public record already associated with the review record (in the case of an updated record rather than a new one)
         if (!publicData) {
@@ -38,7 +38,7 @@ class RecordHandler {
         } else {
             publicData.set({ ...this.req.body }) //if one does exist, set the properties to the request body
         }
-        const duplicateCheck = await duplicateChecker.publishRecord(publicData.recordProps, sourceId) //send appropriate data to the publishrecord duplicaterecord checker
+        const duplicateCheck = await duplicateChecker.publishRecord(publicData.recordProps, recordId) //send appropriate data to the publishrecord duplicaterecord checker
         if (duplicateCheck) return this.duplicateError() //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
         if (reviewData.author[0].equals(this.req.user._id)) { //checks to ensure an admin isn't publishing their own record.
             this.req.flash('error', "You can't approve your own article you weirdo. How did you even get here?")
@@ -119,12 +119,9 @@ class RecordHandler {
 
     //method that allows a user to delete a record in thier review queue
     async deleteReviewRecord() {
-        const { sourceId } = this.req.params
         const reviewData = await this.dataLookup() //lookup the review record data
         const image = new ImageHandler(reviewData.images, reviewData, this.recordProps) //instantiates a new instance of the imagehandler class with the image data from the review record
-        // await image.deleteReviewImage() //uses the deletereviewimage method to delete the image
         await reviewData.remove()        
-        // await mongoose.model(this.recordProps.review).findByIdAndDelete(sourceId) //deletes the review record
 
         if (reviewData.publicId) { //checks to see if the review record is related to existing public record
             const publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId) //if so, finds the public record
