@@ -14,14 +14,14 @@
     <div class="form">
         <h1>Review Submission</h1>
         <% if (currentUser.role === 'admin' && !data.author[0].equals(currentUser._id) && data.state === 'new') {%>
-            <form action="/sources/review/<%= data._id %>" method="POST" id="publishSource" class="sourceForm" data-formtype="publishSubmission" enctype="multipart/form-data">
+            <form action="/events/review/<%= data._id %>" method="POST" id="publishEvent" class="eventForm" data-formtype="publishSubmission" enctype="multipart/form-data">
         <% } %> 
         <% if (currentUser.role === 'admin' && !data.author[0].equals(currentUser._id) && data.state === 'update') {%>
-            <form action="/sources/review/<%= data._id %>?_method=PUT" method="POST" id="publishSource" class="sourceForm" data-formtype="publishSubmission" enctype="multipart/form-data">
+            <form action="/events/review/<%= data._id %>?_method=PUT" method="POST" id="publishEvent" class="eventForm" data-formtype="publishSubmission" enctype="multipart/form-data">
         <% } %> 
  
 
-        <%- include('../partials/sourceforms.ejs') %>
+        <%- include('../partials/eventforms.ejs') %>
         
         <div class="form-field">
             <label for="adminNotes">Admin Comments</label>
@@ -42,4 +42,5 @@
 <script>
     const recordId = '<%- data._id %>'
 </script>
-<script type="module" src="/dist/main.bundle.js"></script>
+<!-- <script type="module" src="/dist/main.bundle.js"></script> -->
+

@@ -1,5 +1,5 @@
 import { rejectPublish } from "./rejectPublish";
-import { sourceSchema } from '../../../schemas'
+import { sourceSchema, eventSchema } from '../../../schemas'
 
 
 
@@ -26,6 +26,29 @@ const populateFormInfo = (formProperties) => {
                 case 'updatePublicSource':
                     formProperties.duplicateCheck = 'editPublic'
                     formProperties.lockLocation = 'PublicSource'
+                break;
+            }
+        break;
+        case 'eventForm':
+            formProperties.schema = eventSchema
+            switch (formProperties.formId) {
+                case 'newEvent':
+                    formProperties.existingSource = false
+                    formProperties.duplicateCheck = 'submitNew'
+                    formProperties.lockLocation = 'ReviewEvent'
+                break;
+                case 'updateReviewEvent':
+                    formProperties.duplicateCheck = 'updateReview'
+                    formProperties.lockLocation = 'ReviewEvent'
+                break;
+                case 'publishEvent':
+                    formProperties.duplicateCheck = 'publishRecord'
+                    formProperties.lockLocation = 'ReviewEvent'
+                    rejectPublish(formProperties)
+                break;
+                case 'updatePublicEvent':
+                    formProperties.duplicateCheck = 'editPublic'
+                    formProperties.lockLocation = 'PublicEvent'
                 break;
             }
         break;

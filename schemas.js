@@ -188,5 +188,15 @@ module.exports.sourceSchema = Joi.object({
     })
 })
 
-
+module.exports.eventSchema = Joi.object({
+    title: stringRulesNoMax
+        .required()
+        .max(100)
+        .label('Title') //labels are for the error message.
+        .messages(customStringErrors),
+    adminNotes: stringRulesNoMax
+        .max(500)
+        .label('Admin Notes')
+        .messages(customStringErrors),
+})
 

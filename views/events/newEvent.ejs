@@ -1,0 +1,23 @@
+<% layout('layouts/boilerplate.ejs') %>
+
+
+<main>
+    <div class="form">
+        <h1>Submit a New Source</h1>
+        <form action='/events/new' method="POST" id="newEvent" class="eventForm" data-formtype="newSubmission" enctype="multipart/form-data">
+
+
+        <%- include('../partials/eventforms.ejs') %>
+
+        <div>
+            <button class="btn-blue">Submit for Review</button>
+        </div>
+        <div id="warning"></div>
+        </form>
+    </div>
+</main>
+
+<script>
+    const recordId = null
+</script>
+<!-- <script type="module" src="/dist/main.bundle.js"></script> -->

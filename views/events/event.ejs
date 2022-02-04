@@ -1,0 +1,87 @@
+<% layout('layouts/boilerplate.ejs') %>
+
+<div class="disableDiv">
+    <div class="warning-popup">
+        Confirm you want to delete this record by typing DELETE and clicking "Delete".
+        <form action="" id="delete-confirmation">
+            <div class="form-field"><input type="text" id="delete-validate" autofocus></div>
+            <div class="popup-btn-container">
+                <button class="btn-red btn-margins">Delete</button>
+        </form>
+        <button class="btn-blue btn-margins">Cancel</button>
+    </div>
+</div>
+</div>
+
+<main>
+
+    <div class="display-container">
+        <h1>Source</h1>
+        <div class="record-header">
+            <%= data.title %>
+        </div>
+        <div class="record-image">
+            <% if (data.images.path) { %> 
+                <img src="<%= data.displayImage %>">
+            <% } else { %>
+                <img src="/images/placeholder.png">
+            <% } %> 
+        </div>
+        <div class="data-line">
+            Media: <%= data.mediaType %>
+        </div>
+
+
+        <%- include('../partials/sourcedata.ejs') %>
+
+
+
+        <div class="data-line">
+            Most Recent Record Contributors:
+            <% for (let contributor of data.author) { %>
+                <div><%= contributor.username %></div>
+            <% } %> 
+        </div>
+
+
+        <div class="data-line">
+            Last Update: <%= data.updateDate %> 
+            <% if (data.state !== 'rejected') { %> 
+                reviewed by <%= data.lastApprover.username %>
+            <% } %>
+        </div>
+
+        <% if(data.state === 'approved' || data.state === 'rejected') { %>
+            <div class="data-line">Admin Notes: <%= data.adminNotes %> </div>
+        <% } else { %>
+
+        <% if (currentUser) { %>
+            <% if (!data.checkedOut) { %>
+                <div>
+                    <a href="/sources/<%= data.slug %>/edit"><button class="btn-blue">Edit</button></a>
+                </div>
+            <% } else { %>
+                <div>
+                    <button class="btn-disabled">Locked</button>
+                </div>
+            <% } %>
+        <% } %>
+        <% if (currentUser && currentUser.role ==='admin') { %>
+            <% if (!data.checkedOut) { %>
+                <div>
+                    <form action="/sources/<%= data.slug %>?_method=DELETE" method="POST" class="delete-record">
+                    <button class="btn-red">Delete Record</button>
+                    </form>
+                </div>
+             <% } else { %>
+                <div>
+                    <button class="btn-disabled">Locked</button>
+                </div>
+            <% } %>
+        <% } %>
+    <% } %> 
+    </div>
+</main>
+
+<!-- using the same scripts as dashboard since it's only the delete confirmation script -->
+<script type="module" src="/js/dashboard.js"></script>

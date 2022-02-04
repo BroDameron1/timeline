@@ -11,10 +11,10 @@
 <main>
     <div class="form">
         <h1>Edit Submission</h1>
-            <form action="/sources/review/<%= data._id %>/edit?_method=PUT" method="POST" id="updateReviewSource" class="sourceForm" data-formtype="updateReviewSubmission" enctype="multipart/form-data">
+            <form action="/events/review/<%= data._id %>/edit?_method=PUT" method="POST" id="updateReviewEvent" class="eventForm" data-formtype="updateReviewSubmission" enctype="multipart/form-data">
 
         
-        <%- include('../partials/sourceforms.ejs') %>
+        <%- include('../partials/eventforms.ejs') %>
 
         <div>
             <button class="btn-blue">Submit for Review</button>
@@ -29,6 +29,6 @@
 <script>
     const recordId = '<%- data._id %>'
 </script>
-<script type="module" src="/dist/main.bundle.js"></script>
+<!-- <script type="module" src="/dist/main.bundle.js"></script> -->
 
 
