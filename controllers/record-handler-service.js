@@ -190,7 +190,7 @@ class RecordHandler {
         //   console.log(staticFieldOptions2, 'test')
         // const staticFieldOptions2 = DataObjectParser.transpose(staticFieldOptions)
         // console.log(staticFieldOptions2, 'here2')
-        console.log(data.recordProps, 'data')
+        console.log(data.mediaType, 'data')
         return this.res.render(this.template, {data, staticFields})
         //TODO: Replicate this for sources!
         // return this.res.render(this.template, { data, staticFieldOptions2 }) //renders the page with the data and the options for their static fields

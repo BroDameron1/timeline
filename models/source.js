@@ -122,7 +122,10 @@ sourceSchema.virtual('recordProps').get(function() {
         },
         review: 'ReviewSource',
         public: 'PublicSource',
-        staticFields: ['mediaType'],
+        // staticFields: ['mediaType'],
+        staticFields: {
+            mediaType: mongoose.model('ReviewSource').schema.path('mediaType').enumValues
+        },
         id: this._id
     }
     return recordProps

@@ -7,13 +7,13 @@
     <% if (!data.mediaType) { %>
         <select name="mediaType" id="mediaType">
             <option value="default">----Select a Media----</option>
-            <% for(let mediaType of staticFieldOptions.mediaType) { %>
+            <% for(let mediaType of data.recordProps.staticFields.mediaType) { %>
                 <option value="<%= mediaType %>"><%= mediaType %></option>
             <% } %> 
         </select>
     <% } else { %> 
         <select name="mediaType" id="mediaType" disabled>
-            <% for(let mediaType of staticFieldOptions.mediaType) { %>
+            <% for(let mediaType of data.recordProps.staticFields.mediaType) { %>
                 <option value="<%= mediaType %>" <%= data.mediaType === mediaType ? 'selected': ''%>><%= mediaType %></option>
             <% } %>
         </select>

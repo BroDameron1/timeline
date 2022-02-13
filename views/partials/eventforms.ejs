@@ -4,13 +4,13 @@
 </div>
 
 <div class="form-field">
-    <label for="event-year">Issue</label>
+    <label for="event-year">Year</label>
     <input type="number" id="event-year" name="eventDate[year]" value="<%= data.eventDate.year %>" min="-10" max="10">
 </div>
 
 <div class="form-field">
-    <label for="eventNotation">Media Type</label>
-    <% if (!data.eventDate) { %>
+    <label for="eventNotation">Year Notation</label>
+    <% if (!data.eventDate.notation) { %>
         <select name="eventDate[notation]" id="eventNotation">
             <option value="default">----Select a Notation----</option>
             <% for(let notation of data.recordProps.staticFields.eventDate.notation) { %>
