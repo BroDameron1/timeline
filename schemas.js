@@ -198,5 +198,5 @@ module.exports.eventSchema = Joi.object({
         .max(500)
         .label('Admin Notes')
         .messages(customStringErrors),
-})
+}).unknown()
 

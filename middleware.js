@@ -1,8 +1,9 @@
 const User = require('./models/user');
 const ExpressError = require('./utils/expressError')
-const { userSchema, sourceSchema } = require('./schemas');
+const { userSchema, sourceSchema, eventSchema } = require('./schemas');
 const mongoose = require('mongoose');
 const ObjectID = require('mongoose').Types.ObjectId;
+const { required } = require('joi');
 
 //TODO: Should I check if something is checkedOut (true) before making put/post requests
 
@@ -36,7 +37,7 @@ const validateUser = (req, res, next) => {
 }
 
 const cleanSubmission = (req, res, next) => {
-
+    console.log(req.baseUrl, 'is it here')
     //checks the req.body object for any empty fields and changes them to undefined so they don't get stored.
     for (let [key, value] of Object.entries(req.body)) {
         if (req.body[key] === '' || req.body[key] === null) {
@@ -59,13 +60,15 @@ const cleanSubmission = (req, res, next) => {
     }
 
     //valites the now altered req.body against the Joi schema definitions.
-    const { error } = sourceSchema.validate(req.body)
+    //TODO: This is a problem since it only checks against the sourceSchema.  Fix after fixing event body issue
+    const { error } = eventSchema.validate(req.body)
     if (error) {
         const errorMsg = error.details.map(el => el.message).join(',')
         throw new ExpressError(errorMsg, 400)
     } else {
         next();
     }
+    
 }
 
 

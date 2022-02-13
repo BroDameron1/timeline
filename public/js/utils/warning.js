@@ -2,7 +2,7 @@
 
 export const generateWarning = (warningContent, fieldId) => {
     const warningDiv = document.querySelector('#warning') //identifies the div in which the warning will appear.
-
+    console.log(fieldId)
     //uses the fieldId and puts a red border around an incorrect form field
     document.querySelector(`#${fieldId}`).style.border = 'rgb(196, 63, 63) solid 2px' 
 

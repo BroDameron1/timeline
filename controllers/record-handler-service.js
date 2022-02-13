@@ -1,7 +1,7 @@
 const duplicateChecker = require('../utils/duplicateChecker') //pull in duplicatechecker functions
 const { ImageHandler } = require('../utils/cloudinary') //pull in imagehandler class
 const mongoose = require('mongoose');
-const DataObjectParser = require('dataobject-parser')
+
 
 
 class RecordHandler {

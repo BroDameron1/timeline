@@ -14,10 +14,10 @@
     <div class="form">
         <h1>Review Submission</h1>
         <% if (currentUser.role === 'admin' && !data.author[0].equals(currentUser._id) && data.state === 'new') {%>
-            <form action="/events/review/<%= data._id %>" method="POST" id="publishEvent" class="eventForm" data-formtype="publishSubmission" enctype="multipart/form-data">
+            <form action="/events/review/<%= data._id %>" method="POST" id="publishEvent" class="eventForm" data-formtype="publishSubmission" enctype="application/x-www-form-urlencoded">
         <% } %> 
         <% if (currentUser.role === 'admin' && !data.author[0].equals(currentUser._id) && data.state === 'update') {%>
-            <form action="/events/review/<%= data._id %>?_method=PUT" method="POST" id="publishEvent" class="eventForm" data-formtype="publishSubmission" enctype="multipart/form-data">
+            <form action="/events/review/<%= data._id %>?_method=PUT" method="POST" id="publishEvent" class="eventForm" data-formtype="publishSubmission" enctype="application/x-www-form-urlencoded">
         <% } %> 
  
 
