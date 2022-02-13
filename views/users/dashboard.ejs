@@ -23,19 +23,19 @@
             Pending Submissions
         </div>
         <% for(let pendingRequest of viewablePendingRequests) { %>
-            <% if (currentUser._id.equals(pendingRequest.author[0]._id) && (pendingRequest.state === 'new' || pendingRequest.state === 'update')) { %>
+            <% if (currentUser._id.equals(pendingRequest.reviewRecord.author[0]._id) && (pendingRequest.reviewRecord.state === 'new' || pendingRequest.reviewRecord.state === 'update')) { %>
                 <div class="column-entry">
-                    <div class="record-title">Record: <%= pendingRequest.title %></div>
-                    <div class="record-date">Last Update: <%= pendingRequest.updateDate %> </div>
+                    <div class="record-title">Record: <%= pendingRequest.reviewRecord.title %></div>
+                    <div class="record-date">Last Update: <%= pendingRequest.reviewRecord.updateDate %> </div>
                     <div class="record-state">
                         <div class="state-container">
-                            <%= pendingRequest.state.charAt(0).toUpperCase() + pendingRequest.state.slice(1) %> <%= pendingRequest.recordType %> 
+                            <%= pendingRequest.reviewRecord.state.charAt(0).toUpperCase() + pendingRequest.reviewRecord.state.slice(1) %> <%= pendingRequest.reviewRecord.recordType %> 
                         </div>
                     </div>
-                    <% if (!pendingRequest.checkedOut) { %> 
-                    <div class="record-button"><a href="sources/review/<%= pendingRequest._id %>/edit/"><button class="btn-blue">Edit</button></a></div>
+                    <% if (!pendingRequest.reviewRecord.checkedOut) { %> 
+                    <div class="record-button"><a href="sources/review/<%= pendingRequest.reviewRecord._id %>/edit/"><button class="btn-blue">Edit</button></a></div>
                     <div class="record-button">
-                        <form action="/sources/review/<%= pendingRequest._id %>?_method=DELETE" method="POST" class="delete-record">
+                        <form action="/sources/review/<%= pendingRequest.reviewRecord._id %>?_method=DELETE" method="POST" class="delete-record">
                             <button class="btn-red">Delete</button>
                         </form>
                     </div>
@@ -52,18 +52,18 @@
             Reviewed
         </div>
         <% for(let pendingRequest of viewablePendingRequests) { %>
-            <% if (pendingRequest.state === 'approved' || pendingRequest.state === 'rejected') { %>
+            <% if (pendingRequest.state === 'approved' || pendingRequest.reviewRecord.state === 'rejected') { %>
                 <div class="column-entry">
-                    <div class="record-title">Record: <%= pendingRequest.title %></div>
-                    <div class="record-date">Last Update: <%= pendingRequest.updateDate %></div>
+                    <div class="record-title">Record: <%= pendingRequest.reviewRecord.title %></div>
+                    <div class="record-date">Last Update: <%= pendingRequest.reviewRecord.updateDate %></div>
                     <div class="record-state">
                         <div class="state-container">
-                            <%= pendingRequest.state.charAt(0).toUpperCase() + pendingRequest.state.slice(1) %>
+                            <%= pendingRequest.reviewRecord.state.charAt(0).toUpperCase() + pendingRequest.reviewRecord.state.slice(1) %>
                         </div>
                     </div>
                     <div class="record-button"></div>
                     <div class="record-button">
-                        <a href="/sources/review/<%= pendingRequest._id %>/view/"><button class="btn-blue">View Notes</button></a>
+                        <a href="/sources/review/<%= pendingRequest.reviewRecord._id %>/view/"><button class="btn-blue">View Notes</button></a>
                     </div>
                 </div>
             <% } %>
@@ -75,18 +75,18 @@
                 To Be Reviewed
             </div>
             <% for(let pendingRequest of viewablePendingRequests) { %>
-                <% if (currentUser.role === 'admin' && !currentUser._id.equals(pendingRequest.author[0]._id)) { %>
+                <% if (currentUser.role === 'admin' && !currentUser._id.equals(pendingRequest.reviewRecord.author[0]._id)) { %>
                     <div class="column-entry">
-                        <div class="record-title">Record: <%= pendingRequest.title %></div>
-                        <div class="record-date">Last Update: <%= pendingRequest.updateDate %></div>
+                        <div class="record-title">Record: <%= pendingRequest.reviewRecord.title %></div>
+                        <div class="record-date">Last Update: <%= pendingRequest.reviewRecord.updateDate %></div>
                         <div class="record-state">
                             <div class="state-container">
-                                <%= pendingRequest.state.charAt(0).toUpperCase() + pendingRequest.state.slice(1) %> <%= pendingRequest.recordType %> 
+                                <%= pendingRequest.reviewRecord.state.charAt(0).toUpperCase() + pendingRequest.reviewRecord.state.slice(1) %> <%= pendingRequest.reviewRecord.recordType %> 
                             </div>
                         </div>
                         <div></div>
-                        <% if (!pendingRequest.checkedOut) { %> 
-                        <div class="record-button"><a href="/sources/review/<%= pendingRequest._id %>"><button class="btn-blue">Review</button></a></div>
+                        <% if (!pendingRequest.reviewRecord.checkedOut) { %> 
+                        <div class="record-button"><a href="/sources/review/<%= pendingRequest.reviewRecord._id %>"><button class="btn-blue">Review</button></a></div>
                         <% } else { %> 
                         <div class="record-button"><button class="btn-disabled">Locked</button></div>
                         <% } %> 

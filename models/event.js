@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { createSlug, imageDelete, formDate, updateDate, displayImage } = require('./middleware.js')
+const { createSlug, imageDelete, formDate, updateDate, displayImage, createReviewMaster } = require('./middleware.js')
 
 Schema.Types.String.set('trim', true); //sets all strings to trim()
 
@@ -8,6 +8,12 @@ const eventSchema = new Schema({
     title: {
         type: String,
         required: true
+    },
+    recordType: {
+        type: String,
+        default: 'Event',
+        required: true,
+        immutable: true
     },
     slug: {
         type: String
@@ -78,6 +84,9 @@ eventSchema.virtual('updateDate').get(updateDate)
 
 //middleware that creates and adds the slug to the document before saving.
 eventSchema.pre('save', createSlug)
+
+//creates a master review record
+eventSchema.pre('save', createReviewMaster)
 
 //middleware that removes any unnecessary images if a document is deleted
 eventSchema.post('remove', {document: true, query: false}, imageDelete)

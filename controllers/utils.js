@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const duplicateChecker = require('../utils/duplicateChecker')
 
+
 //this controller contains various endpoints for random pieces of functionality.
 
 //controller that accepts duplicatecheck data from the frontend to validate and send back.
@@ -42,22 +43,16 @@ module.exports.autocomplete = async (req, res) => {
 //controller that allowss for updating a review record that has been rejected by an admin
 module.exports.rejectPublish = async (req, res) => {
     const { recordId, collection, adminNotes, state } = req.body //pull the needed data from the request body
-    console.log('did i make it')
     const reviewData = await mongoose.model(collection).findById(recordId) //find the record from the appropriate collection and ID
     Object.assign(reviewData, {adminNotes, state}) //update the record object adminnotes and state
-    console.log(reviewData, 'reviewData')
-    await reviewData.save()
-    // return res.json(reviewData)
+    await reviewData.save()  //TODO: make this a FindOneAndUpdate maybe so it doesn't trigger save middleware in the mongoose model
     return res.status(200).end()
 }
 
 //controller that allows for updating the checkedOut field between true/false
 module.exports.stateManager = async (req, res) => {
     const stateParams = JSON.parse(req.body) //parse the JSON string TODO: Why do I have to do this here and not in the duplicate check controller
-    const recordToToggle = await mongoose.model(stateParams.collection).findById(stateParams.recordId) //finds the record to update
-    recordToToggle.checkedOut = stateParams.checkedOut //updates that record with the new boolean value
-    recordToToggle.save()
-
+    await mongoose.model(stateParams.collection).findOneAndUpdate({ _id: stateParams.recordId}, { checkedOut: stateParams.checkedOut })
 }
 
 //controller for retrieving record properties that can be passed back in for other requests (like duplicatechecking)

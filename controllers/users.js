@@ -6,6 +6,8 @@ const sendMail = require('../utils/sendMail');
 const tokenHandling = require('../utils/tokenHandling');
 const ExpressError = require('../utils/expressError');
 const Source = require('../models/source');
+const ReviewMaster = require('../models/review');
+const Event = require('../models/event')
 const { filterPendingRequests } = require('../utils/permissions');
 
 module.exports.renderRegister = (req, res) => {
@@ -122,9 +124,14 @@ module.exports.forgotReset = async (req, res, next) => {
     })
 }
 
-module.exports.renderDashboard = async (req, res) => {
-    const allPendingRequests = await Source.reviewSource.find().populate('author', 'username')
+module.exports.renderDashboard = async (req, res) => { //TODO: Fix this to be a better query or aggregate from the DB
+    // const allPendingRequests = await Source.reviewSource.find().populate('author', 'username')
+    // allPendingRequests.push(await Event.reviewEvent.findOne().populate('author', 'username'))
+    // console.log(allPendingRequests, 'pending')
+    const allPendingRequests = await ReviewMaster.find().populate({path: 'reviewRecord', populate: { path: 'author'}})
     const viewablePendingRequests = filterPendingRequests(req.user, allPendingRequests);
+
+//     const viewablePendingRequests = filterPendingRequests(req.user, allPendingRequests);
     res.render('users/dashboard', { viewablePendingRequests })
 }
 

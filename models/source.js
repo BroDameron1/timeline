@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { createSlug, imageDelete, formDate, updateDate, displayImage } = require('./middleware.js')
+
+const { createSlug, imageDelete, formDate, updateDate, displayImage, createReviewMaster } = require('./middleware.js')
 
 Schema.Types.String.set('trim', true); //sets all strings to trim()
 
@@ -9,7 +10,7 @@ const sourceSchema = new Schema({
         type: String,
         required: true
     },
-    recordType: { //currently not used any where but may be useful in the future
+    recordType: { //TODO: Find out where used
         type: String,
         default: 'Source',
         required: true,
@@ -137,11 +138,16 @@ sourceSchema.virtual('displayImage').get(displayImage)
 //virtual property that uses the timestamp field to construct a readable update date
 sourceSchema.virtual('updateDate').get(updateDate)
 
+//creates a master review record
+sourceSchema.pre('save', createReviewMaster)
+
 //middleware that creates and adds the slug to the document before saving.
 sourceSchema.pre('save', createSlug)
 
 //middleware that removes any unnecessary images if a document is deleted TODO: search multiple collections at once
 sourceSchema.post('remove', {document: true, query: false}, imageDelete)
+
+
 
 const reviewSource = mongoose.model('ReviewSource', sourceSchema);
 const publicSource = mongoose.model('PublicSource', sourceSchema);

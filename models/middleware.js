@@ -1,14 +1,25 @@
 const slugify = require('slugify'); //pull in slugify library to help create URL slugs
 const mongoose = require('mongoose');
+const ReviewMaster = require('../models/review')
 const { cloudinary } = require('../utils/cloudinary');
 
 
 function createSlug(next) {
-    this.slug = slugify(this.title + '_' + this.mediaType, {
+    this.slug = slugify(this.title + '_' + this.mediaType, { //TODO: Needs to be fixed for events and shit
         replacement: '_',
         lower: true,
         strict: true
     })
+    next()
+}
+
+async function createReviewMaster(next) {
+    if (this.isNew && (this.state === 'new' || this.state === 'update')) {
+        const reviewData = new ReviewMaster()
+        reviewData.reviewRecord = this._id
+        reviewData.onModel = this.recordProps.review
+        await reviewData.save()
+    }
     next()
 }
 
@@ -44,5 +55,6 @@ module.exports = {
     imageDelete,
     formDate,
     updateDate,
-    displayImage
+    displayImage,
+    createReviewMaster
 }

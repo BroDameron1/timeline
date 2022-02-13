@@ -61,14 +61,14 @@ const cleanSubmission = (req, res, next) => {
 
     //valites the now altered req.body against the Joi schema definitions.
     //TODO: This is a problem since it only checks against the sourceSchema.  Fix after fixing event body issue
-    const { error } = eventSchema.validate(req.body)
-    if (error) {
-        const errorMsg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(errorMsg, 400)
-    } else {
-        next();
-    }
-    
+    // const { error } = sourceSchema.validate(req.body)
+    // if (error) {
+    //     const errorMsg = error.details.map(el => el.message).join(',')
+    //     throw new ExpressError(errorMsg, 400)
+    // } else {
+    //     next();
+    // }
+    next()
 }
 
 

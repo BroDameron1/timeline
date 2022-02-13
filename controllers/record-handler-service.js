@@ -1,6 +1,7 @@
 const duplicateChecker = require('../utils/duplicateChecker') //pull in duplicatechecker functions
 const { ImageHandler } = require('../utils/cloudinary') //pull in imagehandler class
 const mongoose = require('mongoose');
+const ReviewMaster = require('../models/review');
 
 
 
@@ -19,7 +20,7 @@ class RecordHandler {
         let data
         if (slug) { //if there is a slug, query by that to find the record and provide the author and last approver usernames.
             data = await mongoose.model(this.recordProps.public).findOne({ slug })
-                .populate('author', 'username')
+                .populate('author', 'username') //TODO: What is username here?!
                 .populate('lastApprover', 'username')
         } else { //if there is a recordId, query by that and find the record and provide the author and last approver usernames.
             data = await mongoose.model(this.recordProps.review).findById(recordId)
@@ -123,6 +124,9 @@ class RecordHandler {
             publicData.checkedOut = false //sets the checkout flag to false on the public record
             publicData.save()
         }
+
+        await ReviewMaster.findOneAndRemove({ reviewRecord: reviewData._id }) //this line deletes the master review record used for rendering the dashboard.
+
         this.req.flash('info', 'Your submission was successfully deleted.')
         this.res.redirect(this.redirectUrl)
     }
