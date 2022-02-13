@@ -1,6 +1,7 @@
 const duplicateChecker = require('../utils/duplicateChecker') //pull in duplicatechecker functions
 const { ImageHandler } = require('../utils/cloudinary') //pull in imagehandler class
 const mongoose = require('mongoose');
+const DataObjectParser = require('dataobject-parser')
 
 
 class RecordHandler {
@@ -108,11 +109,6 @@ class RecordHandler {
     //method that allows an admin to delete a public record
     async deletePublicRecord() {
         const publicData = await this.dataLookup() //lookup the public record requested
-        if (publicData.images.path) { //check if there is an image
-            const image = new ImageHandler(publicData.images, publicData, this.recordProps) //if so, instantiate a new instance of the imagehandler class and send in the appropriate data
-            // await image.deletePublicImage() //use the deletepublicimage method to delete the image
-        }
-        // await publicData.delete() //delete the record
         await publicData.remove() //delete the record
         this.res.redirect(this.redirectUrl) //redirect user to default url
     }
@@ -120,7 +116,6 @@ class RecordHandler {
     //method that allows a user to delete a record in thier review queue
     async deleteReviewRecord() {
         const reviewData = await this.dataLookup() //lookup the review record data
-        const image = new ImageHandler(reviewData.images, reviewData, this.recordProps) //instantiates a new instance of the imagehandler class with the image data from the review record
         await reviewData.remove()        
 
         if (reviewData.publicId) { //checks to see if the review record is related to existing public record
@@ -156,13 +151,49 @@ class RecordHandler {
 
     //method to render any EJS template
     async renderPage(data, staticFields) { //parameters accepted are the data needing to be rendered (either review or public) and any static fields that pull their values from the database model
-        const staticFieldOptions = new Object() //creates a new object to store static values
-        if (staticFields) { //checks if there are static values
-            for (let field of staticFields) { //if so, loops through each field that can be a static value and collects them into the object.
-                staticFieldOptions[field] = await mongoose.model(this.recordProps.review).schema.path(field).enumValues  //Each key is the field name with an an associated array of options pulled from database model
-            }
-        }
-        return this.res.render(this.template, { data, staticFieldOptions }) //renders the page with the data and the options for their static fields
+        console.log(staticFields, 'here')
+        // const staticFieldOptions = new Object() //creates a new object to store static values
+ 
+        // if (staticFields) { //checks if there are static values
+        //     for (let field of staticFields) { //if so, loops through each field that can be a static value and collects them into the object.
+                
+        //         staticFieldOptions[field] = await mongoose.model(this.recordProps.review).schema.path(field).enumValues  //Each key is the field name with an an associated array of options pulled from database model
+        //     }
+        // }
+
+        // //this works
+        // function deepen(obj) {
+        //     const result = {};
+          
+        //     // For each object path (property key) in the object
+        //     for (const objectPath in obj) {
+        //       // Split path into component parts
+        //       const parts = objectPath.split('.');
+          
+        //       // Create sub-objects along path as needed
+        //       let target = result;
+        //       while (parts.length > 1) {
+        //         const part = parts.shift();
+        //         target = target[part] = target[part] || {};
+        //       }
+          
+        //       // Set value at end of path
+        //       target[parts[0]] = obj[objectPath]
+        //     }
+          
+        //     return result;
+        //   }
+
+        // //   console.log(deepen(staticFieldOptions), 'test')
+
+        //   const staticFieldOptions2 = deepen(staticFieldOptions)
+        //   console.log(staticFieldOptions2, 'test')
+        // const staticFieldOptions2 = DataObjectParser.transpose(staticFieldOptions)
+        // console.log(staticFieldOptions2, 'here2')
+        console.log(data.recordProps, 'data')
+        return this.res.render(this.template, {data, staticFields})
+        //TODO: Replicate this for sources!
+        // return this.res.render(this.template, { data, staticFieldOptions2 }) //renders the page with the data and the options for their static fields
     }
 
     //method that updates the author of a public record

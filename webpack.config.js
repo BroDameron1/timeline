@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
     mode: 'development',
     entry: {
-        main: path.resolve(__dirname, 'public/js/manageSources.js')
+        source: path.resolve(__dirname, 'public/js/manageSources.js')
     },
     output: {
         path: path.resolve(__dirname, 'public/dist'),

@@ -43,6 +43,8 @@ const eventSchema = new Schema({
         },
         notation: {
             type: String,
+            required: true,
+            enum: ['BBY', 'BBY/ABY', 'ABY']
         }
     }
 },
@@ -56,7 +58,13 @@ eventSchema.virtual('recordProps').get(function() {
         },
         review: 'ReviewEvent',
         public: 'PublicEvent',
-        staticFields: [],
+        // staticFields: ['eventDate.notation'],
+        staticFields:
+            {
+                eventDate: {
+                    notation: mongoose.model('ReviewEvent').schema.path('eventDate.notation').enumValues
+                }
+            },
         id: this._id
     }
     return recordProps
