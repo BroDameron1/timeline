@@ -71,7 +71,8 @@ eventSchema.virtual('recordProps').get(function() {
                     notation: mongoose.model('ReviewEvent').schema.path('eventDate.notation').enumValues
                 }
             },
-        id: this._id
+        id: this._id,
+        reviewUrl: `/events/review/${this._id}`
     }
     return recordProps
 })

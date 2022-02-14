@@ -5,7 +5,7 @@ const { cloudinary } = require('../utils/cloudinary');
 
 
 function createSlug(next) {
-    this.slug = slugify(this.title + '_' + this.mediaType, { //TODO: Needs to be fixed for events and shit
+    this.slug = slugify(this.title + '_' + (this.mediaType ? this.mediaType : '') + '_' + this.recordType, {
         replacement: '_',
         lower: true,
         strict: true
@@ -23,8 +23,8 @@ async function createReviewMaster(next) {
     next()
 }
 
-async function imageDelete(doc, next) {
-    if (doc.images.filename) {
+async function imageDelete(doc, next) {  
+    if (doc.images) { //TODO: Changed this from doc.images.filename to doc.images.  Check if works still
         const publicData = await mongoose.model(this.recordProps.public).findOne({'images.filename': this.images.filename })
         const reviewData = await mongoose.model(this.recordProps.review).findOne({'images.filename': this.images.filename })
         if (!publicData && !reviewData) {

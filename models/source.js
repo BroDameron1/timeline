@@ -127,7 +127,8 @@ sourceSchema.virtual('recordProps').get(function() {
         staticFields: {
             mediaType: mongoose.model('ReviewSource').schema.path('mediaType').enumValues
         },
-        id: this._id
+        id: this._id,
+        reviewUrl: `/sources/review/${this._id}`
     }
     return recordProps
 })

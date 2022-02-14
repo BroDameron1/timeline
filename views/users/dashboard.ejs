@@ -33,9 +33,9 @@
                         </div>
                     </div>
                     <% if (!pendingRequest.reviewRecord.checkedOut) { %> 
-                    <div class="record-button"><a href="sources/review/<%= pendingRequest.reviewRecord._id %>/edit/"><button class="btn-blue">Edit</button></a></div>
+                    <div class="record-button"><a href="<%= pendingRequest.reviewRecord.recordProps.reviewUrl %>/edit/"><button class="btn-blue">Edit</button></a></div>
                     <div class="record-button">
-                        <form action="/sources/review/<%= pendingRequest.reviewRecord._id %>?_method=DELETE" method="POST" class="delete-record">
+                        <form action="<%= pendingRequest.reviewRecord.recordProps.reviewUrl %>?_method=DELETE" method="POST" class="delete-record">
                             <button class="btn-red">Delete</button>
                         </form>
                     </div>
@@ -63,7 +63,7 @@
                     </div>
                     <div class="record-button"></div>
                     <div class="record-button">
-                        <a href="/sources/review/<%= pendingRequest.reviewRecord._id %>/view/"><button class="btn-blue">View Notes</button></a>
+                        <a href="<%= pendingRequest.reviewRecord.recordProps.reviewUrl %>/view/"><button class="btn-blue">View Notes</button></a>
                     </div>
                 </div>
             <% } %>
@@ -86,7 +86,7 @@
                         </div>
                         <div></div>
                         <% if (!pendingRequest.reviewRecord.checkedOut) { %> 
-                        <div class="record-button"><a href="/sources/review/<%= pendingRequest.reviewRecord._id %>"><button class="btn-blue">Review</button></a></div>
+                        <div class="record-button"><a href="<%= pendingRequest.reviewRecord.recordProps.reviewUrl %>"><button class="btn-blue">Review</button></a></div>
                         <% } else { %> 
                         <div class="record-button"><button class="btn-disabled">Locked</button></div>
                         <% } %> 

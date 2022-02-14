@@ -143,7 +143,7 @@ class RecordHandler {
         reviewData.author.unshift(this.req.user._id)
         reviewData.state = 'new' //sets new review record status
         await reviewData.save()
-        this.req.flash('info', 'Your new Source has been submitted for approval.')
+        this.req.flash('info', `Your new ${reviewData.recordType} has been submitted for approval.`)
         return this.res.redirect(this.redirectUrl);
     }
 
