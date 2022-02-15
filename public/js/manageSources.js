@@ -170,7 +170,6 @@ formProperties.formData.addEventListener('submit', async event => {
     const adminNote = adminNoteCheck()
     const formFail = formValidation(formProperties.formData, formProperties.schema)
 
-    //
     const submittedRecord = new Duplicate(formProperties.lockLocation, recordId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
 

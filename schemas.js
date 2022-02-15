@@ -198,5 +198,20 @@ module.exports.eventSchema = Joi.object({
         .max(500)
         .label('Admin Notes')
         .messages(customStringErrors),
-}).unknown()
+    eventDate: Joi.object({
+        year: Joi.number()
+            .label('Year')
+            .required()
+            .integer()
+            .min(-10)
+            .max(10),
+        notation: Joi.string()
+            .required()
+            .valid('BBY', 'BBY/ABY', 'ABY')
+            .escapeHTML()
+            .messages({
+                'any.only': 'Please choose a Notation.'
+        }),
+    })
+})
 

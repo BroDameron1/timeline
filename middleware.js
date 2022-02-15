@@ -37,7 +37,6 @@ const validateUser = (req, res, next) => {
 }
 
 const cleanSubmission = (req, res, next) => {
-    console.log(req.baseUrl, 'is it here')
     //checks the req.body object for any empty fields and changes them to undefined so they don't get stored.
     for (let [key, value] of Object.entries(req.body)) {
         if (req.body[key] === '' || req.body[key] === null) {
@@ -58,7 +57,6 @@ const cleanSubmission = (req, res, next) => {
             }
         }
     }
-
     //valites the now altered req.body against the Joi schema definitions.
     //TODO: This is a problem since it only checks against the sourceSchema.  Fix after fixing event body issue
     // const { error } = sourceSchema.validate(req.body)
@@ -70,7 +68,6 @@ const cleanSubmission = (req, res, next) => {
     // }
     next()
 }
-
 
 const notLoggedIn = (req, res, next) => {
     if(req.user) {

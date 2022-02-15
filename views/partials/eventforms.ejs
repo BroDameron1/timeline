@@ -5,20 +5,20 @@
 
 <div class="form-field">
     <label for="eventDate">Year</label>
-    <input type="number" id="eventDate" name="eventDate[year]" value="<%= data.eventDate.year %>" min="-10" max="10">
+    <input type="number" id="eventDate-year" name="eventDate[year]" value="<%= data.eventDate.year %>" min="-10" max="10">
 </div>
 
 <div class="form-field">
     <label for="eventNotation">Year Notation</label>
     <% if (!data.eventDate.notation) { %>
-        <select name="eventDate[notation]" id="eventNotation">
+        <select name="eventDate[notation]" id="eventDate-notation">
             <option value="default">----Select a Notation----</option>
             <% for(let notation of data.recordProps.staticFields.eventDate.notation) { %>
                 <option value="<%= notation %>"><%= notation %></option>
             <% } %> 
         </select>
     <% } else { %> 
-        <select name="eventDate[notation]" id="eventNotation">
+        <select name="eventDate[notation]" id="eventDate-notation">
             <% for(let notation of data.recordProps.staticFields.eventDate.notation) { %>
                 <option value="<%= notation %>" <%= data.eventDate.notation === notation ? 'selected': ''%>><%= notation %></option>
             <% } %>

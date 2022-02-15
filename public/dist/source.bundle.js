@@ -10428,6 +10428,7 @@ const formValidation = (formData, schema) => {
     const { error } = schema.validate(serializedData, { abortEarly: false })
     if (error) {
         for (let errorDetails of error.details) {
+            console.log(errorDetails)
             let invalidFieldName = errorDetails.path
             if (invalidFieldName.length === 2) {
                 invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`
@@ -10971,7 +10972,22 @@ module.exports.eventSchema = Joi.object({
         .max(500)
         .label('Admin Notes')
         .messages(customStringErrors),
-}).unknown()
+    eventDate: Joi.object({
+        year: Joi.number()
+            .label('Year')
+            .required()
+            .integer()
+            .min(-10)
+            .max(10),
+        notation: Joi.string()
+            .required()
+            .valid('BBY', 'BBY/ABY', 'ABY')
+            .escapeHTML()
+            .messages({
+                'any.only': 'Please choose a Notation.'
+        }),
+    })
+})
 
 
 
@@ -11381,7 +11397,6 @@ formProperties.formData.addEventListener('submit', async event => {
     const adminNote = (0,_utils_rejectPublish_js__WEBPACK_IMPORTED_MODULE_5__.adminNoteCheck)()
     const formFail = (0,_utils_formValidation_js__WEBPACK_IMPORTED_MODULE_4__.formValidation)(formProperties.formData, formProperties.schema)
 
-    //
     const submittedRecord = new _utils_duplicateChecker__WEBPACK_IMPORTED_MODULE_2__.Duplicate(formProperties.lockLocation, recordId, formProperties.duplicateCheck)
     const duplicateResult = await submittedRecord.validateDuplicates()
 

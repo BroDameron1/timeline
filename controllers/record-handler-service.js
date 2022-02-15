@@ -1,7 +1,9 @@
 const duplicateChecker = require('../utils/duplicateChecker') //pull in duplicatechecker functions
 const { ImageHandler } = require('../utils/cloudinary') //pull in imagehandler class
 const mongoose = require('mongoose');
-const ReviewMaster = require('../models/review');
+const ReviewMaster = require('../models/review'); //model that holds references to all review records
+const { sourceSchema, eventSchema } = require('../schemas');
+const ExpressError = require('../utils/expressError')
 
 
 
@@ -30,8 +32,28 @@ class RecordHandler {
         return data
     }
 
+    //method that allows a new record to be published to the review queue
+    async createNewRecord() {
+        const { error } = this.validateBody(this.recordProps.review)
+        if (error) return this.validationError(error)
+        const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new review record object with the data from the request body
+        const duplicateCheck = await duplicateChecker.submitNew(reviewData.recordProps) //runs the data through submitnew duplicate checker
+        if (duplicateCheck) return this.duplicateError() //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
+        if(this.req.file) { //checks if there is an image uploaded
+            const image = new ImageHandler(this.req.file, reviewData, this.recordProps) //if so, instantiates a new instance of the imagehandler class with the new file
+            image.newReviewImage() //runs the newreviewimage method to add the file information to the new review record
+        }
+        reviewData.author.unshift(this.req.user._id)
+        reviewData.state = 'new' //sets new review record status
+        await reviewData.save()
+        this.req.flash('info', `Your new ${reviewData.recordType} has been submitted for approval.`)
+        return this.res.redirect(this.redirectUrl);
+    }
+
     //method for publishing a record from the review queue to the public queue
     async publishReviewRecord() {
+        const { error } = this.validateBody(this.recordProps.review)
+        if (error) return this.validationError(error)
         const { recordId } = this.req.params
         let reviewData = await this.dataLookup()
         let publicData = await mongoose.model(this.recordProps.public).findById(reviewData.publicId) //queries to see if there is a public record already associated with the review record (in the case of an updated record rather than a new one)
@@ -68,6 +90,8 @@ class RecordHandler {
 
     //method that updates a review record if a user makes changes after intial submission
     async editReviewRecord() {
+        const { error } = this.validateBody(this.recordProps.review)
+        if (error) return this.validationError(error)
         const reviewData = await this.dataLookup() //lookup the review record
         reviewData.set({ ...this.req.body }) //sets all the properties in the review record to match the request body
         if (this.req.file) { //checks if a new image was uploaded during this edit
@@ -84,6 +108,8 @@ class RecordHandler {
 
     //method that creates a review record if someone submits an update to a public record
     async editPublicRecord() {
+        const { error } = this.validateBody(this.recordProps.review)
+        if (error) return this.validationError(error)
         const publicData = await this.dataLookup() //look up the current public record
         const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new object for the review queue based on the request body.
         const duplicateCheck = await duplicateChecker.editPublic(reviewData.recordProps, publicData._id) //sends data to the editpublic duplicate checker
@@ -131,28 +157,6 @@ class RecordHandler {
         this.res.redirect(this.redirectUrl)
     }
 
-    //method that allows a new record to be published to the review queue
-    async createNewRecord() {
-        const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new review record object with the data from the request body
-        const duplicateCheck = await duplicateChecker.submitNew(reviewData.recordProps) //runs the data through submitnew duplicate checker
-        if (duplicateCheck) return this.duplicateError() //if there is a duplicate record, error out the submission.  This is redundant of the front end functionality just in case.
-        if(this.req.file) { //checks if there is an image uploaded
-            const image = new ImageHandler(this.req.file, reviewData, this.recordProps) //if so, instantiates a new instance of the imagehandler class with the new file
-            image.newReviewImage() //runs the newreviewimage method to add the file information to the new review record
-        }
-        reviewData.author.unshift(this.req.user._id)
-        reviewData.state = 'new' //sets new review record status
-        await reviewData.save()
-        this.req.flash('info', `Your new ${reviewData.recordType} has been submitted for approval.`)
-        return this.res.redirect(this.redirectUrl);
-    }
-
-    //can be called to create an error when there is a duplicate record (not for submitting changes to a public record since there is a different redirect)
-    duplicateError() {
-        this.req.flash('error', 'This record already exists.')
-        this.res.redirect(this.redirectUrl)
-    }
-
     //method to render any EJS template
     async renderPage(data, staticFields) { //parameters accepted are the data needing to be rendered (either review or public) and any static fields that pull their values from the database model
         console.log(staticFields, 'here')
@@ -194,9 +198,7 @@ class RecordHandler {
         //   console.log(staticFieldOptions2, 'test')
         // const staticFieldOptions2 = DataObjectParser.transpose(staticFieldOptions)
         // console.log(staticFieldOptions2, 'here2')
-        console.log(data.mediaType, 'data')
         return this.res.render(this.template, {data, staticFields})
-        //TODO: Replicate this for sources!
         // return this.res.render(this.template, { data, staticFieldOptions2 }) //renders the page with the data and the options for their static fields
     }
 
@@ -207,6 +209,26 @@ class RecordHandler {
         if (data.author.length > 5) { //if the array length is greater than 5, cuts it down to 5, removing the oldest contributors
             data.author.splice(5)
         }
+    }
+
+    validateBody(recordType) {
+        switch (recordType) {
+            case 'ReviewSource':
+                return sourceSchema.validate(this.req.body)
+            case 'ReviewEvent':
+                return eventSchema.validate(this.req.body)
+        }
+    }
+
+    //can be called to create an error when there is a duplicate record (not for submitting changes to a public record since there is a different redirect)
+    duplicateError() {
+        this.req.flash('error', 'This record already exists.')
+        this.res.redirect(this.redirectUrl)
+    }
+
+    validationError(error) {
+        const errorMsg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(errorMsg, 400)
     }
 }
 

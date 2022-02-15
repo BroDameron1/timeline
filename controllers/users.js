@@ -128,6 +128,7 @@ module.exports.renderDashboard = async (req, res) => { //TODO: Fix this to be a 
     // const allPendingRequests = await Source.reviewSource.find().populate('author', 'username')
     // allPendingRequests.push(await Event.reviewEvent.findOne().populate('author', 'username'))
     // console.log(allPendingRequests, 'pending')
+    // const allPendingRequests = await ReviewMaster.find().populate({path: 'reviewRecord', populate: { path: 'author'}})
     const allPendingRequests = await ReviewMaster.find().populate({path: 'reviewRecord', populate: { path: 'author'}})
     const viewablePendingRequests = filterPendingRequests(req.user, allPendingRequests);
 

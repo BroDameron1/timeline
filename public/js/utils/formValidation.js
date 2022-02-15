@@ -10,6 +10,7 @@ export const formValidation = (formData, schema) => {
     const { error } = schema.validate(serializedData, { abortEarly: false })
     if (error) {
         for (let errorDetails of error.details) {
+            console.log(errorDetails)
             let invalidFieldName = errorDetails.path
             if (invalidFieldName.length === 2) {
                 invalidFieldName = `${invalidFieldName[0]}-${invalidFieldName[1]}`

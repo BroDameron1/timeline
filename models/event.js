@@ -64,15 +64,14 @@ eventSchema.virtual('recordProps').get(function() {
         },
         review: 'ReviewEvent',
         public: 'PublicEvent',
-        // staticFields: ['eventDate.notation'],
+        id: this._id,
+        reviewUrl: `/events/review/${this._id}`,
         staticFields:
             {
                 eventDate: {
                     notation: mongoose.model('ReviewEvent').schema.path('eventDate.notation').enumValues
                 }
-            },
-        id: this._id,
-        reviewUrl: `/events/review/${this._id}`
+            }
     }
     return recordProps
 })
