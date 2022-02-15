@@ -34,6 +34,7 @@ class RecordHandler {
 
     //method that allows a new record to be published to the review queue
     async createNewRecord() {
+        console.log(this.req.body)
         const { error } = this.validateBody(this.recordProps.review)
         if (error) return this.validationError(error)
         const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new review record object with the data from the request body

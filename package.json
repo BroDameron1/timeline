@@ -21,7 +21,7 @@
     "express": "^4.17.1",
     "express-mongo-sanitize": "^2.1.0",
     "express-session": "^1.17.2",
-    "form-serialize-improved": "^0.8.9",
+    "form-serialize": "^0.7.2",
     "helmet": "^4.6.0",
     "joi": "^17.4.1",
     "method-override": "^3.0.0",

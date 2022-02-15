@@ -2664,10 +2664,10 @@ Object.defineProperty(exports, "decodeXMLStrict", ({ enumerable: true, get: func
 
 /***/ }),
 
-/***/ "./node_modules/form-serialize-improved/index.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/form-serialize-improved/index.js ***!
-  \*******************************************************/
+/***/ "./node_modules/form-serialize/index.js":
+/*!**********************************************!*\
+  !*** ./node_modules/form-serialize/index.js ***!
+  \**********************************************/
 /***/ ((module) => {
 
 // get successful control from form and assemble into object
@@ -2675,13 +2675,13 @@ Object.defineProperty(exports, "decodeXMLStrict", ({ enumerable: true, get: func
 
 // types which indicate a submit action and are not successful controls
 // these will be ignored
-const k_r_submitter = /^(?:submit|button|image|reset|file)$/i;
+var k_r_submitter = /^(?:submit|button|image|reset|file)$/i;
 
 // node names which could be successful controls
-const k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
+var k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
 
 // Matches bracket notation.
-const brackets = /(\[[^\[\]]*\])/g;
+var brackets = /(\[[^\[\]]*\])/g;
 
 // serializes form fields
 // @param form MUST be an HTMLForm element
@@ -2694,7 +2694,6 @@ const brackets = /(\[[^\[\]]*\])/g;
 //    hash and url encoded str serializers are provided with this module
 //    - disabled: [true | false]. If true serialize disabled fields.
 //    - empty: [true | false]. If true serialize empty fields
-
 function serialize(form, options) {
     if (typeof options != 'object') {
         options = { hash: !!options };
@@ -2703,15 +2702,16 @@ function serialize(form, options) {
         options.hash = true;
     }
 
-    let result = (options.hash) ? {} : '';
-    const serializer = options.serializer || ((options.hash) ? hash_serializer : str_serialize);
+    var result = (options.hash) ? {} : '';
+    var serializer = options.serializer || ((options.hash) ? hash_serializer : str_serialize);
 
-    const elements = form && form.elements ? form.elements : [];
+    var elements = form && form.elements ? form.elements : [];
 
     //Object store each radio and set if it's empty or not
-    const radio_store = Object.create(null);
+    var radio_store = Object.create(null);
 
-    for (let element of elements) {
+    for (var i=0 ; i<elements.length ; ++i) {
+        var element = elements[i];
 
         // ingore disabled fields
         if ((!options.disabled && element.disabled) || !element.name) {
@@ -2723,212 +2723,213 @@ function serialize(form, options) {
             continue;
         }
 
-        const key = element.name;
-        const type = element.type;
-        let val = element.value;
+        var key = element.name;
+        var val = element.value;
 
-        switch (type) {
-            case 'number':
-                if (val != undefined)
-                    val = Number(val);
-                break;
-            case 'checkbox':
-                if (options.booleans) {
-                    if (element.indeterminate)
-                        val=null;         
-                    else                    
-                    val = element.checked;
-                }
-                else {
-                    if (!element.checked) {
-                        val = '';
-                    }
-                }
-                break;
+        // we can't just use element.value for checkboxes cause some browsers lie to us
+        // they say "on" for value when the box isn't checked
+        if ((element.type === 'checkbox' || element.type === 'radio') && !element.checked) {
+            val = undefined;
+        }
 
-            case 'radio': {
-                if (!radio_store[key] && !element.checked) {
-                    radio_store[key] = false;
-                }
-                else if (element.checked) {
-                    radio_store[key] = true;
-                }
-                if (!element.checked) {
-                    val = undefined;
-                    continue;
-                }
-                break;
+        // If we want empty elements
+        if (options.empty) {
+            // for checkbox
+            if (element.type === 'checkbox' && !element.checked) {
+                val = '';
             }
 
-            case 'select-multiple': {
-                if (!(options.empty || options.booleans) && !val) {
-                    continue;
+            // for radio
+            if (element.type === 'radio') {
+                if (!radio_store[element.name] && !element.checked) {
+                    radio_store[element.name] = false;
                 }
-                val = [];
-                const selectOptions = element.options;
-                let isSelectedOptions = false;
-                for (let option of selectOptions) {
-                    const allowedEmpty = (options.empty || options.booleans) && !option.value;
-                    const hasValue = (option.value || allowedEmpty);
-                    if (option.selected && hasValue) {
-                        isSelectedOptions = true;
+                else if (element.checked) {
+                    radio_store[element.name] = true;
+                }
+            }
 
-                        // If using a hash serializer be sure to add the
-                        // correct notation for an array in the multi-select
-                        // context. Here the name attribute on the select element
-                        // might be missing the trailing bracket pair. Both names
-                        // "foo" and "foo[]" should be arrays.
-                        if (options.hash && key.slice(key.length - 2) !== '[]') {
-                            result = serializer(result, key + '[]', option.value);
-                        }
-                        else {
-                            result = serializer(result, key, option.value);
-                        }
-                    }
-                }
-
-                // Serialize if no selected options and options.empty is true
-                if (!isSelectedOptions && (options.empty || options.booleans)) {
-                    result = serializer(result, key, '');
-                }
+            // if options empty is true, continue only if its radio
+            if (val == undefined && element.type == 'radio') {
                 continue;
             }
         }
-        if (!(options.empty || options.booleans) && !val) {
+        else {
+            // value-less fields are ignored unless options.empty is true
+            if (!val) {
+                continue;
+            }
+        }
+
+        // multi select boxes
+        if (element.type === 'select-multiple') {
+            val = [];
+
+            var selectOptions = element.options;
+            var isSelectedOptions = false;
+            for (var j=0 ; j<selectOptions.length ; ++j) {
+                var option = selectOptions[j];
+                var allowedEmpty = options.empty && !option.value;
+                var hasValue = (option.value || allowedEmpty);
+                if (option.selected && hasValue) {
+                    isSelectedOptions = true;
+
+                    // If using a hash serializer be sure to add the
+                    // correct notation for an array in the multi-select
+                    // context. Here the name attribute on the select element
+                    // might be missing the trailing bracket pair. Both names
+                    // "foo" and "foo[]" should be arrays.
+                    if (options.hash && key.slice(key.length - 2) !== '[]') {
+                        result = serializer(result, key + '[]', option.value);
+                    }
+                    else {
+                        result = serializer(result, key, option.value);
+                    }
+                }
+            }
+
+            // Serialize if no selected options and options.empty is true
+            if (!isSelectedOptions && options.empty) {
+                result = serializer(result, key, '');
+            }
+
             continue;
         }
+
         result = serializer(result, key, val);
     }
 
     // Check for all empty radio buttons and serialize them with key=""
-    if (options.empty || options.booleans) {
-        for (let key in radio_store) {
+    if (options.empty) {
+        for (var key in radio_store) {
             if (!radio_store[key]) {
                 result = serializer(result, key, '');
             }
         }
     }
+
     return result;
+}
 
+function parse_keys(string) {
+    var keys = [];
+    var prefix = /^([^\[\]]*)/;
+    var children = new RegExp(brackets);
+    var match = prefix.exec(string);
 
-    // Object/hash encoding serializer.
-    function hash_serializer(result, key, value) {
-        const matches = key.match(brackets);
+    if (match[1]) {
+        keys.push(match[1]);
+    }
 
-        // Has brackets? Use the recursive assignment function to walk the keys,
-        // construct any missing objects in the result tree and make the assignment
-        // at the end of the chain.
-        if (matches) {
-            const keys = parse_keys(key);
-            hash_assign(result, keys, value);
+    while ((match = children.exec(string)) !== null) {
+        keys.push(match[1]);
+    }
+
+    return keys;
+}
+
+function hash_assign(result, keys, value) {
+    if (keys.length === 0) {
+        result = value;
+        return result;
+    }
+
+    var key = keys.shift();
+    var between = key.match(/^\[(.+?)\]$/);
+
+    if (key === '[]') {
+        result = result || [];
+
+        if (Array.isArray(result)) {
+            result.push(hash_assign(null, keys, value));
         }
         else {
-            // Non bracket notation can make assignments directly.
-            const existing = result[key];
-
-            // If the value has been assigned already (for instance when a radio and
-            // a checkbox have the same name attribute) convert the previous value
-            // into an array before pushing into it.
-            //
-            // NOTE: If this requirement were removed all hash creation and
-            // assignment could go through `hash_assign`.
-            if (existing) {
-                if (!Array.isArray(existing)) {
-                    result[key] = [existing];
-                }
-
-                result[key].push(value);
-            }
-            else {
-                result[key] = value;
-            }
+            // This might be the result of bad name attributes like "[][foo]",
+            // in this case the original `result` object will already be
+            // assigned to an object literal. Rather than coerce the object to
+            // an array, or cause an exception the attribute "_values" is
+            // assigned as an array.
+            result._values = result._values || [];
+            result._values.push(hash_assign(null, keys, value));
         }
+
         return result;
+    }
 
-        function parse_keys(string) {
-            const keys = [];
-            const prefix = /^([^\[\]]*)/;
-            const children = new RegExp(brackets);
-            let match = prefix.exec(string);
+    // Key is an attribute name and can be assigned directly.
+    if (!between) {
+        result[key] = hash_assign(result[key], keys, value);
+    }
+    else {
+        var string = between[1];
+        // +var converts the variable into a number
+        // better than parseInt because it doesn't truncate away trailing
+        // letters and actually fails if whole thing is not a number
+        var index = +string;
 
-            if (match[1]) {
-                keys.push(match[1]);
-            }
-
-            while ((match = children.exec(string)) !== null) {
-                keys.push(match[1]);
-            }
-            return keys;
+        // If the characters between the brackets is not a number it is an
+        // attribute name and can be assigned directly.
+        if (isNaN(index)) {
+            result = result || {};
+            result[string] = hash_assign(result[string], keys, value);
         }
-
-        function hash_assign(result, keys, value) {
-            if (keys.length === 0) {
-                result = value;
-                return result;
-            }
-
-            const key = keys.shift();
-            const between = key.match(/^\[(.+?)\]$/);
-
-            if (key === '[]') {
-                result = result || [];
-
-                if (Array.isArray(result)) {
-                    result.push(hash_assign(null, keys, value));
-                }
-                else {
-                    // This might be the result of bad name attributes like "[][foo]",
-                    // in this case the original `result` object will already be
-                    // assigned to an object literal. Rather than coerce the object to
-                    // an array, or cause an exception the attribute "_values" is
-                    // assigned as an array.
-                    result._values = result._values || [];
-                    result._values.push(hash_assign(null, keys, value));
-                }
-
-                return result;
-            }
-
-            // Key is an attribute name and can be assigned directly.
-            if (!between) {
-                result[key] = hash_assign(result[key], keys, value);
-            }
-            else {
-                const string = between[1];
-                // +var converts the variable into a number
-                // better than parseInt because it doesn't truncate away trailing
-                // letters and actually fails if whole thing is not a number
-                const index = +string;
-
-                // If the characters between the brackets is not a number it is an
-                // attribute name and can be assigned directly.
-                if (isNaN(index)) {
-                    result = result || {};
-                    result[string] = hash_assign(result[string], keys, value);
-                }
-                else {
-                    result = result || [];
-                    result[index] = hash_assign(result[index], keys, value);
-                }
-            }
-            return result;
+        else {
+            result = result || [];
+            result[index] = hash_assign(result[index], keys, value);
         }
     }
 
-    // urlform encoding serializer
-    function str_serialize(result, key, value) {
-        if (typeof value === 'string') {
-            value = value.replace(/(\r)?\n/g, '\r\n');
-            value = encodeURIComponent(value);
-
-            // spaces should be '+' rather than '%20'.
-            value = value.replace(/%20/g, '+');
-        }
-
-        return result + (result ? '&' : '') + encodeURIComponent(key) + '=' + value;
-    }
+    return result;
 }
-module.exports =  serialize;
+
+// Object/hash encoding serializer.
+function hash_serializer(result, key, value) {
+    var matches = key.match(brackets);
+
+    // Has brackets? Use the recursive assignment function to walk the keys,
+    // construct any missing objects in the result tree and make the assignment
+    // at the end of the chain.
+    if (matches) {
+        var keys = parse_keys(key);
+        hash_assign(result, keys, value);
+    }
+    else {
+        // Non bracket notation can make assignments directly.
+        var existing = result[key];
+
+        // If the value has been assigned already (for instance when a radio and
+        // a checkbox have the same name attribute) convert the previous value
+        // into an array before pushing into it.
+        //
+        // NOTE: If this requirement were removed all hash creation and
+        // assignment could go through `hash_assign`.
+        if (existing) {
+            if (!Array.isArray(existing)) {
+                result[key] = [ existing ];
+            }
+
+            result[key].push(value);
+        }
+        else {
+            result[key] = value;
+        }
+    }
+
+    return result;
+}
+
+// urlform encoding serializer
+function str_serialize(result, key, value) {
+    // encode newlines as \r\n cause the html spec says so
+    value = value.replace(/(\r)?\n/g, '\r\n');
+    value = encodeURIComponent(value);
+
+    // spaces should be '+' rather than '%20'.
+    value = value.replace(/%20/g, '+');
+    return result + (result ? '&' : '') + encodeURIComponent(key) + '=' + value;
+}
+
+module.exports = serialize;
 
 
 /***/ }),
@@ -10413,8 +10414,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "formValidation": () => (/* binding */ formValidation)
 /* harmony export */ });
-/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! form-serialize-improved */ "./node_modules/form-serialize-improved/index.js");
-/* harmony import */ var form_serialize_improved__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(form_serialize_improved__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var form_serialize__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! form-serialize */ "./node_modules/form-serialize/index.js");
+/* harmony import */ var form_serialize__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(form_serialize__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./warning */ "./public/js/utils/warning.js");
 //validates the form entry for record submission against the same backend Joi validations
 
@@ -10422,9 +10423,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 const formValidation = (formData, schema) => {
-    const serializedData = form_serialize_improved__WEBPACK_IMPORTED_MODULE_0___default()(formData, {hash: true })
+    const serializedData = form_serialize__WEBPACK_IMPORTED_MODULE_0___default()(formData, {hash: true})
+    console.log(serializedData)
     const { error } = schema.validate(serializedData, { abortEarly: false })
     if (error) {
         for (let errorDetails of error.details) {
@@ -10975,10 +10976,8 @@ module.exports.eventSchema = Joi.object({
     eventDate: Joi.object({
         year: Joi.number()
             .label('Year')
-            .required()
-            .integer()
-            .min(-10)
-            .max(10),
+            .allow(0)
+            .required(),
         notation: Joi.string()
             .required()
             .valid('BBY', 'BBY/ABY', 'ABY')

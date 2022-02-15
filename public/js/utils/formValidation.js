@@ -1,12 +1,12 @@
 //validates the form entry for record submission against the same backend Joi validations
-
-import serialize from 'form-serialize-improved'
+import serialize from 'form-serialize'
 import { generateWarning } from './warning'
 
 
 
 export const formValidation = (formData, schema) => {
-    const serializedData = serialize(formData, {hash: true })
+    const serializedData = serialize(formData, {hash: true})
+    console.log(serializedData)
     const { error } = schema.validate(serializedData, { abortEarly: false })
     if (error) {
         for (let errorDetails of error.details) {

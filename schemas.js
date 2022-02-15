@@ -201,10 +201,8 @@ module.exports.eventSchema = Joi.object({
     eventDate: Joi.object({
         year: Joi.number()
             .label('Year')
-            .required()
-            .integer()
-            .min(-10)
-            .max(10),
+            .allow(0)
+            .required(),
         notation: Joi.string()
             .required()
             .valid('BBY', 'BBY/ABY', 'ABY')
