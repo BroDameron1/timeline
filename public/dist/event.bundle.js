@@ -11296,7 +11296,7 @@ formProperties.formData.addEventListener('submit', async event => {
         (0,_utils_leavePrompt__WEBPACK_IMPORTED_MODULE_7__.suppressLeavePrompt)()
         return formProperties.formData.submit()
     }
-    event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
+    //event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
 })
 
 

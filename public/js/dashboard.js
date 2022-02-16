@@ -11,11 +11,13 @@ deleteButtons.forEach((deleteBtn) => {
         blurBackground.style.display = 'block'
         deleteConfirmation.addEventListener('submit', event => {
             event.preventDefault()
+            event.submitter.disabled = true
             const deleteValidate = document.querySelector('#delete-validate').value
             if (deleteValidate === 'DELETE') {
                 return deleteBtn.submit()
             } else {
                 document.querySelector('#delete-validate').style.border = 'rgb(196, 63, 63) solid 2px'
+                event.submitter.disabled = false
             }
         })
         cancelDelete.addEventListener('click', event => {

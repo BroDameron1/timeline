@@ -18,6 +18,10 @@ const eventSchema = new Schema({
     slug: {
         type: String
     },
+    images: {
+        path: String,
+        filename: String,
+    },
     state: {
         type: String,
         required: true,

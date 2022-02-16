@@ -70,7 +70,7 @@ formProperties.formData.addEventListener('submit', async event => {
         suppressLeavePrompt()
         return formProperties.formData.submit()
     }
-    event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
+    //event.submitter.disabled = false //re-enables the submit functionality in the event that a duplicate result was found.
 })
 
 

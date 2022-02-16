@@ -34,7 +34,6 @@ class RecordHandler {
 
     //method that allows a new record to be published to the review queue
     async createNewRecord() {
-        console.log(this.req.body)
         const { error } = this.validateBody(this.recordProps.review)
         if (error) return this.validationError(error)
         const reviewData = new mongoose.model(this.recordProps.review)(this.req.body) //creates a new review record object with the data from the request body
@@ -73,6 +72,7 @@ class RecordHandler {
             const image = new ImageHandler(this.req.file, publicData, this.recordProps) //instantiates a new imagehandler class. Sends the NEW file data through if uploaded during the approval.
             await image.publishImage() //uses the publishimage method to update the record
         } else {
+        // } else if (reviewData.images) { //checks to see if the review data has any images.
             const image = new ImageHandler(reviewData.images, publicData, this.recordProps) //instantiates a new imagehandler class.  If no new file was upload during the approval process, sends the image data that already exists in the review record
             await image.publishImage() //uses the publish image method to update the record
         }
