@@ -52,7 +52,7 @@ module.exports.userSchema = Joi.object({ //schema validation for user data.  TOD
 }).unknown() //allows for information not defined in the schema to be added to the DB and not validated. TODO: Should we just check all fields.
 
 //regex string for all text input boxes.  Must star with a letter and includes any number of the defined characters after that.
-const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.'? ]*$/i  
+const regex = /^\w+[a-zA-Z0-9!#&()\-:;,.'? ]*$/i
 
 const stringRulesMax = Joi.string().escapeHTML().pattern(regex).min(3).max(80) //defines the validations for a string with a max length.  Checks against regex.
 

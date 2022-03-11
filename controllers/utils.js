@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const duplicateChecker = require('../utils/duplicateChecker')
+const { sourceSchema } = require('../schemas')
 
 
 //this controller contains various endpoints for random pieces of functionality.
@@ -19,9 +20,20 @@ module.exports.duplicateCheck = async (req, res) => {
     }
 }
 
+//TODO: TRYING TO HANDLE JOI WITH AUTOCOMPLETE
 //controller that accepts data needed for autocomplete results and returns the results.
 module.exports.autocomplete = async (req, res) => { 
-    const { field, fieldValue, collection } = req.query //field is the field that needs autocomplete data (key), fieldValue is the current value of that field (value), collection is which collection to check.  
+    const { field, fieldValue, collection } = req.query //field is the field that needs autocomplete data (key), fieldValue is the current value of that field (value), collection is which collection to check.
+    // const regex = new RegExp(/^\w+[a-zA-Z0-9!#&()\-:;,.'? ]*$/i)
+    // if(!regex.test(fieldValue)) return
+    console.log(field, "field", fieldValue, "fieldValue")
+    const testVar = sourceSchema.extract(field)
+    const { error } = testVar.validate(fieldValue)
+    console.log(error, 'test')
+
+
+    const regex = new RegExp(/^\w+[a-zA-Z0-9!#&()\-:;,.'? ]*$/i)
+    if(!regex.test(fieldValue)) return
     try {
         const autofillResponse = await mongoose.model(collection).aggregate(  //makes a call to the appropriate db collection
             [

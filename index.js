@@ -89,6 +89,7 @@ store.on('error', function(err) {
     console.log('Session store error', err)
 })
 
+//something not working here
 const sessionConfig = {
     store: store,
     name: 'HistoriaSession',
