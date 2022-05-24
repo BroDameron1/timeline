@@ -1,0 +1,33 @@
+
+.timeline-container {
+    position: relative;
+}
+
+.event-div {
+    box-sizing: border-box;
+    align-self: center;
+    opacity: 0;
+    /* visibility: hidden; */
+    position: absolute;
+    /* height: 2px;
+    width: 300px; */
+    border: 1px solid black;
+    border-radius: 1px;
+    padding: 10px
+}
+
+.event-div::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 1px solid black;
+    border-top-color: transparent;
+    border-left-color: transparent;
+    transform: translate(-50%, 50%) rotate(45deg);
+    transform-origin: center center;
+    z-index: 0;
+}

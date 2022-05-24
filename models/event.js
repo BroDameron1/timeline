@@ -55,6 +55,9 @@ const eventSchema = new Schema({
             type: String,
             required: true,
             enum: ['BBY', 'BBY/ABY', 'ABY']
+        },
+        day: {
+            type: Number
         }
     }
 },

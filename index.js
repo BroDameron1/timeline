@@ -54,6 +54,7 @@ db.once('open', () => {
 const userRoutes = require('./routes/users');
 const sourceRoutes = require('./routes/sources');
 const eventRoutes = require('./routes/events');
+const timelineRoutes = require('./routes/timeline')
 const utilRoutes = require('./routes/utils');
 
 
@@ -113,7 +114,7 @@ app.use(
         directives: {
             defaultSrc: [],
             connectSrc: ["'self'"],
-            scriptSrc: ["'unsafe-inline'", "'self'"],
+            scriptSrc: ["'unsafe-inline'", "'self'", "https://unpkg.com"],
             styleSrc: ["'self'", "'unsafe-inline'"],
             workerSrc: ["'self'", "blob:"],
             objectSrc: [],
@@ -156,6 +157,8 @@ app.use('/', userRoutes);
 app.use('/sources', sourceRoutes);
 //direct requests to the event routes
 app.use('/events', eventRoutes);
+//direct request to the timeline route for handling all requests related to the timeline page
+app.use('/timeline', timelineRoutes)
 //direct requests to the util routes for various generic data handling requests
 app.use('/utils', utilRoutes);
 
